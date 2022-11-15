@@ -24,10 +24,10 @@
 	"scripts": {
 		"lint": "phpcs --extensions=php -s -p",
 		"format": "phpcbf -p",
-		"test" : "phpunit",
+		"test" : "phpunit --no-coverage",
 		"test:watch": [
 			"Composer\\Config::disableProcessTimeout",
-			"phpunit-watcher watch"
+			"phpunit-watcher watch --no-coverage"
 		],
 		"test:coverage": "php -d xdebug.mode=coverage ./vendor/bin/phpunit"
 	}
