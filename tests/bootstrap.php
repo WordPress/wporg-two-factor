@@ -3,6 +3,7 @@
  * PHPUnit bootstrap file
  *
  * phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- This is a shell script.
+ * phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited -- This is intentional and necessary.
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
@@ -23,6 +24,10 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	// Mimic w.org capes.php.
+	$GLOBALS['supes']        = array();
+	$GLOBALS['super_admins'] = array();
+
 	require dirname( __DIR__, 2 ) . '/two-factor/two-factor.php';
 	require dirname( __DIR__ ) . '/wporg-two-factor.php';
 }
