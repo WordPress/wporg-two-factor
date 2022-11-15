@@ -12,6 +12,12 @@
 namespace WordPressdotorg\Two_Factor;
 defined( 'WPINC' ) || die();
 
+// Disabled until ready for launch.
+if ( 'production' === wp_get_environment_type() ) {
+	return;
+}
+
+
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run after all other plugins.
 
 /**
