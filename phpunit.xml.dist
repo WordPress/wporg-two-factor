@@ -8,6 +8,10 @@
 	cacheResultFile="./tests/.phpunit.result.cache"
 	>
 
+	<php>
+		<const name="WP_TESTS_MULTISITE" value="1" />
+	</php>
+
 	<testsuites>
 		<testsuite name="wporg-two-factor">
 			<directory prefix="test-" suffix=".php">
