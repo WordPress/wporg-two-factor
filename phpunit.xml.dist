@@ -1,0 +1,28 @@
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	cacheResultFile="./tests/.phpunit.result.cache"
+	>
+
+	<testsuites>
+		<testsuite name="wporg-two-factor">
+			<directory prefix="test-" suffix=".php">
+				./tests/
+			</directory>
+		</testsuite>
+	</testsuites>
+
+	<coverage processUncoveredFiles="false">
+		<include>
+			<file>wporg-two-factor.php</file>
+		</include>
+
+		<report>
+			<html outputDirectory="./tests/coverage" />
+		</report>
+	</coverage>
+</phpunit>

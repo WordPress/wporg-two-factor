@@ -1,0 +1,3 @@
+tests/.phpunit.result.cache
+tests/coverage
+vendor
