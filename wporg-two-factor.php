@@ -92,13 +92,11 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
  * Check if the user has enough elevated privileges to require 2FA.
  */
 function user_requires_2fa( WP_User $user ) : bool {
-	global $supes, $trusted_deputies, $wcorg_subroles;
+	global $trusted_deputies, $wcorg_subroles;
 
 	$required = false;
 
-	// Only checking `$supes` because a user should never be in `$super_admins` without first being in `$supes`.
-	// A user still requires 2FA even if `remove_super_admins_until_2fa_enabled()` has removed them from `$GLOBALS['super_admins']`.
-	if ( $supes && in_array( $user->user_login, $supes, true ) ) {
+	if ( is_special_user( $user->ID ) ) {
 		$required = true;
 	} elseif ( $trusted_deputies && in_array( $user->ID, $trusted_deputies, true ) ) {
 		$required = true;

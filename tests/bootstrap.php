@@ -24,12 +24,18 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
+// Mock w.org functions
+function is_special_user( $user_id = false ) {
+	return in_array( $user_id, $GLOBALS['mock_is_special_user'], true );
+}
+
 /**
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	$GLOBALS['mock_is_special_user'] = array();
+
 	// Mimic w.org capes.php.
-	$GLOBALS['supes']        = array();
 	$GLOBALS['super_admins'] = array();
 
 	require dirname( __DIR__, 2 ) . '/two-factor/two-factor.php';

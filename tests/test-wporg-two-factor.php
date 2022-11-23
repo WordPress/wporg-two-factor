@@ -27,7 +27,8 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	public function tear_down() : void {
 		parent::tear_down();
 
-		$GLOBALS['super_admins'] = array();
+		$GLOBALS['super_admins']         = array();
+		$GLOBALS['mock_is_special_user'] = array();
 	}
 
 	/**
@@ -61,9 +62,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\remove_super_admins_until_2fa_enabled
 	 */
 	public function test_super_admin_removed_when_2fa_not_enabled() : void {
-		global $supes, $super_admins;
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 
 		$this->assertTrue( is_super_admin( self::$privileged_user->ID ) );
 		$this->assertTrue( user_requires_2fa( self::$privileged_user ) );
@@ -75,9 +76,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\remove_super_admins_until_2fa_enabled
 	 */
 	public function test_super_admin_maintained_when_2fa_enabled() : void {
-		global $supes, $super_admins;
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 
 		$this->assertTrue( is_super_admin( self::$privileged_user->ID ) );
 		$this->assertTrue( user_requires_2fa( self::$privileged_user ) );
@@ -90,9 +91,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\remove_capabilities_until_2fa_enabled
 	 */
 	public function test_caps_removed_when_2fa_not_enabled() : void {
-		global $supes, $super_admins;
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 
 		$this->assertTrue( is_super_admin( self::$privileged_user->ID ) );
 		$this->assertTrue( user_requires_2fa( self::$privileged_user ) );
@@ -107,9 +108,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\remove_capabilities_until_2fa_enabled
 	 */
 	public function test_caps_maintained_when_2fa_enabled() : void {
-		global $supes, $super_admins;
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 
 		self::enable_2fa_for_user( self::$privileged_user->ID );
 		$this->assertTrue( is_super_admin( self::$privileged_user->ID ) );
@@ -143,9 +144,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 */
 	public function data_user_requires_2fa() : array {
 		return array(
-			'supes' => array(
-				'global_name'  => 'supes',
-				'global_value' => array( self::$privileged_user->user_login ),
+			'is special user' => array(
+				'global_name'  => 'mock_is_special_user',
+				'global_value' => array( self::$privileged_user->ID ),
 			),
 
 			'wordcamp trusted deputies' => array(
@@ -166,9 +167,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\redirect_to_2fa_settings
 	 */
 	public function test_redirected_when_2fa_needed() {
-		global $supes, $super_admins;
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 
 		wp_set_current_user( self::$privileged_user->ID, self::$privileged_user->user_login );
 		$expected = admin_url( 'profile.php' );
@@ -183,7 +184,7 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\redirect_to_2fa_settings
 	 */
 	public function test_not_redirected_when_2fa_not_needed() {
-		global $supes, $super_admins;
+		global $mock_is_special_user, $super_admins;
 
 		$expected = admin_url();
 
@@ -194,8 +195,8 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 
 		// User requires 2fa and has it enabled.
-		$supes[]        = self::$privileged_user->user_login;
-		$super_admins[] = self::$privileged_user->user_login;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
 		$this->enable_2fa_for_user( self::$privileged_user->ID );
 		wp_set_current_user( self::$privileged_user->ID, self::$privileged_user->user_login );
 		$actual = apply_filters( 'login_redirect', $expected, $expected, self::$privileged_user);
