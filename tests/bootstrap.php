@@ -6,6 +6,10 @@
  * phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited -- This is intentional and necessary.
  */
 
+if ( false !== stripos( gethostname(), 'wordpress.org' ) ) {
+	die( 'These tests modify the database and should only be run in local environments, never in w.org sandboxes.' );
+}
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {
