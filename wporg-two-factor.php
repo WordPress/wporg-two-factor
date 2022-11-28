@@ -157,6 +157,10 @@ function render_enable_2fa_notice() : void {
 
 /**
  * Disable the Two Factor 2FA interface on the front-end (ie. bbPress profiles).
+ *
+ * We may add this back when we redesign the UI, but it's more likely that we'll write our own custom interface.
+ *
+ * @codeCoverageIgnore
  */
 function disable_core_ui_on_frontend() : void {
 	if ( ! is_admin() ) {
