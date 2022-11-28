@@ -25,6 +25,7 @@ add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
+add_action( 'plugins_loaded', __NAMESPACE__ . '\disable_core_ui_on_frontend' ); // Must run after two-factor plugin loaded.
 
 /**
  * Determine which providers should be available to users.
@@ -152,4 +153,14 @@ function render_enable_2fa_notice() : void {
 	</div>
 
 	<?php
+}
+
+/**
+ * Disable the Two Factor 2FA interface on the front-end (ie. bbPress profiles).
+ */
+function disable_core_ui_on_frontend() : void {
+	if ( ! is_admin() ) {
+		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
+		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
+	}
 }
