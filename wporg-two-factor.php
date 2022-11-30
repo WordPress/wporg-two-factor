@@ -95,6 +95,12 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 function user_requires_2fa( WP_User $user ) : bool {
 	global $trusted_deputies, $wcorg_subroles;
 
+	// 2FA is opt-in during beta testing.
+	// todo Remove this once we open it to all users.
+	if ( 'production' === wp_get_environment_type() ) {
+		return false;
+	}
+
 	$required = false;
 
 	if ( is_special_user( $user->ID ) ) {
