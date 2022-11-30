@@ -35,8 +35,13 @@ function two_factor_providers( array $providers ) : array {
 	$desired_providers = array(
 		'Two_Factor_WebAuthn'     => '',
 		'Two_Factor_Totp'         => '',
-		'Two_Factor_Backup_Codes' => '',
 	);
+
+	// Check current user has a primary method setup, before allowing backup codes
+	$user_providers = Two_Factor_Core::get_enabled_providers_for_user();
+	if ( ! empty( array_intersect_key( $user_providers, $desired_providers ) ) ) {
+		$desired_providers['Two_Factor_Backup_Codes'] = '';
+	}
 
 	return array_intersect_key( $providers, $desired_providers );
 }
