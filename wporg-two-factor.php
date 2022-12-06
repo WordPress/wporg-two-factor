@@ -170,8 +170,17 @@ function render_enable_2fa_notice() : void {
  * @codeCoverageIgnore
  */
 function disable_core_ui_on_frontend() : void {
+	// rename to match added functionality
+
 	if ( ! is_admin() ) {
 		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
+
+		// remove "account" section from https://wordpress.org/support/users/me/edit/
+
+		// add "account" section to https://wordpress.org/support/users/me/edit/account/
+
+		// add a small card on ^ that has the "security checklist" 2fa card on it.
+		// clicking on that will lead to a new page where the `wporg-two-factor/settings` block is rendered
 	}
 }

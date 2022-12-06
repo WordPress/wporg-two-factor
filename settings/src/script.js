@@ -27,19 +27,31 @@ function renderSettings() {
 }
 
 function Main() {
-	const enabled = false;
+	const enabled = false; // use core user meta data store? or create an upstream API endpoint for this?
 
 	if ( enabled ) {
-		return (
-			"You've enabled two step..." +
-			"button to disable"
-		);
+		return <ShowSettings />
+	} else {
+		return <SetupTOTP />
 	}
+}
 
+function ShowSettings() {
 	return(
-		'You do not have two-factor auth enabled. button to enable'
+		<>
+			<p>
+				"You've enabled TOTP..." +
+				"button to disable"
+			</p>
+
+			<p>
+				"backup codes let you..."
+				type a backup code to verify
+			</p>
+		</>
 	);
 }
+
 
 function SetupTOTP() {
 	return (
