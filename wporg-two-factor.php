@@ -20,6 +20,8 @@ if ( 'production' === wp_get_environment_type() ) {
 	return;
 }
 
+// Load the Two Factor plugin, so that only this plugin needs to be activated, and the above conditional is respected.
+include_once( WP_PLUGIN_DIR . '/two-factor/two-factor.php' );
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
