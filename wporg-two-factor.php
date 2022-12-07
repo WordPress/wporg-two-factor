@@ -26,6 +26,7 @@ add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
 add_action( 'plugins_loaded', __NAMESPACE__ . '\disable_core_ui_on_frontend' ); // Must run after two-factor plugin loaded.
+add_action( 'authenticate', __NAMESPACE__ . '\disable_cookies_being_sent_on_interstitial', 1000 ); // Must be run after all other authenticate filters.
 
 /**
  * Determine which providers should be available to users.
@@ -173,4 +174,18 @@ function disable_core_ui_on_frontend() : void {
 		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 	}
+}
+
+/**
+ * Disable sending authentication cookies during the 2FA interstitial.
+ *
+ * This is intended on being temporary until the 'send_auth_cookies' filter is respected upstream in the Two Factor plugin.
+ * @see https://github.com/WordPress/two-factor/pull/502
+ */
+function disable_cookies_being_sent_on_interstitial( $user ) {
+	if ( $user instanceof WP_User && Two_Factor_Core::is_user_using_two_factor( $user->ID ) && did_action( 'login_init' ) ) {
+		add_filter( 'send_auth_cookies', '__return_false', 100 );
+	}
+
+	return $user;
 }
