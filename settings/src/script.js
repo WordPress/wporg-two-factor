@@ -29,14 +29,38 @@ function renderSettings() {
 function Main() {
 	const enabled = false; // use core user meta data store? or create an upstream API endpoint for this?
 
-	if ( enabled ) {
-		return <ShowSettings />
-	} else {
-		return <SetupTOTP />
-	}
+	return (
+		<>
+			<Password />
+			<EmailAddress />
+			<Language />
+
+			{ enabled && <TwoFactorStatus /> }
+			{ ! enabled && <SetupTOTP /> }
+		</>
+	);
+
 }
 
-function ShowSettings() {
+function Password() {
+	return (
+		<p>password</p>
+	);
+}
+
+function EmailAddress() {
+	return (
+		<p>email address</p>
+	);
+}
+
+function Language() {
+	return (
+		<p>language</p>
+	);
+}
+
+function TwoFactorStatus() {
 	return(
 		<>
 			<p>

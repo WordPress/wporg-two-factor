@@ -176,11 +176,12 @@ function disable_core_ui_on_frontend() : void {
 		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 
-		// remove "account" section from https://wordpress.org/support/users/me/edit/
+		// remove "account" section from https://wordpress.org/support/users/me/edit/ -- done in wporg-support theme
 
 		// add "account" section to https://wordpress.org/support/users/me/edit/account/
-
-		// add a small card on ^ that has the "security checklist" 2fa card on it.
-		// clicking on that will lead to a new page where the `wporg-two-factor/settings` block is rendered
+		// todo move to regular func
+		add_action( 'bbp_user_edit_account', function() {
+			echo do_blocks( '<!-- wp:wporg-two-factor/settings /-->' );
+		} );
 	}
 }
