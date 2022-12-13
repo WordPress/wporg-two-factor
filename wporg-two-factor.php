@@ -11,7 +11,7 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
-use WP_User;
+use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
 
@@ -122,6 +122,8 @@ function user_requires_2fa( WP_User $user ) : bool {
  *
  * This isn't usually necessary, since WordPress will prevent Subscribers from visiting other Core screens, but
  * sometimes plugins add screens that are available to Subscribers (either intentionally or not).
+ *
+ * @param WP_User|WP_Error $user
  */
 function redirect_to_2fa_settings( string $redirect_to, string $requested_redirect_to, $user ) : string {
 	if ( is_wp_error( $user ) ) {
@@ -132,11 +134,9 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
 		return $redirect_to;
 	}
 
-	$primary_blog_id = (int) get_user_meta( $user->ID, 'primary_blog', true );
-	$primary_site    = get_site( $primary_blog_id );
-
-	// todo Change this to match the front-end URL once that's implemented.
-	return 'https://' . $primary_site->domain . trailingslashit( $primary_site->path ) . 'wp-admin/profile.php';
+	return get_edit_account_url();
+	// todo need to tell user why they were redirected, so need to have something like render_enable_2fa_notice on the front end ui?
+	// still need to keep the wpadmin one too, though
 }
 
 /**
@@ -145,8 +145,6 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
  * @codeCoverageIgnore
  */
 function render_enable_2fa_notice() : void {
-	// @todo change this to use front-end URL/styles when 2FA settings are moved there.
-
 	?>
 
 	<div class="notice notice-error">
@@ -156,10 +154,19 @@ function render_enable_2fa_notice() : void {
 					'Your account requires two-factor authentication, which adds an extra layer of protection against hackers. You cannot make any changes to the site until you <a href="%s">enable it</a>.',
 					'wporg'
 				),
-				esc_url( admin_url( 'profile.php' ) ) . '#two-factor-options'
+				get_edit_account_url()
 			) ); ?>
 		</p>
 	</div>
 
 	<?php
+}
+
+/**
+ * Get the URL of the Edit Account screen.
+ */
+function get_edit_account_url() : string {
+	$user = wp_get_current_user();
+
+	return bbp_get_user_profile_edit_url( $user->ID, $user->user_nicename ) . 'account/';
 }
