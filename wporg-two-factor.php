@@ -29,7 +29,6 @@ add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
-add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 
 /**
  * Determine which providers should be available to users.
@@ -163,27 +162,4 @@ function render_enable_2fa_notice() : void {
 	</div>
 
 	<?php
-}
-
-/**
- * Replace the Two Factor UI with our custom version.
- *
- * @codeCoverageIgnore
- */
-function replace_core_ui_with_custom() : void {
-	if ( ! is_admin() ) {
-		// @todo Remove the `if()` once the custom UI is fully functional, since the back-end upstream UI will no
-		// longer be needed, and may cause conflicts.
-		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
-		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
-	}
-
-	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
-}
-
-/**
- * Render our custom 2FA interface.
- */
-function render_custom_ui() : void {
-	echo do_blocks( '<!-- wp:wporg-two-factor/settings /-->' );
 }
