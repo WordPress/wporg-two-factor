@@ -31,7 +31,6 @@ function Main() {
 		'account-status': AccountStatus,
 		'email' : EmailAddress,
 		'password': Password,
-		'language': Language,
 		'two-factor-status': TwoFactorStatus,
 		'setup-totp': SetupTOTP,
 		'backup-codes': GenerateBackupCodes,
@@ -131,18 +130,6 @@ function Password() {
 		<p>
 			Password:
 			Generate Password button
-		</p>
-	);
-}
-
-/**
- * Render the Language setting.
- */
-function Language() {
-	return (
-		<p>
-			Language:
-			dropdown field
 		</p>
 	);
 }
