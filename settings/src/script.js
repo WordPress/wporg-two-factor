@@ -10,14 +10,8 @@ window.addEventListener( 'DOMContentLoaded', renderSettings );
  * Render the initial view into the DOM.
  */
 function renderSettings() {
-	const props = {};
-
-	// todo might need to render different functions based on the current step
-	// use history.pushstate to preserve deep urls
 	render(
-		<div { ...props }>
-			<Main />
-		</div>,
+		<Main />,
 		document.querySelector( '.wp-block-wporg-two-factor-settings' )
 	);
 }
@@ -28,12 +22,12 @@ function renderSettings() {
 function Main() {
 	// The index is the URL slug and the value is the React component.
 	const components = {
-		'account-status': AccountStatus,
-		'email' : EmailAddress,
-		'password': Password,
+		'account-status':    AccountStatus,
+		'email':             EmailAddress,
+		'password':          Password,
 		'two-factor-status': TwoFactorStatus,
-		'setup-totp': SetupTOTP,
-		'backup-codes': GenerateBackupCodes,
+		'setup-totp':        SetupTOTP,
+		'backup-codes':      GenerateBackupCodes,
 	};
 
 	let currentUrl    = new URL( document.location.href )
@@ -63,12 +57,16 @@ function Main() {
 	return (
 		<>
 			{ 'account-status' !== screen &&
-				<a href="?screen=account-status" onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }>
-					← Back
-				</a>
+				<div className="wporg-2fa__navigation">
+					<a href="?screen=account-status" onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }>
+						← Back
+					</a>
+				</div>
 			}
 
-			<CurrentScreen clickScreenLink={ clickScreenLink } />
+			<div className={ 'wporg-2fa__' + screen }>
+				<CurrentScreen clickScreenLink={ clickScreenLink } />
+			</div>
 		</>
 	);
 }
