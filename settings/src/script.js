@@ -50,42 +50,59 @@ function Main() {
 	currentUrl.searchParams.set( 'screen', screen );
 	history.pushState( {}, '', currentUrl );
 
+	/**
+	 * Update the screen without refreshing the page.
+	 *
+	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
+	 * behaviors that are broken otherwise.
+	 */
+	function clickScreenLink( event, screen ) {
+		event.preventDefault();
+		setScreen( screen );
+	}
+
 	return (
-		<CurrentScreen />
+		<>
+			{ 'account-status' !== screen &&
+				<a href="?screen=account-status" onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }>
+					← Back
+				</a>
+			}
+
+			<CurrentScreen clickScreenLink={ clickScreenLink } />
+		</>
 	);
 }
 
 /**
  * Render the Account Status.
  */
-function AccountStatus() {
-	// todo need to update state when clicked, but bad practice to pass a setState() handler into a child?
-
+function AccountStatus( { clickScreenLink } ) {
 	return (
 		<>
 			<p>
-				<a href="?screen=password" onClick={ () => setCurrentScreen( 'password' ) }>
+				<a href="?screen=password" onClick={ ( event ) => clickScreenLink( event, 'password' ) }>
 					Password
 					You have a password configured, but can change it at any time.
 				</a>
 			</p>
 
 			<p>
-				<a href="?screen=email" onClick={ () => setCurrentScreen( 'email' ) }>
+				<a href="?screen=email" onClick={ ( event ) => clickScreenLink( event, 'email' ) }>
 					Account Email
 					Your account email address is foo@bar.com.
 				</a>
 			</p>
 
 			<p>
-				<a href="?screen=two-factor-status" onClick={ () => setCurrentScreen( 'two-factor-status' ) }>
+				<a href="?screen=two-factor-status" onClick={ ( event ) => clickScreenLink( event, 'two-factor-status' ) }>
 					Two Factor Authentication
 					You have two-factor authentication enabled using an app.
 				</a>
 			</p>
 
 			<p>
-				<a href="?screen=backup-codes" onClick={ () => setCurrentScreen( 'backup-codes' ) }>
+				<a href="?screen=backup-codes" onClick={ ( event ) => clickScreenLink( event, 'backup-codes' ) }>
 					Two-Factor Backup Codes
 					You have verified your backup codes for two-factor authentication.
 				</a>
