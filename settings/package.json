@@ -12,6 +12,7 @@
 		"start": "wp-scripts start --webpack-copy-php"
 	},
 	"devDependencies": {
+		"@wordpress/icons": "^9.14.0",
 		"@wordpress/scripts": "^24.6.0"
 	}
 }
