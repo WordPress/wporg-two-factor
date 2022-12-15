@@ -1,32 +1,4 @@
 .wp-block-wporg-two-factor-settings {
-	.wporg-2fa__status-card {
-		margin-bottom: 40px;
-
-		a {
-			text-decoration: none;
-		}
-
-		.components-card__header {
-			justify-content: flex-start;
-		}
-
-		.components-card__body {
-			display: flex;
-			justify-content: space-between;
-		}
-	}
-
-	.wporg-2fa__status-icon {
-		&.is-enabled {
-			fill: green;
-		}
-
-		&.is-pending {
-			fill: orange;
-		}
-
-		&.is-disabled {
-			fill: red;
-		}
-	}
 }
+
+@import "components/account-status";
