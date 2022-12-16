@@ -169,5 +169,12 @@ function render_enable_2fa_notice() : void {
 function get_edit_account_url() : string {
 	$user = wp_get_current_user();
 
-	return bbp_get_user_profile_edit_url( $user->ID, $user->user_nicename ) . 'account/';
+	if ( function_exists( 'bbp_get_user_profile_edit_url' ) ) {
+		$url = bbp_get_user_profile_edit_url( $user->ID, $user->user_nicename ) . 'account/';
+	} else {
+		// Fallback for sites that don't have bbPress active.
+		$url = "https://wordpress.org/support/users/{$user->user_nicename}/edit/account/";
+	}
+
+	return $url;
 }
