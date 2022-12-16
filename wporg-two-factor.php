@@ -81,10 +81,12 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 
 	if ( ! Two_Factor_Core::is_user_using_two_factor( $user->ID ) ) {
 		// This also relies on `remove_super_admins_until_2fa_enabled()`, see notes in that function.
-		$allcaps = array(
-			'subscriber' => true,
-			'read'       => true,
-		);
+		$allcaps = get_role( 'subscriber' )->capabilities;
+
+		if ( function_exists( 'bbp_is_user_inactive' ) && ! bbp_is_user_inactive( $user->ID ) ) {
+			$allcaps = array_merge( $allcaps, bbp_get_caps_for_role( bbp_get_participant_role() ) );
+			$allcaps['read_private_forums'] = false;
+		}
 
 		add_action( 'admin_notices', __NAMESPACE__ . '\render_enable_2fa_notice' );
 	}
