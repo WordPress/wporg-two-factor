@@ -100,7 +100,8 @@ function user_requires_2fa( WP_User $user ) : bool {
 
 	// 2FA is opt-in during beta testing.
 	// todo Remove this once we open it to all users.
-	if ( 'production' === wp_get_environment_type() ) {
+	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth' );
+	if ( ! in_array( $user->user_login, $beta_testers, true ) ) {
 		return false;
 	}
 
