@@ -21,7 +21,7 @@ if ( 'production' === wp_get_environment_type() ) {
 }
 
 // Load the Two Factor plugin, so that only this plugin needs to be activated, and the above conditional is respected.
-include_once( WP_PLUGIN_DIR . '/two-factor/two-factor.php' );
+include_once( dirname( __DIR__ ) . '/two-factor/two-factor.php' );
 
 require_once __DIR__ . '/settings/settings.php';
 
