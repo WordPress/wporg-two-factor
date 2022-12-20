@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { render, useState } from '@wordpress/element';
+import { reactDOM, StrictMode, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 
 /**
@@ -16,9 +16,12 @@ window.addEventListener( 'DOMContentLoaded', renderSettings );
  * Render the initial view into the DOM.
  */
 function renderSettings() {
-	render(
-		<Main />,
-		document.querySelector( '.wp-block-wporg-two-factor-settings' )
+	const root = ReactDOM.createRoot( document.querySelector( '.wp-block-wporg-two-factor-settings' ) );
+
+	root.render(
+	  <StrictMode>
+		<Main />
+	  </StrictMode>
 	);
 }
 
