@@ -88,7 +88,8 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 			$allcaps['read_private_forums'] = false;
 		}
 
-		add_action( 'admin_notices', __NAMESPACE__ . '\render_enable_2fa_notice' );
+		add_action( 'admin_notices', __NAMESPACE__ . '\render_2fa_admin_notice' );
+		add_filter( 'wporg_global_header_alert_markup', __NAMESPACE__ . '\get_enable_2fa_notice' );
 	}
 
 	return $allcaps;
@@ -138,8 +139,6 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
 	}
 
 	return get_edit_account_url();
-	// todo need to tell user why they were redirected, so need to have something like render_enable_2fa_notice on the front end ui?
-	// still need to keep the wpadmin one too, though
 }
 
 /**
@@ -147,22 +146,33 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
  *
  * @codeCoverageIgnore
  */
-function render_enable_2fa_notice() : void {
+function render_2fa_admin_notice() : void {
 	?>
 
 	<div class="notice notice-error">
 		<p>
-			<?php echo wp_kses_data( sprintf(
-				__(
-					'Your account requires two-factor authentication, which adds an extra layer of protection against hackers. You cannot make any changes to the site until you <a href="%s">enable it</a>.',
-					'wporg'
-				),
-				get_edit_account_url()
-			) ); ?>
+			<?php echo wp_kses_post( get_enable_2fa_notice() ); ?>
 		</p>
 	</div>
 
 	<?php
+}
+
+/**
+ * Get the notice for enabling 2FA.
+ *
+ * When used as a filter callback, this will prepend the 2FA notice to others notices.
+ */
+function get_enable_2fa_notice( string $existing_notices = '' ) : string {
+	$two_factor_notice = sprintf(
+		__(
+			'Your account requires two-factor authentication, which adds an extra layer of protection against hackers. You cannot make any changes to this site until you <a href="%s">enable it</a>.',
+			'wporg'
+		),
+		get_edit_account_url()
+	);
+
+	return $two_factor_notice . $existing_notices;
 }
 
 /**
