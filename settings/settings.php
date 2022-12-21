@@ -35,5 +35,9 @@ function replace_core_ui_with_custom() : void {
  */
 function render_custom_ui() : void {
 	wp_enqueue_style( 'wp-components' );
-	echo do_blocks( '<!-- wp:wporg-two-factor/settings /-->' );
+
+	$user_id    = (int) bbp_get_displayed_user_id();
+	$json_attrs = json_encode( (object) [ 'userId' => $user_id ] );
+
+	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }

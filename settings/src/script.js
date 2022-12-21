@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { reactDOM, StrictMode, useState } from '@wordpress/element';
+import { reactDOM, StrictMode, useState, useEffect } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { getEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,7 +28,7 @@ function renderSettings() {
 
 	root.render(
 	  <StrictMode>
-		<Main />
+		<Main userId={ wrapper.dataset.userid || 0 } />
 	  </StrictMode>
 	);
 }
@@ -34,7 +36,11 @@ function renderSettings() {
 /**
  * Render the correct component based on the URL.
  */
-function Main() {
+function Main( { userId } ) {
+	const userData = useSelect( ( select ) => {
+		return select('core').getEntityRecord( 'root', 'user', userId, { context: 'edit' } );
+	} );
+
 	// The index is the URL slug and the value is the React component.
 	const components = {
 		'account-status':    AccountStatus,
@@ -45,7 +51,7 @@ function Main() {
 		'backup-codes':      GenerateBackupCodes,
 	};
 
-	let currentUrl    = new URL( document.location.href )
+	let currentUrl    = new URL( document.location.href );
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
 	if ( ! components[ initialScreen ] ) {
