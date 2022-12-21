@@ -5,8 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { reactDOM, StrictMode, useState, useEffect } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-import { getEntityRecord } from '@wordpress/core-data';
-
+import { getUser } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,11 +25,12 @@ function renderSettings() {
 		return;
 	}
 
+
 	const root = ReactDOM.createRoot( wrapper );
 
 	root.render(
 	  <StrictMode>
-		<Main userId={ wrapper.dataset.userid || 0 } />
+		<Main userId={ wrapper.dataset.userid } />
 	  </StrictMode>
 	);
 }
@@ -40,7 +40,7 @@ function renderSettings() {
  */
 function Main( { userId } ) {
 	const userData = useSelect( ( select ) => {
-		return select('core').getEntityRecord( 'root', 'user', userId, { context: 'edit' } );
+		return select( 'core' ).getUser( userId, { context: 'edit' } );
 	} );
 
 	// The index is the URL slug and the value is the React component.
