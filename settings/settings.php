@@ -34,5 +34,6 @@ function replace_core_ui_with_custom() : void {
  * Render our custom 2FA interface.
  */
 function render_custom_ui() : void {
+	wp_enqueue_style( 'wp-components' );
 	echo do_blocks( '<!-- wp:wporg-two-factor/settings /-->' );
 }

@@ -9,6 +9,7 @@ import { Icon, arrowLeft } from '@wordpress/icons';
  * Internal dependencies
  */
 import AccountStatus from './components/account-status';
+import Password from './components/password';
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -89,18 +90,6 @@ function EmailAddress() {
 		<p>
 			Email:
 			input field
-		</p>
-	);
-}
-
-/**
- * Render the Password setting.
- */
-function Password() {
-	return (
-		<p>
-			Password:
-			Generate Password button
 		</p>
 	);
 }
