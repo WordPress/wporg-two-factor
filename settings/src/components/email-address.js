@@ -3,11 +3,18 @@
  * WordPress dependencies
  */
 import { Button, TextControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Render the Email setting.
  */
 export default function EmailAddress( { userData } ) {
+	const [ email, setEmail ] = useState( null );
+
+	// TODO: This is only needed until the parent component waits for the userData to load before rendering.
+	if ( null === email && userData && userData.email ) {
+		setEmail( userData.email );
+	}
 
 	return (
 		<>
@@ -20,13 +27,13 @@ export default function EmailAddress( { userData } ) {
 				help="We will send you a verification email after updating your email address."
 				label="Your email address"
 				size="62"
-				placeholder="my@email.address"
-				value={ userData?.email }
-				onChange={ ( value ) => { console.log( value ); } }
+				placeholder="my-email-address@example.org"
+				value={ email || '' }
+				onChange={ ( value ) => setEmail( value ) }
 			/>
 
 			<p>
-				<Button variant="primary" onClick={ updateEmail } disabled="disabled">
+				<Button variant="primary" onClick={ updateEmail } disabled={ email == userData?.email }>
 					Update Email Address
 				</Button>
 			</p>
