@@ -7,11 +7,13 @@ import { Icon, arrowLeft } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { getEntityRecord } from '@wordpress/core-data';
 
+
 /**
  * Internal dependencies
  */
 import AccountStatus from './components/account-status';
 import Password from './components/password';
+import EmailAddress from './components/email-address';
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -87,21 +89,9 @@ function Main( { userId } ) {
 			}
 
 			<div className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen clickScreenLink={ clickScreenLink } />
+				<CurrentScreen clickScreenLink={ clickScreenLink } userData={ userData } />
 			</div>
 		</>
-	);
-}
-
-/**
- * Render the Email setting.
- */
-function EmailAddress() {
-	return (
-		<p>
-			Email:
-			input field
-		</p>
 	);
 }
 

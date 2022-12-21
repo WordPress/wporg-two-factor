@@ -7,7 +7,7 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
 /**
  * Render the Account Status.
  */
-export default function AccountStatus( { clickScreenLink } ) {
+export default function AccountStatus( { clickScreenLink, userData } ) {
 	const emailStatus = 'pending';
 	const totpStatus  = 'disabled';
 	// todo make dynamic
@@ -26,7 +26,7 @@ export default function AccountStatus( { clickScreenLink } ) {
 				screen="email"
 				status={ emailStatus }
 				headerText="Account Email"
-				bodyText="Your account email address is foo@bar.com."
+				bodyText={ "Your account email address is " + userData?.email + "." }
 				clickScreenLink={ clickScreenLink }
 			/>
 
