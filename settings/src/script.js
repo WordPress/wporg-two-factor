@@ -17,7 +17,12 @@ window.addEventListener( 'DOMContentLoaded', renderSettings );
  * Render the initial view into the DOM.
  */
 function renderSettings() {
-	const root = ReactDOM.createRoot( document.querySelector( '.wp-block-wporg-two-factor-settings' ) );
+	const wrapper = document.querySelector( '.wp-block-wporg-two-factor-settings' );
+	if ( ! wrapper ) {
+		return;
+	}
+
+	const root = ReactDOM.createRoot( wrapper );
 
 	root.render(
 	  <StrictMode>
