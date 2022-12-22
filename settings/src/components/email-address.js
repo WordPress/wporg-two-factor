@@ -71,16 +71,19 @@ export default function EmailAddress( { userData } ) {
 	 * Dismiss the email change.
 	 */
 	function dismissEmailChange() {
+		// TODO: See above about this not actually working.
+		wp.data.dispatch( 'core' ).saveUser( { id: userData.id, pending_email: false } );
+		userData.pending_email = false;
+
 		console.log( "Dismiss" );
-		alert( "Dismiss email change, got it.. don't know how to yet.. simulating.." );
-		delete userData.meta._new_email;
+		alert( "Dismiss email change, Done" );
 	}
 
 	return (
 		<>
-			{ userData?.meta?._new_email && <Notice status="info" onDismiss={ dismissEmailChange }>
+			{ userData?.pending_email && <Notice status="info" onDismiss={ dismissEmailChange }>
 				<p>
-					There is a pending email change to { userData?.meta?._new_email }
+					There is a pending email change to { userData.pending_email }.
 				</p>
 			</Notice> }
 

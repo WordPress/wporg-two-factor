@@ -6,7 +6,7 @@ defined( 'WPINC' ) || die();
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
-add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_meta' );
+add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_fields' );
 
 /**
  * Registers the block
@@ -107,25 +107,26 @@ function preload_api_requests( array $preload_paths ) : void {
 /**
  * Register any user meta that needs to be exposed.
  */
-function register_user_meta(): void {
-	// Expose the `_user_user` user meta through the rest api.
+function register_user_fields(): void {
+	// Expose the `_new_email` user meta through the rest api as a custom user field.
 	// This is for "The user has a pending email change"
-	if ( ! registered_meta_key_exists( 'user', '_new_email' ) ) {
-		register_meta(
-			'user',
-			'_new_email',
-			[
-				'single'       => true,
-				'show_in_rest' => [
-					'schema' => [
-						'type'    => 'string',
-						'context' => [ 'edit' ],
-					],
-					'prepare_callback' => function( $value ) {
-						return $value['newemail'] ?? false;
-					}
-				]
+	register_rest_field(
+		'user',
+		'pending_email',
+		[
+			'get_callback' => function( $user ) {
+				return get_user_meta( $user['id'], '_new_email', true )['newemail'] ?? false;
+			},
+			'update_callback' => function( $value, $user ) {
+				if ( false === $value ) {
+					delete_user_meta( $user->ID, '_new_email' );
+					return true;
+				}
+			},
+			'schema' => [
+				'context' => [ 'edit' ],
 			]
-		);
-	}
+		]
+	);
+
 }

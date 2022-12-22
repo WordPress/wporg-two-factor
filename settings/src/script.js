@@ -25,7 +25,6 @@ function renderSettings() {
 		return;
 	}
 
-
 	const root = ReactDOM.createRoot( wrapper );
 
 	root.render(

@@ -8,7 +8,7 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
  * Render the Account Status.
  */
 export default function AccountStatus( { clickScreenLink, userData } ) {
-	const emailStatus = userData?.meta?._new_email ? 'pending' : 'ok';
+	const emailStatus = userData?.pending_email ? 'pending' : 'ok';
 	const totpStatus  = 'disabled';
 	// todo make dynamic
 
@@ -27,8 +27,8 @@ export default function AccountStatus( { clickScreenLink, userData } ) {
 				status={ emailStatus }
 				headerText="Account Email"
 				bodyText={
-					userData?.meta?._new_email ?
-					"Your account email is pending a change to " + userData?.meta?._new_email + "." :
+					userData?.pending_email ?
+					"Your account email is pending a change to " + userData?.pending_email + "." :
 					"Your account email address is " + userData?.email + "."
 				}
 				clickScreenLink={ clickScreenLink }
