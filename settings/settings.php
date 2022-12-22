@@ -6,6 +6,7 @@ defined( 'WPINC' ) || die();
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
+add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_meta' );
 
 /**
  * Registers the block
@@ -37,7 +38,7 @@ function render_custom_ui() : void {
 	wp_enqueue_style( 'wp-components' );
 
 	$user_id    = (int) bbp_get_displayed_user_id();
-	$json_attrs = json_encode( (object) [ 'userId' => $user_id ] );
+	$json_attrs = json_encode( [ 'userId' => $user_id ] );
 
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
@@ -74,7 +75,7 @@ function preload_api_requests( array $preload_paths ) : void {
 	$preload_data = array_reduce(
 		$preload_paths,
 		'rest_preload_api_request',
-		array()
+		[]
 	);
 
 	// Restore the global $post, $wp_scripts, and $wp_styles as they were before API preloading.
@@ -99,6 +100,32 @@ function preload_api_requests( array $preload_paths ) : void {
 			'wp-api-fetch',
 			$preload_js,
 			'after'
+		);
+	}
+}
+
+/**
+ * Register any user meta that needs to be exposed.
+ */
+function register_user_meta(): void {
+	// Expose the `_user_user` user meta through the rest api.
+	// This is for "The user has a pending email change"
+	if ( ! registered_meta_key_exists( 'user', '_new_email' ) ) {
+		register_meta(
+			'user',
+			'_new_email',
+			[
+				'single'       => true,
+				'show_in_rest' => [
+					'schema' => [
+						'type'    => 'string',
+						'context' => [ 'edit' ],
+					],
+					'prepare_callback' => function( $value ) {
+						return $value['newemail'] ?? false;
+					}
+				]
+			]
 		);
 	}
 }

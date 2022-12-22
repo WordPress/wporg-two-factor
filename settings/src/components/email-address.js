@@ -2,7 +2,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, TextControl } from '@wordpress/components';
+import { Button, TextControl, Notice } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { saveUser, saveEntityRecord } from '@wordpress/core-data';
@@ -23,12 +23,18 @@ export default function EmailAddress( { userData } ) {
 	 */
 	function updateEmail( event ) {
 		// TODO: This doesn't cause the button to go back to a disabled state afterwards.
+		// TODO: This doesn't trigger the "pending email change" notifications..
 
 		// send rest api request
 		// on success, update state to show that it's been saved
 
 		wp.data.dispatch('core').saveEntityRecord( 'root', 'user', { id: userData.id, email: email }, { throwOnError: true /* required for reject */ } ).then(
 			( response ) => {
+				if ( response.email !== email ) {
+					userData.meta._new_email = email;
+					alert( "Pending change" );
+				}
+
 				console.log( "Success ", response );
 				userData = response;
 				alert( "Email has been updated" );
@@ -61,8 +67,23 @@ export default function EmailAddress( { userData } ) {
 */
 	}
 
+	/**
+	 * Dismiss the email change.
+	 */
+	function dismissEmailChange() {
+		console.log( "Dismiss" );
+		alert( "Dismiss email change, got it.. don't know how to yet.. simulating.." );
+		delete userData.meta._new_email;
+	}
+
 	return (
 		<>
+			{ userData?.meta?._new_email && <Notice status="info" onDismiss={ dismissEmailChange }>
+				<p>
+					There is a pending email change to { userData?.meta?._new_email }
+				</p>
+			</Notice> }
+
 			<p>
 				To change your email address enter a new one below.
 			</p>
