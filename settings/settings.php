@@ -7,6 +7,7 @@ defined( 'WPINC' ) || die();
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_fields' );
+add_filter( 'rest_pre_insert_user', __NAMESPACE__ . '\require_email_confirmation', 10, 2 );
 
 /**
  * Registers the block
@@ -124,9 +125,40 @@ function register_user_fields(): void {
 				}
 			},
 			'schema' => [
+				'type'    => 'string',
 				'context' => [ 'edit' ],
 			]
 		]
 	);
 
+}
+
+/**
+ * Implement the "Require email confirmation" functionality for the rest api.
+ *
+ * TODO: This is a core bug. This should be handled by core.
+ *
+ * @param array $insert_data The user data being updated.
+ * @return array
+ */
+function require_email_confirmation( $insert_data, $request ) {
+	global $errors;
+
+	if ( isset( $insert_data->user_email ) ) {
+		$post_backup = $_POST;
+
+		// The POST fields needed by send_confirmation_on_profile_email().
+		$_POST['user_id'] = $insert_data->ID;
+		$_POST['email']   = $insert_data->user_email;
+
+		send_confirmation_on_profile_email();
+
+		if ( $_POST['email'] !== $insert_data->user_email || $errors->has_errors() ) {
+			$insert_data->user_email = $_POST['email'];
+		}
+
+		$_POST = $post_backup;
+	}
+
+	return $insert_data;
 }
