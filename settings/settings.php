@@ -47,11 +47,11 @@ function render_custom_ui() : void {
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }
 
-// reimplement block_editor_rest_api_preload() because of course there isn't a generic approach.
 /**
  * Register/Output some REST-API calls to be pre-loaded.
  *
  * This prevents the browser having to make the HTTP call before the react UI can be ready.
+ * This duplicates block_editor_rest_api_preload() as there is no generic function for performing this preloading.
  * WARNING: This will output Javascript immediately if called during the page load if the wp-api-fetch script has already been output.
  *
  * @param array $preload_paths The REST API paths to be pre-loaded, must include prefixed slash.
