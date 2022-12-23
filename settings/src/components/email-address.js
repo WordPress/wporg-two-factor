@@ -73,7 +73,7 @@ export default function EmailAddress( { userId } ) {
 				label="Your email address"
 				size="62"
 				placeholder="my-email-address@example.org"
-				value={ editedRecord.email || record.email }
+				value={ editedRecord.email ?? record.email }
 				onChange={ handleEmailChange }
 			/>
 
