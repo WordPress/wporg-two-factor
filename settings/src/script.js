@@ -6,7 +6,7 @@ import { reactDOM, StrictMode, useState, useEffect } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
+import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,21 +39,7 @@ function renderSettings() {
  * Render the correct component based on the URL.
  */
 function Main( { userId } ) {
-	const { userData, userDataAvailable } = useSelect(
-		( select ) => {
-			const selectorArgs = [ userId, { context: 'edit' } ];
-			return {
-				userDataAvailable: select( coreDataStore ).hasFinishedResolution(
-					'getUser',
-					selectorArgs
-				),
-				userData: select( coreDataStore ).getUser(
-					...selectorArgs
-				)
-			};
-		},
-		[]
-	);
+	const { record: userData, edit: editUserData, hasEdits: userDataNeedsReset } = useEntityRecord( 'root', 'user', userId );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -86,10 +72,16 @@ function Main( { userId } ) {
 	 */
 	function clickScreenLink( event, screen ) {
 		event.preventDefault();
+
+		// Reset to initial after navigating away from a page.
+		if ( userDataNeedsReset ) {
+			editUserData( userData );
+		}
+
 		setScreen( screen );
 	}
 
-	if ( ! userDataAvailable ) {
+	if ( ! userData ) {
 		return <Spinner />
 	}
 
