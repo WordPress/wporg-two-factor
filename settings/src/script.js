@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { reactDOM, StrictMode, useState, useEffect } from '@wordpress/element';
+import { reactDOM, StrictMode, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
