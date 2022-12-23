@@ -9,6 +9,8 @@ add_action( 'init', __NAMESPACE__ . '\register_block' );
 
 /**
  * Registers the block
+ *
+ * @codeCoverageIgnore
  */
 function register_block() {
 	register_block_type( __DIR__ . '/build' );
@@ -32,8 +34,14 @@ function replace_core_ui_with_custom() : void {
 
 /**
  * Render our custom 2FA interface.
+ *
+ * @codeCoverageIgnore
  */
 function render_custom_ui() : void {
+	if ( ! current_user_can( 'edit_user', bbp_get_displayed_user_id() ) ) {
+		return;
+	}
+
 	wp_enqueue_style( 'wp-components' );
 	echo do_blocks( '<!-- wp:wporg-two-factor/settings /-->' );
 }
