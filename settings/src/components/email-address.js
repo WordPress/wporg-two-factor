@@ -16,25 +16,31 @@ export default function EmailAddress( { userId } ) {
 	// useEntityRecord() doesn't expose isSaving. Huh.
 	const isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
 
+	const [ emailError, setEmailError ] = useState( '' );
+	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
+
 	const handleEmailChange = ( email ) => edit( { email } );
 
 	const handleSave = async () => {
 		try {
-			const result = await save();
+			await save();
+
+			setJustChangedEmail( true );
 		} catch( error ) {
-			alert( error.message );
-			return;
+			// TODO: Change these texts
+			// error.code: rest_user_invalid_email (can't use that one), rest_invalid_param (invalid email format)
+			// TODO: The red paragraph inserted inline feels a bit hacky.
+			setEmailError( error.message );
 		}
-
-		console.log( result );
-
-		alert( "Saved!" );
 	};
 
 	const handleDiscard = async () => {
-		await edit( { pending_email: '' } );
-		await save();
-		alert( "Discarded." );
+		try {
+			await edit( { pending_email: '' } );
+			await save();
+		} catch( error ) {
+			alert( error.message );
+		}
 	};
 
 	if ( ! record ) {
@@ -43,10 +49,17 @@ export default function EmailAddress( { userId } ) {
 
 	return (
 		<>
-			{ record.pending_email && <Notice status="warning" onDismiss={ handleDiscard }>
+			{ record.pending_email && ! justChangedEmail && <Notice status="warning" className="actions-on-right" isDismissible={ false } actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }>
 				<p>
 					There is a pending email change to { record.pending_email }.<br />
 					Please check your email for a confirmation link.
+				</p>
+			</Notice> }
+
+			{ record.pending_email && justChangedEmail && <Notice status="success" className="actions-on-right" isDismissible={ false } actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }>
+				<p>
+					Please check your email for a confirmation email.<br />
+					If { record.pending_email } is incorrect, simply enter a new email below.
 				</p>
 			</Notice> }
 
@@ -63,6 +76,8 @@ export default function EmailAddress( { userId } ) {
 				value={ editedRecord.email || record.email }
 				onChange={ handleEmailChange }
 			/>
+
+			{ emailError && <p style={{color: 'red'}}>{ emailError }</p> }
 
 			<p>
 				<Button variant="primary" onClick={ handleSave } disabled={ ! hasEdits || isSaving }>

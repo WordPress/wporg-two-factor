@@ -28,8 +28,8 @@ export default function AccountStatus( { clickScreenLink, userData } ) {
 				headerText="Account Email"
 				bodyText={
 					userData.pending_email ?
-					"Your account email is pending a change to " + userData.pending_email + "." :
-					"Your account email address is " + userData.email + "."
+					`Your account email is pending a change to ${ userData.pending_email }.` :
+					`Your account email address is ${ userData.email }.`
 				}
 				clickScreenLink={ clickScreenLink }
 			/>
