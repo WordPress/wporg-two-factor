@@ -119,7 +119,7 @@ function register_user_fields(): void {
 				return get_user_meta( $user['id'], '_new_email', true )['newemail'] ?? false;
 			},
 			'update_callback' => function( $value, $user ) {
-				if ( false === $value ) {
+				if ( '' === $value ) {
 					delete_user_meta( $user->ID, '_new_email' );
 					return true;
 				}
@@ -137,6 +137,8 @@ function register_user_fields(): void {
  * Implement the "Require email confirmation" functionality for the rest api.
  *
  * TODO: This is a core bug. This should be handled by core.
+ * TODO: This generates urls to /support/wp-admin/profile.php?newuseremail=%s
+ *       bbPress also implements this functionality, through bbp_edit_user_email_send_notification()
  *
  * @param array $insert_data The user data being updated.
  * @return array
