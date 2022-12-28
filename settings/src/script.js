@@ -41,7 +41,7 @@ function renderSettings() {
 function Main( { userId } ) {
 	const userRecord = getUserRecord( userId );
 
-	const { record, edit, hasEdits } = userRecord;
+	const { record, edit, hasEdits, hasResolved } = userRecord;
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -83,7 +83,7 @@ function Main( { userId } ) {
 		setScreen( screen );
 	}
 
-	if ( ! record ) {
+	if ( ! hasResolved ) {
 		return <Spinner />
 	}
 

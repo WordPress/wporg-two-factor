@@ -38,10 +38,6 @@ export default function EmailAddress( { userRecord } ) {
 		}
 	};
 
-	if ( ! record ) {
-		return <Spinner />
-	}
-
 	return (
 		<>
 			{ record.pending_email && ! justChangedEmail &&
