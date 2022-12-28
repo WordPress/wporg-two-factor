@@ -3,7 +3,7 @@
  * WordPress dependencies
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Render the Email setting.
@@ -14,9 +14,7 @@ export default function EmailAddress( { userRecord } ) {
 	const [ emailError, setEmailError ] = useState( '' );
 	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
 
-	const handleEmailChange = ( email ) => edit( { email } );
-
-	const handleSave = async () => {
+	const handleSave = useCallback( async () => {
 		try {
 			await save();
 
@@ -27,16 +25,16 @@ export default function EmailAddress( { userRecord } ) {
 			// TODO: The red paragraph inserted inline feels a bit hacky.
 			setEmailError( error.message );
 		}
-	};
+	}, [] );
 
-	const handleDiscard = async () => {
+	const handleDiscard = useCallback( async () => {
 		try {
 			await edit( { pending_email: '' } );
 			await save();
 		} catch( error ) {
 			alert( error.message );
 		}
-	};
+	}, [] );
 
 	return (
 		<>
@@ -79,7 +77,7 @@ export default function EmailAddress( { userRecord } ) {
 				size="62"
 				placeholder="my-email-address@example.org"
 				value={ editedRecord.email ?? record.email }
-				onChange={ handleEmailChange }
+				onChange={ (email) => edit( { email } ) }
 			/>
 
 			{ emailError && <p className="error">{ emailError }</p> }
