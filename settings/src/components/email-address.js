@@ -10,9 +10,8 @@ import { useCallback, useState } from '@wordpress/element';
  */
 export default function EmailAddress( { userRecord } ) {
 	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord
-
-	const [ emailError, setEmailError ] = useState( '' );
-	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
+	const [ emailError, setEmailError ]                            = useState( '' );
+	const [ justChangedEmail, setJustChangedEmail ]                = useState( false );
 
 	const handleSave = useCallback( async () => {
 		try {
