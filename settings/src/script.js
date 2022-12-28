@@ -4,12 +4,16 @@
 import { __ } from '@wordpress/i18n';
 import { reactDOM, StrictMode, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
+import { Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import AccountStatus from './components/account-status';
 import Password from './components/password';
+import EmailAddress from './components/email-address';
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -26,7 +30,7 @@ function renderSettings() {
 
 	root.render(
 	  <StrictMode>
-		<Main />
+		<Main userId={ wrapper.dataset.userid } />
 	  </StrictMode>
 	);
 }
@@ -34,7 +38,10 @@ function renderSettings() {
 /**
  * Render the correct component based on the URL.
  */
-function Main() {
+function Main( { userId } ) {
+	const userRecord                              = getUserRecord( userId );
+	const { record, edit, hasEdits, hasResolved } = userRecord;
+
 	// The index is the URL slug and the value is the React component.
 	const components = {
 		'account-status':    AccountStatus,
@@ -45,7 +52,7 @@ function Main() {
 		'backup-codes':      GenerateBackupCodes,
 	};
 
-	let currentUrl    = new URL( document.location.href )
+	let currentUrl    = new URL( document.location.href );
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
 	if ( ! components[ initialScreen ] ) {
@@ -66,7 +73,17 @@ function Main() {
 	 */
 	function clickScreenLink( event, screen ) {
 		event.preventDefault();
+
+		// Reset to initial after navigating away from a page.
+		if ( hasEdits ) {
+			edit( record );
+		}
+
 		setScreen( screen );
+	}
+
+	if ( ! hasResolved ) {
+		return <Spinner />
 	}
 
 	return (
@@ -81,22 +98,24 @@ function Main() {
 			}
 
 			<div className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen clickScreenLink={ clickScreenLink } />
+				<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
 			</div>
 		</>
 	);
 }
 
 /**
- * Render the Email setting.
+ * Fetch the user record.
  */
-function EmailAddress() {
-	return (
-		<p>
-			Email:
-			input field
-		</p>
-	);
+function getUserRecord( userId ) {
+	let userRecord = useEntityRecord( 'root', 'user', userId );
+
+	// Polyfill in isSaving.
+	if ( undefined === userRecord.isSaving ) {
+		userRecord.isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
+	}
+
+	return userRecord;
 }
 
 /**

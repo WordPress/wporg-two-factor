@@ -7,8 +7,9 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
 /**
  * Render the Account Status.
  */
-export default function AccountStatus( { clickScreenLink } ) {
-	const emailStatus = 'pending';
+export default function AccountStatus( { clickScreenLink, userRecord } ) {
+	const { record }  = userRecord;
+	const emailStatus = record.pending_email ? 'pending' : 'ok';
 	const totpStatus  = 'disabled';
 	// todo make dynamic
 
@@ -26,7 +27,11 @@ export default function AccountStatus( { clickScreenLink } ) {
 				screen="email"
 				status={ emailStatus }
 				headerText="Account Email"
-				bodyText="Your account email address is foo@bar.com."
+				bodyText={
+					record.pending_email ?
+					`Your account email is pending a change to ${ record.pending_email }.` :
+					`Your account email address is ${ record.email }.`
+				}
 				clickScreenLink={ clickScreenLink }
 			/>
 
@@ -85,6 +90,7 @@ function StatusIcon( { status } ) {
 	let icon;
 
 	switch ( status ) {
+		case 'ok':
 		case 'enabled':
 			icon = check;
 			break;
@@ -93,6 +99,7 @@ function StatusIcon( { status } ) {
 			icon = warning;
 			break;
 
+		case 'error':
 		case 'disabled':
 		default:
 			icon = cancelCircleFilled;

@@ -17,7 +17,8 @@
 	}
 
 	.wporg-2fa__status-icon {
-		&.is-enabled {
+		&.is-enabled,
+		&.is-ok {
 			fill: green;
 		}
 
@@ -25,7 +26,8 @@
 			fill: orange;
 		}
 
-		&.is-disabled {
+		&.is-disabled,
+		&.is-error {
 			fill: red;
 		}
 	}
