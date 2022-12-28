@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { reactDOM, StrictMode, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
