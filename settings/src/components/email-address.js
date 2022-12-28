@@ -3,7 +3,7 @@
  * WordPress dependencies
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
