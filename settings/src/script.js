@@ -41,7 +41,7 @@ function renderSettings() {
 function Main( { userId } ) {
 	const userRecord = getUserRecord( userId );
 
-	const { record: userData, edit: editUserData, hasEdits: userDataNeedsReset } = userRecord;
+	const { record, edit, hasEdits } = userRecord;
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -76,14 +76,14 @@ function Main( { userId } ) {
 		event.preventDefault();
 
 		// Reset to initial after navigating away from a page.
-		if ( userDataNeedsReset ) {
-			editUserData( userData );
+		if ( hasEdits ) {
+			edit( record );
 		}
 
 		setScreen( screen );
 	}
 
-	if ( ! userData ) {
+	if ( ! record ) {
 		return <Spinner />
 	}
 
