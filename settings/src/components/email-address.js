@@ -4,17 +4,12 @@
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Render the Email setting.
  */
-export default function EmailAddress( { userId } ) {
-	const { record, edit, save, editedRecord, hasEdits } = useEntityRecord( 'root', 'user', userId );
-
-	// useEntityRecord() doesn't expose isSaving. Huh.
-	const isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
+export default function EmailAddress( { userRecord } ) {
+	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord
 
 	const [ emailError, setEmailError ] = useState( '' );
 	const [ justChangedEmail, setJustChangedEmail ] = useState( false );

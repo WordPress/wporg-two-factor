@@ -5,7 +5,8 @@ import { __ } from '@wordpress/i18n';
 import { reactDOM, StrictMode, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,7 +39,9 @@ function renderSettings() {
  * Render the correct component based on the URL.
  */
 function Main( { userId } ) {
-	const { record: userData, edit: editUserData, hasEdits: userDataNeedsReset } = useEntityRecord( 'root', 'user', userId );
+	const userRecord = getUserRecord( userId );
+
+	const { record: userData, edit: editUserData, hasEdits: userDataNeedsReset } = userRecord;
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -96,10 +99,24 @@ function Main( { userId } ) {
 			}
 
 			<div className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen clickScreenLink={ clickScreenLink } userId={ userId } userData={ userData } />
+				<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
 			</div>
 		</>
 	);
+}
+
+/**
+ * Fetch the user record.
+ */
+function getUserRecord( userId ) {
+	let userRecord = useEntityRecord( 'root', 'user', userId );
+
+	// Polyfill in isSaving.
+	if ( undefined === userRecord.isSaving ) {
+		userRecord.isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
+	}
+
+	return userRecord;
 }
 
 /**
