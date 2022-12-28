@@ -19,7 +19,7 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 				screen="password"
 				status="enabled"
 				headerText="Password"
-				bodyText="You have a password configured, but can change it at any time"
+				bodyText="You have a password configured, but can change it at any time."
 				clickScreenLink={ clickScreenLink }
 			/>
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { reactDOM, StrictMode, useState } from '@wordpress/element';
+import { StrictMode, useCallback, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -26,6 +26,7 @@ function renderSettings() {
 		return;
 	}
 
+	// todo import from wp.element once https://github.com/WordPress/gutenberg/pull/46467 lands
 	const root = ReactDOM.createRoot( wrapper );
 
 	root.render(
@@ -71,19 +72,22 @@ function Main( { userId } ) {
 	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
 	 * behaviors that are broken otherwise.
 	 */
-	function clickScreenLink( event, screen ) {
+	const clickScreenLink = useCallback( ( event, screen ) => {
 		event.preventDefault();
 
 		// Reset to initial after navigating away from a page.
+		// @todo This no longer works, maybe `userRecord` is not passed by reference between screens?
+		// Also, some screens will have additional state that should be reset, but this won't have any way of
+		// knowing that. So maybe just remove this?
 		if ( hasEdits ) {
 			edit( record );
 		}
 
 		setScreen( screen );
-	}
+	}, [] );
 
 	if ( ! hasResolved ) {
-		return <Spinner />
+		return <Spinner />;
 	}
 
 	return (
