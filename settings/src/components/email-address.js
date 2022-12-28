@@ -16,14 +16,21 @@ export default function EmailAddress( { userRecord } ) {
 
 	const handleSave = useCallback( async () => {
 		try {
+			setEmailError('');
+
 			await save();
 
 			setJustChangedEmail( true );
 		} catch( error ) {
-			// TODO: Change these texts
-			// error.code: rest_user_invalid_email (can't use that one), rest_invalid_param (invalid email format)
-			// TODO: The red paragraph inserted inline feels a bit hacky.
-			setEmailError( error.message );
+			let message = error.message;
+
+			if ( 'rest_user_invalid_email' === error.code ) {
+				message = 'Sorry, that email is already in use by another account.';
+			} else if ( 'rest_invalid_param' === error.code ) {
+				message = 'Sorry, it looks like that email is invalid.';
+			}
+
+			setEmailError( message );
 		}
 	}, [] );
 
@@ -80,7 +87,7 @@ export default function EmailAddress( { userRecord } ) {
 				onChange={ (email) => edit( { email } ) }
 			/>
 
-			{ emailError && <p className="error">{ emailError }</p> }
+			{ emailError && <p className="email-error">{ emailError }</p> }
 
 			<p>
 				<Button
