@@ -1,8 +1,14 @@
 .wporg-2fa__email {
+	/* Align the actions in a <Notice /> to the right */
 	.components-notice.actions-on-right > div {
 		display: flex;
+		&> p {
+			flex-grow: 1;
+			margin: initial; /* wporg-support adds top padding to <p> causing button alignment issues. */
+		}
 	}
-	.components-notice.actions-on-right > div > p {
-		flex-grow: 1
+
+	.error {
+		color: red;
 	}
 }

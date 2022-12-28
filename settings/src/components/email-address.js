@@ -74,7 +74,7 @@ export default function EmailAddress( { userRecord } ) {
 
 			<TextControl
 				type="email"
-				help="We will send you a verification email after updating your email address."
+				help="We will send you a verification email before updating your email address."
 				label="Your email address"
 				size="62"
 				placeholder="my-email-address@example.org"
@@ -82,10 +82,14 @@ export default function EmailAddress( { userRecord } ) {
 				onChange={ handleEmailChange }
 			/>
 
-			{ emailError && <p style={{color: 'red'}}>{ emailError }</p> }
+			{ emailError && <p className="error">{ emailError }</p> }
 
 			<p>
-				<Button variant="primary" onClick={ handleSave } disabled={ ! hasEdits || isSaving }>
+				<Button
+					variant="primary"
+					onClick={ handleSave }
+					disabled={ ! hasEdits || isSaving }
+				>
 					{ isSaving ? (
 						<>
 							<Spinner/>
