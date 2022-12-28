@@ -44,19 +44,33 @@ export default function EmailAddress( { userRecord } ) {
 
 	return (
 		<>
-			{ record.pending_email && ! justChangedEmail && <Notice status="warning" className="actions-on-right" isDismissible={ false } actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }>
-				<p>
-					There is a pending email change to { record.pending_email }.<br />
-					Please check your email for a confirmation link.
-				</p>
-			</Notice> }
+			{ record.pending_email && ! justChangedEmail &&
+				<Notice
+					status="warning"
+					className="actions-on-right"
+					isDismissible={ false }
+					actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }
+				>
+					<p>
+						There is a pending email change to { record.pending_email }.<br />
+						Please check your email for a confirmation link.
+					</p>
+				</Notice>
+			}
 
-			{ record.pending_email && justChangedEmail && <Notice status="success" className="actions-on-right" isDismissible={ false } actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }>
-				<p>
-					Please check your email for a confirmation email.<br />
-					If { record.pending_email } is incorrect, simply enter a new email below.
-				</p>
-			</Notice> }
+			{ record.pending_email && justChangedEmail &&
+				<Notice
+					status="success"
+					className="actions-on-right"
+					isDismissible={ false }
+					actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }
+				>
+					<p>
+						Please check your email for a confirmation email.<br />
+						If { record.pending_email } is incorrect, simply enter a new email below.
+					</p>
+				</Notice>
+			}
 
 			<p>
 				To change your email address enter a new one below.
