@@ -12,6 +12,9 @@
 	"attributes": {
 		"userId": {
 			"type": "integer"
+		},
+		"userRequires2fa": {
+			"type": "boolean"
 		}
 	},
 	"textdomain": "wporg",

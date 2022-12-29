@@ -45,9 +45,13 @@ function render_custom_ui() : void {
 	}
 
 	wp_enqueue_style( 'wp-components' );
+	wp_enqueue_script( 'zxcvbn-async' ); // Can't be enqueued via asset.php because it doesn't have a `wp-` prefix.
 
 	$user_id    = bbp_get_displayed_user_id();
-	$json_attrs = json_encode( [ 'userId' => $user_id ] );
+	$json_attrs = json_encode( [
+		'userId'          => $user_id,
+		'userRequires2fa' => user_requires_2fa( get_userdata( $user_id ) ),
+	] );
 
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
