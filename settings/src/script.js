@@ -31,7 +31,7 @@ function renderSettings() {
 
 	root.render(
 	  <StrictMode>
-		<Main userId={ wrapper.dataset.userid } />
+		<Main userId={ parseInt( wrapper.dataset.userId ) } />
 	  </StrictMode>
 	);
 }

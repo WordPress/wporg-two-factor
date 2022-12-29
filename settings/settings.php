@@ -46,7 +46,7 @@ function render_custom_ui() : void {
 
 	wp_enqueue_style( 'wp-components' );
 
-	$user_id    = (int) bbp_get_displayed_user_id();
+	$user_id    = bbp_get_displayed_user_id();
 	$json_attrs = json_encode( [ 'userId' => $user_id ] );
 
 	$preload_paths = [
