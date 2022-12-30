@@ -33,14 +33,38 @@ export default function Password( { userRecord, userRequires2fa } ) {
 	}, [ userRecord.editedRecord.password ] );
 
 	/**
-	 * @todo When starting from a fresh page load, theres a flash of the red "too easy" notice before it shows
+	 * @todo When starting from a fresh page load, there's a flash of the red "too easy" notice before it shows
 	 * the success notice. It happens between the time when `edit()` is called and the `useEffect` callback fires
 	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
 	 * Or maybe the condition that renders the notice can include something like `hasResolved`?
 	 */
 	const generatePassword = useCallback( async () => {
 		setGenerating( true );
-		const password = await post( 'generate-password' );
+		let password;
+
+		try {
+			// Modified from https://stackoverflow.com/a/43020177/450127 to improve readability, and to make
+			// the length and character pool match the result of the `generate-password` AJAX endpoint.
+			const characterPool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+			const pwLength      = 24;
+			const randomNumbers = new Uint32Array( 1 );
+			const umax          = Math.pow( 2, 32 );
+			const max           = umax - ( umax % characterPool.length );
+
+			password = new Array( pwLength ).fill( 0 );
+			password = password.map( () => {
+				do {
+					crypto.getRandomValues( randomNumbers ); // Overwrite the existing numbers with new ones.
+				} while ( randomNumbers[ 0 ] > max );
+
+				return characterPool[ randomNumbers[ 0 ] % characterPool.length ];
+			} );
+			password = password.join( '' );
+
+		} catch ( exception ) {
+			console.error( exception );
+			password = await post( 'generate-password' );
+		}
 
 		userRecord.edit( { password } );
 		setInputType( 'text' );
