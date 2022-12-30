@@ -89,6 +89,19 @@ function register_user_fields(): void {
 		]
 	);
 
+	register_rest_field(
+		'user',
+		'2fa_required',
+		[
+			'get_callback' => function( $user ) {
+				return user_requires_2fa( get_userdata( $user['id'] ) );
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
 }
 
 /**

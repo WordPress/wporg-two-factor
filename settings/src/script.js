@@ -31,10 +31,7 @@ function renderSettings() {
 
 	root.render(
 	  <StrictMode>
-		<Main
-			userId={ parseInt( wrapper.dataset.userId ) }
-			userRequires2fa={ 'true' === wrapper.dataset.userRequiresTwoFactor }
-		/>
+		<Main userId={ parseInt( wrapper.dataset.userId ) } />
 	  </StrictMode>
 	);
 }
@@ -42,7 +39,7 @@ function renderSettings() {
 /**
  * Render the correct component based on the URL.
  */
-function Main( { userId, userRequires2fa } ) {
+function Main( { userId } ) {
 	const userRecord                              = getUserRecord( userId );
 	const { record, edit, hasEdits, hasResolved } = userRecord;
 
@@ -105,11 +102,7 @@ function Main( { userId, userRequires2fa } ) {
 			}
 
 			<div className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen
-					clickScreenLink={ clickScreenLink }
-					userRecord={ userRecord }
-					userRequires2fa={ userRequires2fa }
-				/>
+				<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
 			</div>
 		</>
 	);

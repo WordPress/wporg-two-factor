@@ -17,7 +17,7 @@ const { post } = wp.ajax;
 /**
  * Render the Password setting.
  */
-export default function Password( { userRecord, userRequires2fa } ) {
+export default function Password( { userRecord } ) {
 	const [ passwordStrong, setPasswordStrong ] = useState( false );
 	const [ saved, setSaved ]                   = useState( false );
 	const [ generating, setGenerating ]         = useState( false );
@@ -29,7 +29,7 @@ export default function Password( { userRecord, userRequires2fa } ) {
 		}
 
 		setSaved( false );
-		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record, userRequires2fa ) );
+		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
 	}, [ userRecord.editedRecord.password ] );
 
 	/**
@@ -160,7 +160,7 @@ export default function Password( { userRecord, userRequires2fa } ) {
  *
  * @todo maybe have a Context for the user params so don't have to drill down to here?
  */
-function isPasswordStrong( password, userRecord, userRequires2fa ) {
+function isPasswordStrong( password, userRecord ) {
 	const { zxcvbn } = window; // Done here because it's loaded asyncronously.
 
 	if ( ! zxcvbn ) {
@@ -173,7 +173,7 @@ function isPasswordStrong( password, userRecord, userRequires2fa ) {
 	) );
 	blocklist = blocklist.concat( [ 'wordpress', 'wporg', 'wordpressorg' ] );
 
-	const minimumScore = userRequires2fa ? 4 : 3;
+	const minimumScore = userRecord['2fa_required'] ? 4 : 3;
 	const strength     = zxcvbn( password, blocklist );
 
 	return strength.score >= minimumScore;
