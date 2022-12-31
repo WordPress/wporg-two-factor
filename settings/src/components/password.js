@@ -10,6 +10,7 @@ import { pick } from 'lodash';
 import { Button, Flex, Notice, TextControl }     from '@wordpress/components';
 import { useCallback, useEffect, useState }      from '@wordpress/element';
 import { Icon, cancelCircleFilled, check, seen } from '@wordpress/icons';
+import apiFetch                                  from '@wordpress/api-fetch';
 
 import {} from '@wordpress/util'; // Enqueue via asset.php.
 const { post } = wp.ajax;
@@ -71,14 +72,17 @@ export default function Password( { userRecord } ) {
 		setGenerating( false );
 	}, [] );
 
-	/**
-	 * @todo This works the first time it's called, but subsequent calls result in a `403` error. That might be
-	 * because changing the password resets the auth cookies. The failed request is automatically repeated by
-	 * `useEntityRecord.save()`, though, and that request succeeds. The only tangible problem here is the console
-	 * error, but it'd be nice to fix that.
-	 */
 	const savePassword = useCallback( async () => {
 		await userRecord.save();
+
+		// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
+		// retry them automatically, but that results in an extra XHR request and a console error.
+		const response = await apiFetch( {
+			url:   apiFetch.nonceEndpoint,
+			parse: false
+		} );
+		apiFetch.nonceMiddleware.nonce = await response.text();
+
 		setSaved( true );
 	}, [] );
 
