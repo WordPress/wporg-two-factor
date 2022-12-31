@@ -156,15 +156,16 @@ function generatePasswordInBrowser() {
 	const randomNumbers = new Uint32Array( 1 );
 	const umax          = Math.pow( 2, 32 );
 	const max           = umax - ( umax % characterPool.length );
-	let password;
 
-	password = new Array( pwLength ).fill( 0 );
+	let password = new Array( pwLength ).fill( 0 );
+
 	password = password.map( () => {
 		do {
 			crypto.getRandomValues( randomNumbers ); // Overwrite the existing numbers with new ones.
 		} while ( randomNumbers[ 0 ] > max );
 
-		return characterPool[ randomNumbers[ 0 ] % characterPool.length ];
+		const randomPosition = randomNumbers[ 0 ] % characterPool.length;
+		return characterPool[ randomPosition ];
 	} );
 	password = password.join( '' );
 
