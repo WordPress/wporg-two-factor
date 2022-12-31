@@ -39,29 +39,12 @@ export default function Password( { userRecord } ) {
 	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
 	 * Or maybe the condition that renders the notice can include something like `hasResolved`?
 	 */
-	const generatePassword = useCallback( async () => {
+	const generatePasswordController = useCallback( async () => {
 		setGenerating( true );
 		let password;
 
 		try {
-			// Modified from https://stackoverflow.com/a/43020177/450127 to improve readability, and to make
-			// the length and character pool match the result of the `generate-password` AJAX endpoint.
-			const characterPool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-			const pwLength      = 24;
-			const randomNumbers = new Uint32Array( 1 );
-			const umax          = Math.pow( 2, 32 );
-			const max           = umax - ( umax % characterPool.length );
-
-			password = new Array( pwLength ).fill( 0 );
-			password = password.map( () => {
-				do {
-					crypto.getRandomValues( randomNumbers ); // Overwrite the existing numbers with new ones.
-				} while ( randomNumbers[ 0 ] > max );
-
-				return characterPool[ randomNumbers[ 0 ] % characterPool.length ];
-			} );
-			password = password.join( '' );
-
+			password = generatePasswordInBrowser();
 		} catch ( exception ) {
 			console.error( exception );
 			password = await post( 'generate-password' );
@@ -150,7 +133,7 @@ export default function Password( { userRecord } ) {
 
 				<Button
 					variant="secondary"
-					onClick={ generatePassword }
+					onClick={ generatePasswordController }
 				>
 					{ generating ? 'Generating...' : 'Generate strong password' }
 				</Button>
@@ -160,9 +143,38 @@ export default function Password( { userRecord } ) {
 }
 
 /**
+ * Generate a cryptographically secure random password in the browser.
+ *
+ * Modified from https://stackoverflow.com/a/43020177/450127 to improve readability, and to make
+ * the length and character pool match the result of the `generate-password` AJAX endpoint.
+ *
+ * @returns {string}
+ */
+function generatePasswordInBrowser() {
+	const characterPool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+	const pwLength      = 24;
+	const randomNumbers = new Uint32Array( 1 );
+	const umax          = Math.pow( 2, 32 );
+	const max           = umax - ( umax % characterPool.length );
+	let password;
+
+	password = new Array( pwLength ).fill( 0 );
+	password = password.map( () => {
+		do {
+			crypto.getRandomValues( randomNumbers ); // Overwrite the existing numbers with new ones.
+		} while ( randomNumbers[ 0 ] > max );
+
+		return characterPool[ randomNumbers[ 0 ] % characterPool.length ];
+	} );
+	password = password.join( '' );
+
+	return password;
+}
+
+/**
  * Determines if the password is strong.
  *
- * @todo maybe have a Context for the user params so don't have to drill down to here?
+ * @returns {boolean}
  */
 function isPasswordStrong( password, userRecord ) {
 	const { zxcvbn } = window; // Done here because it's loaded asyncronously.
