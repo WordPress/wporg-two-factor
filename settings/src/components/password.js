@@ -146,7 +146,7 @@ export default function Password( { userRecord } ) {
  * Generate a cryptographically secure random password in the browser.
  *
  * Modified from https://stackoverflow.com/a/43020177/450127 to improve readability, and to make
- * the length and character pool match the result of the `generate-password` AJAX endpoint.
+ * the length and character pool match the `generate-password` AJAX endpoint.
  *
  * @returns {string}
  */
