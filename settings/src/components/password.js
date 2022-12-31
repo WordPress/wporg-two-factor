@@ -189,6 +189,8 @@ function isPasswordStrong( password, userRecord ) {
 	) );
 	blocklist = blocklist.concat( [ 'wordpress', 'wporg', 'wordpressorg' ] );
 
+	// `3` is "safely unguessable: moderate protection from offline slow-hash scenario. (guesses < 10^10)"
+	// `4` is "very unguessable: strong protection from offline slow-hash scenario. (guesses >= 10^10)"
 	const minimumScore = userRecord['2fa_required'] ? 4 : 3;
 	const strength     = zxcvbn( password, blocklist );
 
