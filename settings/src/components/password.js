@@ -20,6 +20,7 @@ export default function Password( { userRecord } ) {
 	const [ saved, setSaved ]                   = useState( false );
 	const [ inputType, setInputType ]           = useState( 'password' );
 
+	// Check strength every time the password changes.
 	useEffect( () => {
 		if ( ! userRecord.editedRecord.password ) {
 			return;
@@ -30,6 +31,8 @@ export default function Password( { userRecord } ) {
 	}, [ userRecord.editedRecord.password ] );
 
 	/**
+	 * Handle clicking the `Generate Password` button.
+	 *
 	 * @todo When starting from a fresh page load, there's a flash of the red "too easy" notice before it shows
 	 * the success notice. It happens between the time when `edit()` is called and the `useEffect` callback fires
 	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
@@ -40,7 +43,8 @@ export default function Password( { userRecord } ) {
 		setInputType( 'text' );
 	}, [] );
 
-	const savePassword = useCallback( async () => {
+	// Handle clicking the `Save Password` button.
+	const savePasswordHandler = useCallback( async () => {
 		await userRecord.save();
 
 		// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
@@ -111,7 +115,7 @@ export default function Password( { userRecord } ) {
 				<Button
 					variant="primary"
 					disabled={ passwordStrong && ! userRecord.isSaving ? '' : 'disabled' }
-					onClick={ savePassword }
+					onClick={ savePasswordHandler }
 				>
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
 				</Button>
