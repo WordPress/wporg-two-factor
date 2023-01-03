@@ -12,16 +12,12 @@ import { useCallback, useEffect, useState }      from '@wordpress/element';
 import { Icon, cancelCircleFilled, check, seen } from '@wordpress/icons';
 import apiFetch                                  from '@wordpress/api-fetch';
 
-import {} from '@wordpress/util'; // Enqueue via asset.php.
-const { post } = wp.ajax;
-
 /**
  * Render the Password setting.
  */
 export default function Password( { userRecord } ) {
 	const [ passwordStrong, setPasswordStrong ] = useState( false );
 	const [ saved, setSaved ]                   = useState( false );
-	const [ generating, setGenerating ]         = useState( false );
 	const [ inputType, setInputType ]           = useState( 'password' );
 
 	useEffect( () => {
@@ -39,20 +35,9 @@ export default function Password( { userRecord } ) {
 	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
 	 * Or maybe the condition that renders the notice can include something like `hasResolved`?
 	 */
-	const generatePasswordController = useCallback( async () => {
-		setGenerating( true );
-		let password;
-
-		try {
-			password = generatePasswordInBrowser();
-		} catch ( exception ) {
-			console.error( exception );
-			password = await post( 'generate-password' );
-		}
-
-		userRecord.edit( { password } );
+	const generatePasswordHandler = useCallback( async () => {
+		userRecord.edit( { password: generatePassword() } );
 		setInputType( 'text' );
-		setGenerating( false );
 	}, [] );
 
 	const savePassword = useCallback( async () => {
@@ -131,43 +116,45 @@ export default function Password( { userRecord } ) {
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 
-				<Button
-					variant="secondary"
-					onClick={ generatePasswordController }
-				>
-					{ generating ? 'Generating...' : 'Generate strong password' }
-				</Button>
+				{ crypto.getRandomValues &&
+					<Button
+						variant="secondary"
+						onClick={ generatePasswordHandler }
+					>
+						Generate strong password
+					</Button>
+				}
 			</p>
 		</>
 	);
 }
 
 /**
- * Generate a cryptographically secure random password in the browser.
+ * Generate a cryptographically secure random password.
  *
- * Modified from https://stackoverflow.com/a/43020177/450127 to improve readability, and to make
- * the length and character pool match the `generate-password` AJAX endpoint.
+ * This is just as secure as using the `generate-password` AJAX endpoint, but faster, and avoids introducing the
+ * possibility of XHR failures, etc.
  *
  * @returns {string}
  */
-function generatePasswordInBrowser() {
-	const characterPool = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-	const pwLength      = 24;
-	const randomNumbers = new Uint32Array( 1 );
-	const umax          = Math.pow( 2, 32 );
-	const max           = umax - ( umax % characterPool.length );
+function generatePassword() {
+	const characterPool  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+	const passwordLength = 24;
+	const randomNumber   = new Uint8Array( 1 );
+	let password         = '';
 
-	let password = new Array( pwLength ).fill( 0 );
-
-	password = password.map( () => {
+	// JS doesn't provide a way to generate a cryptographically secure random number within a range, so instead
+	// we just throw out values that don't correspond to a character. This is a little bit slower than using a
+	// modulo operation, but it avoids introducing bias in the distribution. Realistically, it's easily performant
+	// in this context.
+	// @link https://dimitri.xyz/random-ints-from-random-bits/
+	for ( let i = 0; i < passwordLength; i++ ) {
 		do {
-			crypto.getRandomValues( randomNumbers ); // Overwrite the existing numbers with new ones.
-		} while ( randomNumbers[ 0 ] > max );
+			crypto.getRandomValues( randomNumber );
+		} while ( randomNumber[0] >= characterPool.length );
 
-		const randomPosition = randomNumbers[ 0 ] % characterPool.length;
-		return characterPool[ randomPosition ];
-	} );
-	password = password.join( '' );
+		password += characterPool[ randomNumber[0] ];
+	}
 
 	return password;
 }
