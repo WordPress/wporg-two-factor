@@ -1,8 +1,11 @@
 /**
  * External dependencies
+ *
+ * window.zxcvbn is also used, but can't be enqueued via an `import` because the handle doesn't have a 'wp-'
+ * prefix. Instead, it's enqueued via `block.json`. It also can't be declared/destructured here because it's
+ * loaded asyncronously.
  */
 import { pick } from 'lodash';
-// window.zxcvbn is also used, but can't be declared here because it's loaded asyncronously.
 
 /**
  * WordPress dependencies
