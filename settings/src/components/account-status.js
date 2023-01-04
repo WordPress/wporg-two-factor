@@ -8,10 +8,11 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
  * Render the Account Status.
  */
 export default function AccountStatus( { clickScreenLink, userRecord } ) {
-	const { record }  = userRecord;
-	const emailStatus = record.pending_email ? 'pending' : 'ok';
-	const totpStatus  = 'disabled';
-	// todo make dynamic
+	const { record }        = userRecord;
+	const emailStatus       = record.pending_email ? 'pending' : 'ok';
+	const totpStatus        = Object.values( record['2fa_enabled_providers'] ).includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const backupCodesStatus = Object.values( record['2fa_enabled_providers'] ).includes( 'Two_Factor_Backup_Codes' ) &&
+								record['2fa_backup_codes_remaining'] > 0 ? 'enabled' : 'disabled';
 
 	return (
 		<>
@@ -36,18 +37,22 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 			/>
 
 			<SettingStatusCard
-				screen="two-factor-status"
+				screen="totp"
 				status={ totpStatus }
 				headerText="Two Factor Authentication"
-				bodyText="You have two-factor authentication enabled using an app."
+				bodyText={ 'enabled' === totpStatus ?
+					/* @todo update this when hardware tokens become an additional option. */
+					'You have two-factor authentication enabled using an app.' :
+					'You do not have two-factor authentication enabled.'
+				}
 				clickScreenLink={ clickScreenLink }
 			/>
 
 			<SettingStatusCard
 				screen="backup-codes"
-				status={ emailStatus }
+				status={ backupCodesStatus }
 				headerText="Two-Factor Backup Codes"
-				bodyText="You have verified your backup codes for two-factor authentication."
+				bodyText={ `You have ${ 'enabled' === backupCodesStatus ? '' : 'not' } verified your backup codes for two-factor authentication.` }
 				clickScreenLink={ clickScreenLink }
 			/>
 		</>

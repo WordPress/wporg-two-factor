@@ -1,6 +1,7 @@
 <?php
 
 namespace WordPressdotorg\Two_Factor;
+use Two_Factor_Core, Two_Factor_Backup_Codes;
 
 defined( 'WPINC' ) || die();
 
@@ -98,6 +99,34 @@ function register_user_fields(): void {
 			},
 			'schema' => [
 				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_enabled_providers',
+		[
+			'get_callback' => function( $user ) {
+				return Two_Factor_Core::get_enabled_providers_for_user( get_userdata( $user['id'] ) );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_backup_codes_remaining',
+		[
+			'get_callback' => function( $user ) {
+				return Two_Factor_Backup_Codes::codes_remaining_for_user( get_userdata( $user['id'] ) );
+			},
+			'schema' => [
+				'type'    => 'int',
 				'context' => [ 'edit' ],
 			]
 		]

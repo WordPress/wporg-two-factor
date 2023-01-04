@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { StrictMode, useCallback, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
@@ -14,6 +13,8 @@ import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
+import TOTP from './components/totp';
+import BackupCodes from './components/backup-codes';
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -48,9 +49,8 @@ function Main( { userId } ) {
 		'account-status':    AccountStatus,
 		'email':             EmailAddress,
 		'password':          Password,
-		'two-factor-status': TwoFactorStatus,
-		'setup-totp':        SetupTOTP,
-		'backup-codes':      GenerateBackupCodes,
+		'totp':              TOTP,
+		'backup-codes':      BackupCodes,
 	};
 
 	let currentUrl    = new URL( document.location.href );
@@ -120,98 +120,4 @@ function getUserRecord( userId ) {
 	}
 
 	return userRecord;
-}
-
-/**
- * Render the user's 2FA status.
- */
-function TwoFactorStatus() {
-	const totpEnabled = false;
-	// todo use core user meta data store? or create an upstream API endpoint for this?
-
-	//{ totpEnabled && <TwoFactorStatus /> }
-	//{ ! totpEnabled && <SetupTOTP /> }
-
-	return(
-		<>
-			<p>
-				"You've enabled TOTP..." +
-				"button to disable"
-			</p>
-
-			<p>
-				"backup codes let you..."
-				type a backup code to verify
-			</p>
-		</>
-	);
-}
-
-/**
- * Render the view for setting up TOTP.
- */
-function SetupTOTP() {
-	return (
-		<div>
-			<p>
-				Two-factor auth adds an extra layer of security... once enabled...
-			</p>
-
-			<p>
-				{ __( 'Scan this QR code with the authenticator app on your mobile device.', 'wporg' ) }
-
-				<a href="">
-					{ __( "Can't scan the code?", 'wporg' ) }
-				</a>
-			</p>
-
-			<p>
-				qr image
-			</p>
-
-			<p>
-				{ __( 'Then enter the six digit code provided by the app:', 'wporg' ) }
-			</p>
-
-			<p>
-				input field w/ placeholder text
-			</p>
-
-			<p>
-				{ __( 'Not sure what this screen means? You may need to download Authy or Google Authenticator for your phone', 'wporg' ) }
-				{/* add links to those. maybe pick different ones> */}
-			</p>
-
-			<p>
-				enable button
-				cancel button
-			</p>
-		</div>
-	);
-}
-
-/**
- * Render the view for generating backup codes.
- */
-function GenerateBackupCodes() {
-	return (
-		<div>
-			backup codes let you...
-
-			we ask that you...
-
-			list of codes in a pre/code block
-
-			danger icon
-			without access...
-
-			checkbox
-			i have printed...
-
-			all finished button
-			copy button
-			print button
-			download button
-		</div>
-	);
 }
