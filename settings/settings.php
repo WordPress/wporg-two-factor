@@ -41,10 +41,12 @@ function replace_core_ui_with_custom() : void {
  */
 function render_custom_ui() : void {
 	if ( ! current_user_can( 'edit_user', bbp_get_displayed_user_id() ) ) {
+		echo 'You cannot edit this user.';
 		return;
 	}
 
 	wp_enqueue_style( 'wp-components' );
+	wp_enqueue_script( 'zxcvbn-async' ); // Can't be enqueued via asset.php because it doesn't have a `wp-` prefix.
 
 	$user_id    = bbp_get_displayed_user_id();
 	$json_attrs = json_encode( [ 'userId' => $user_id ] );
