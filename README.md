@@ -21,23 +21,38 @@ WordPress.org-specific customizations for the Two Factor plugin
 		return in_array( $user->user_login, $GLOBALS['supes'], true );
 	}
 	```
+1. Install and build the `wporg-mu-plugins` repository.
 1. Add this code to your `wp-content/mu-plugins/0-sandbox.php`:
 	```php
+	require_once WPMU_PLUGIN_DIR. '/wporg-mu-plugins/mu-plugins/loader.php';
+
 	// Enable dummy provider for convenience when testing locally.
 	add_filter( 'two_factor_providers', function( $providers ) {
 		$providers['Two_Factor_Dummy'] = TWO_FACTOR_DIR . 'providers/class-two-factor-dummy.php';
 
 		return $providers;
 	}, 100 ); // Must run _after_ wporg-two-factor.
+
+	// Mimics `mu-plugins/main-network/site-support.php`.
+	function add_rewrite_rules() {
+		// e.g., https://wordpress.org/support/users/foo/edit/account/
+		add_rewrite_rule(
+			bbp_get_user_slug() . '/([^/]+)/' . bbp_get_edit_slug() . '/account/?$',
+			'index.php?' . bbp_get_user_rewrite_id() . '=$matches[1]&' . 'edit_account=1',
+			'top'
+		);
+	}
+	add_action( 'init', __NAMESPACE__ . '\add_rewrite_rules' );
 	```
-1. `git clone` https://github.com/WordPress/two-factor/ into `wp-content/plugins`.
-1. Run `composer install` and  `npm install && npm run build`.
+1. Install, build, and activate the `wporg-support` theme.
+1. Install `bbPress` and `Gutenberg`. You might need to clone & build `trunk` branch of `Gutenberg` if we happen to be using any new features.
+1. `git clone` https://github.com/WordPress/two-factor/ into `wp-content/plugins` and follow their setup instructions.
 1. `git clone` this repo into `wp-content/plugins`
-1. Run `composer install`
-1. `cd settings` and run `npm install && npm run build`
-1. Install `bbPress`.
-1. Activate all three plugins.
-1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI.
+1. `cd wporg-two-factor && composer install`
+1. `cd settings && npm install && npm run build`
+1. Activate all four plugins.
+1. If you want to make JS changes, then `cd settings && npm start`
+1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
 
 ## Security
 
