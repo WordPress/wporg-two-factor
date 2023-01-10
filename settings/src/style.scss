@@ -10,6 +10,18 @@
 	margin-right: 20px;
 }
 
+.wporg-2fa__navigation {
+	a {
+		flex: none;
+	}
+
+	h3 {
+		flex: 1 1 auto;
+		text-align: center;
+		text-transform: capitalize;
+	}
+}
+
 @import "components/account-status";
 @import "components/password";
 @import "components/email-address";

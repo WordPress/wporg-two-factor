@@ -3,7 +3,7 @@
  */
 import { StrictMode, useCallback, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
-import { Spinner } from '@wordpress/components';
+import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
@@ -90,21 +90,31 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
+	if ( 'account-status' === screen ) {
+		return (
+			 <div className={ 'wporg-2fa__' + screen }>
+				 <AccountStatus clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
+			 </div>
+		);
+	}
+
 	return (
-		<>
-			{ 'account-status' !== screen &&
-				<div className="wporg-2fa__navigation">
+		<Card>
+			<CardHeader className="wporg-2fa__navigation" size="xSmall">
+				<Flex>
 					<a href="?screen=account-status" onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }>
 						<Icon icon={ arrowLeft } />
 						Back
 					</a>
-				</div>
-			}
 
-			<div className={ 'wporg-2fa__' + screen }>
+					<h3>{ initialScreen }</h3>
+				</Flex>
+			</CardHeader>
+
+			<CardBody className={ 'wporg-2fa__' + screen }>
 				<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
-			</div>
-		</>
+			</CardBody>
+		</Card>
 	);
 }
 
