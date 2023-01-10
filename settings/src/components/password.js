@@ -49,6 +49,7 @@ export default function Password( { userRecord } ) {
 	// Handle clicking the `Save Password` button.
 	const savePasswordHandler = useCallback( async () => {
 		await userRecord.save();
+		// catch error here and show error? or dont bother b/c shouldn't happen normally and will show up in console?
 
 		// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
 		// retry them automatically, but that results in an extra XHR request and a console error.
@@ -168,6 +169,9 @@ function generatePassword() {
 
 /**
  * Determines if the password is strong.
+ *
+ * Validation is also done on the backend by `security-weak-passwords.php`.
+ * todo ^ may fit better somewhere else, but do want to say something in client about how not just relying on client-side validation
  *
  * @returns {boolean}
  */
