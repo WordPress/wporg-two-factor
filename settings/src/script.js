@@ -107,7 +107,7 @@ function Main( { userId } ) {
 						Back
 					</a>
 
-					<h3>{ initialScreen }</h3>
+					<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'One Time Passwords' ) }</h3>
 				</Flex>
 			</CardHeader>
 
