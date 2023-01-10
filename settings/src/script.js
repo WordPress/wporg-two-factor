@@ -13,8 +13,10 @@ import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
+//import SetupTwoFactor from './components/setup-two-factor';
 import TOTP from './components/totp';
 import BackupCodes from './components/backup-codes';
+//import TwoFactorStatus from './components/two-factor-status';
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -49,8 +51,10 @@ function Main( { userId } ) {
 		'account-status':    AccountStatus,
 		'email':             EmailAddress,
 		'password':          Password,
+		//'setup-two-factor':  SetupTwoFactor,
 		'totp':              TOTP,
 		'backup-codes':      BackupCodes,
+		//'two-factor-status': TwoFactorStatus,
 	};
 
 	let currentUrl    = new URL( document.location.href );
