@@ -30,12 +30,14 @@ function renderSettings() {
 	}
 
 	// todo import from wp.element once https://github.com/WordPress/gutenberg/pull/46467 lands
-	const root = ReactDOM.createRoot( wrapper );
+	//const root = ReactDOM.createRoot( wrapper );
+	// why doesn't this work? maybe because newer version of g than what's on desktop?
 
-	root.render(
+	ReactDOM.render(
 	  <StrictMode>
 		<Main userId={ parseInt( wrapper.dataset.userId ) } />
-	  </StrictMode>
+	  </StrictMode>,
+		wrapper
 	);
 }
 
