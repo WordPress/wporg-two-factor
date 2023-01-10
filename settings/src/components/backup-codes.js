@@ -17,7 +17,7 @@ function Setup() {
 	return (
 		<>
 			<p>
-				Backup codes let you access your account if your phone is lost, stolen, or if you run it through the washing machine and the bag of rice trick doesn't work.
+				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
 				We ask that you print this list of ten unique, one-time-use backup codes and keep the list in a safe place.
 			</p>
 
