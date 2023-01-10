@@ -117,7 +117,7 @@ export default function Password( { userRecord } ) {
 
 			<p>
 				<Button
-					variant="primary"
+					isPrimary
 					disabled={ passwordStrong && ! userRecord.isSaving ? '' : 'disabled' }
 					onClick={ savePasswordHandler }
 				>
@@ -126,7 +126,7 @@ export default function Password( { userRecord } ) {
 
 				{ crypto.getRandomValues &&
 					<Button
-						variant="secondary"
+						isSecondary
 						onClick={ generatePasswordHandler }
 					>
 						Generate strong password
