@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import SetupProgressBar from './setup-progress-bar';
+
 //
 export default function TOTP( { userRecord } ) {
 	const enabledProviders  = Object.values( userRecord.record[ '2fa_enabled_providers' ] );
@@ -16,14 +21,11 @@ export default function TOTP( { userRecord } ) {
 function Setup() {
 	return (
 		<>
+			<SetupProgressBar step="backup-codes" />
+
 			<p>
-				Backup codes let you access your account if your phone is lost, stolen, or if you run it through the washing machine and the bag of rice trick doesn't work.
+				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
 				We ask that you print this list of ten unique, one-time-use backup codes and keep the list in a safe place.
-			</p>
-
-			<p>
-				Backup codes let you access your account if your phone is lost or stolen, or even just accidentally run through the washing machine!
-
 			</p>
 
 			<code>
