@@ -10,9 +10,8 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
 export default function AccountStatus( { clickScreenLink, userRecord } ) {
 	const { record }        = userRecord;
 	const emailStatus       = record.pending_email ? 'pending' : 'ok';
-	const totpStatus        = Object.values( record['2fa_enabled_providers'] ).includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
-	const backupCodesStatus = Object.values( record['2fa_enabled_providers'] ).includes( 'Two_Factor_Backup_Codes' ) &&
-								record['2fa_backup_codes_remaining'] > 0 ? 'enabled' : 'disabled';
+	const totpStatus        = record['2fa_available_providers'].includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const backupCodesStatus = record['2fa_available_providers'].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
 	return (
 		<>
