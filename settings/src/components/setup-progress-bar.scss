@@ -1,0 +1,11 @@
+// todo style this closer to the mockup
+.wporg-2fa__setup-steps {
+	.is-enabled {
+		font-weight: bold;
+		color: blue; // todo use color var w/ correct color
+	}
+
+	.is-disabled {
+		color: grey; // todo use color var w/ correct color
+	}
+}
