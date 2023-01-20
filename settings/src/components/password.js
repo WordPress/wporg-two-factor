@@ -117,7 +117,7 @@ export default function Password( { userRecord } ) {
 
 			<p>
 				<Button
-					variant="primary"
+					isPrimary
 					disabled={ passwordStrong && ! userRecord.isSaving ? '' : 'disabled' }
 					onClick={ savePasswordHandler }
 				>
@@ -126,7 +126,7 @@ export default function Password( { userRecord } ) {
 
 				{ window.crypto?.getRandomValues &&
 					<Button
-						variant="secondary"
+						isSecondary
 						onClick={ generatePasswordHandler }
 					>
 						Generate strong password
@@ -139,6 +139,8 @@ export default function Password( { userRecord } ) {
 
 /**
  * Determines if the password is strong.
+ *
+ * Validation is also done on the backend by `security-weak-passwords.php`.
  *
  * @returns {boolean}
  */
