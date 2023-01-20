@@ -1,6 +1,7 @@
 <?php
 
 namespace WordPressdotorg\Two_Factor;
+use Two_Factor_Core;
 
 defined( 'WPINC' ) || die();
 
@@ -51,6 +52,13 @@ function render_custom_ui() : void {
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
 	];
+
+	$enabled_providers = Two_Factor_Core::get_enabled_providers_for_user( $user_id );
+
+	if ( ! in_array( 'Two_Factor_Totp', $enabled_providers, true ) ) {
+		$preload_paths[] = "/wporg-two-factor/1.0/totp-setup?user_id=$user_id"; // todo not working, still see xhr request
+	}
+
 	preload_api_requests( $preload_paths );
 
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );

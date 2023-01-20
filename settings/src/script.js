@@ -46,11 +46,11 @@ function Main( { userId } ) {
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
-		'account-status':    AccountStatus,
-		'email':             EmailAddress,
-		'password':          Password,
-		'totp':              TOTP,
-		'backup-codes':      BackupCodes,
+		'account-status': AccountStatus,
+		'email':          EmailAddress,
+		'password':       Password,
+		'totp':           TOTP,
+		'backup-codes':   BackupCodes,
 	};
 
 	let currentUrl    = new URL( document.location.href );

@@ -1,17 +1,19 @@
 <?php
 
 namespace WordPressdotorg\Two_Factor;
-use Two_Factor_Core, Two_Factor_Backup_Codes;
+use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
+use WP_REST_Server, WP_REST_Request;
 
 defined( 'WPINC' ) || die();
 
+add_action( 'rest_api_init', __NAMESPACE__ . '\register_rest_routes' );
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_fields' );
 add_filter( 'rest_pre_insert_user', __NAMESPACE__ . '\require_email_confirmation', 10, 2 );
 
 /**
  * Register/Output some REST-API calls to be pre-loaded.
  *
- * This prevents the browser having to make the HTTP call before the react UI can be ready.
+ * This prevents the browser having to make the HTTP call before the React UI can be ready.
  * This duplicates block_editor_rest_api_preload() as there is no generic function for performing this preloading.
  * WARNING: This will output Javascript immediately if called during the page load if the wp-api-fetch script has already been output.
  *
@@ -62,6 +64,43 @@ function preload_api_requests( array $preload_paths ) : void {
 			'after'
 		);
 	}
+}
+
+/**
+ * Register the rest-api endpoints required for this provider.
+ */
+function register_rest_routes() : void {
+	register_rest_route(
+		'wporg-two-factor/1.0',
+		'/totp-setup',
+		array(
+			'methods'  => WP_REST_Server::READABLE,
+			'callback' => __NAMESPACE__ . '\rest_get_totp_setup',
+			'permission_callback' => function( $request ) {
+				return current_user_can( 'edit_user', $request['user_id'] );
+			},
+			'args' => array(
+				'user_id' => array(
+					'required' => true,
+					'type'     => 'number',
+				),
+			),
+		),
+	);
+}
+
+/**
+ * Rest API endpoint for supplying data needed to set up TOTP.
+ */
+function rest_get_totp_setup( WP_REST_Request $request ) : array {
+	$user_id = absint( $request['user_id'] );
+	$user    = get_user_by( 'id', $user_id );
+	$key     = Two_Factor_Totp::generate_key();
+
+	return array(
+		'secret_key'  => $key,
+		'qr_code_url' => Two_Factor_Totp::generate_qr_code_url( $user, $key ),
+	);
 }
 
 /**
