@@ -5,9 +5,7 @@ import SetupProgressBar from './setup-progress-bar';
 
 //
 export default function TOTP( { userRecord } ) {
-	const enabledProviders  = Object.values( userRecord.record[ '2fa_enabled_providers' ] );
-	const backupCodesStatus = enabledProviders.includes( 'Two_Factor_Backup_Codes' ) &&
-	record[ '2fa_backup_codes_remaining' ] > 0 ? 'enabled' : 'disabled';
+	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
 	return (
 		<>

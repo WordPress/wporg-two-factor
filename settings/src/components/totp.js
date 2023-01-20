@@ -12,8 +12,8 @@ import { RawHTML, useCallback, useEffect, useState } from '@wordpress/element';
 import SetupProgressBar from './setup-progress-bar';
 
 export default function TOTP( { userRecord, clickScreenLink } ) {
-	const enabledProviders = Object.values( userRecord.record[ '2fa_enabled_providers' ] );
-	const totpStatus       = enabledProviders.includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const availableProviders = userRecord.record[ '2fa_available_providers' ];
+	const totpStatus         = availableProviders.includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
 
 	return (
 		<>

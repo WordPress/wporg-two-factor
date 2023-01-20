@@ -143,29 +143,16 @@ function register_user_fields(): void {
 		]
 	);
 
+	// Available providers are enabled _and_ configured.
 	register_rest_field(
 		'user',
-		'2fa_enabled_providers',
+		'2fa_available_providers',
 		[
 			'get_callback' => function( $user ) {
-				return Two_Factor_Core::get_enabled_providers_for_user( get_userdata( $user['id'] ) );
+				return array_keys( Two_Factor_Core::get_available_providers_for_user( get_userdata( $user['id'] ) ) );
 			},
 			'schema' => [
 				'type'    => 'array',
-				'context' => [ 'edit' ],
-			]
-		]
-	);
-
-	register_rest_field(
-		'user',
-		'2fa_backup_codes_remaining',
-		[
-			'get_callback' => function( $user ) {
-				return Two_Factor_Backup_Codes::codes_remaining_for_user( get_userdata( $user['id'] ) );
-			},
-			'schema' => [
-				'type'    => 'int',
 				'context' => [ 'edit' ],
 			]
 		]
