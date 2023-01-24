@@ -10,6 +10,7 @@ import { RawHTML, useCallback, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import SetupProgressBar from './setup-progress-bar';
+import { refreshRecord } from '../utilities';
 
 export default function TOTP( { userRecord, clickScreenLink } ) {
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
@@ -19,7 +20,7 @@ export default function TOTP( { userRecord, clickScreenLink } ) {
 		<>
 			{ 'disabled' === totpStatus &&
 				<Setup
-					userID={ userRecord.record.id }
+					userRecord={ userRecord }
 					clickScreenLink={ clickScreenLink }
 				/>
 			}
@@ -32,7 +33,7 @@ export default function TOTP( { userRecord, clickScreenLink } ) {
 /**
  * Setup the TOTP provider.
  */
-function Setup( { userID, clickScreenLink } ) {
+function Setup( { userRecord, clickScreenLink } ) {
 	const [ secretKey, setSecretKey ]     = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ]     = useState( '' );
 	const [ verifyCode, setVerifyCode ]   = useState( '' );
@@ -44,7 +45,7 @@ function Setup( { userID, clickScreenLink } ) {
 		// useEffect callbacks can't be async directly, because that'd return the promise as a "cleanup" function.
 		const fetchSetupData = async () => {
 			const response = await apiFetch( {
-				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userID
+				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userRecord.record.id,
 			} );
 
 			setSecretKey( response[ 'secret_key' ] );
@@ -64,14 +65,13 @@ function Setup( { userID, clickScreenLink } ) {
 				path: '/two-factor/1.0/totp/',
 				method: 'POST',
 				data: {
-					user_id: userID,
+					user_id: userRecord.record.id,
 					key: secretKey,
 					code: verifyCode,
 				},
 			} );
 
-			// todo refresh userrecord. otherwise 'account status' screen still shows disabled after enabling and clicking 'back'
-
+			refreshRecord( userRecord );
 			clickScreenLink( event, 'backup-codes' );
 
 		} catch( error ) {
