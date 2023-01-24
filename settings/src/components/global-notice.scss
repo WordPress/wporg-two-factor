@@ -1,0 +1,24 @@
+.wporg-2fa__global-notice {
+	margin-bottom: 20px;
+
+	&.components-snackbar,
+	.components-snackbar__content {
+		cursor: auto;
+	}
+
+	.components-snackbar__content {
+		position: relative;
+	}
+
+	.components-snackbar .components-snackbar__icon,
+	.components-snackbar__icon {
+		position: relative;
+		width: 30px;
+		top: -6px !important;
+		left: -34px !important;
+		/* todo for some reason this is getting overridden without !important by the core styles, even though the selector is more specific,
+		    and it's inline while the core styles are in a file */
+
+		fill: green; /* todo use var */
+	}
+}

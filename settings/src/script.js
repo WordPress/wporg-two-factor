@@ -14,6 +14,7 @@ import Password from './components/password';
 import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
 import BackupCodes from './components/backup-codes';
+import GlobalNotice from './components/global-notice';
 
 export const GlobalContext = createContext( null );
 // todo change all components to use this instead of being passed userrecord etc
@@ -45,6 +46,7 @@ function renderSettings() {
 function Main( { userId } ) {
 	const userRecord                              = getUserRecord( userId );
 	const { record, edit, hasEdits, hasResolved } = userRecord;
+	const [ globalNotice, setGlobalNotice ]       = useState( '' );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -85,6 +87,7 @@ function Main( { userId } ) {
 			edit( record );
 		}
 
+		setGlobalNotice( '' );
 		setScreen( screen );
 	}, [] );
 
@@ -126,7 +129,8 @@ function Main( { userId } ) {
 	}
 
 	return (
-		<GlobalContext.Provider value={ { clickScreenLink, userRecord } }>
+		<GlobalContext.Provider value={ { clickScreenLink, userRecord, setGlobalNotice } }>
+			<GlobalNotice notice={ globalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
 	);
