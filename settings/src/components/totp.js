@@ -4,13 +4,14 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { RawHTML, useCallback, useEffect, useState } from '@wordpress/element';
+import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import SetupProgressBar from './setup-progress-bar';
 import { refreshRecord } from '../utilities';
+import { GlobalContext } from '../script';
 
 export default function TOTP( { userRecord, clickScreenLink } ) {
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
@@ -34,6 +35,7 @@ export default function TOTP( { userRecord, clickScreenLink } ) {
  * Setup the TOTP provider.
  */
 function Setup( { userRecord, clickScreenLink } ) {
+	const { setGlobalNotice }             = useContext( GlobalContext );
 	const [ secretKey, setSecretKey ]     = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ]     = useState( '' );
 	const [ verifyCode, setVerifyCode ]   = useState( '' );
@@ -73,6 +75,7 @@ function Setup( { userRecord, clickScreenLink } ) {
 
 			refreshRecord( userRecord );
 			clickScreenLink( event, 'backup-codes' );
+			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
 
 		} catch( error ) {
 			setError( error.message );
