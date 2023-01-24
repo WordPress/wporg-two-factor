@@ -11,3 +11,8 @@
 .wporg-2fa__verify-code {
 	width: 10ch;
 }
+
+.wporg-2fa__enabled-status {
+	color: green; // todo use color var
+	text-transform: uppercase;
+}
