@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { StrictMode, useCallback, useState } from '@wordpress/element';
+import { StrictMode, createContext, useCallback, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
 
@@ -14,6 +14,9 @@ import Password from './components/password';
 import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
 import BackupCodes from './components/backup-codes';
+
+export const GlobalContext = createContext( null );
+// todo change all components to use this instead of being passed userrecord etc
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -89,30 +92,42 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
+	let screenContent;
+
 	if ( 'account-status' === screen ) {
-		return (
-			 <div className={ 'wporg-2fa__' + screen }>
-				 <AccountStatus clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
-			 </div>
+		screenContent = (
+			<div className={ 'wporg-2fa__' + screen }>
+				<AccountStatus clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
+			</div>
+		);
+
+	} else {
+		screenContent = (
+			<Card>
+				<CardHeader className="wporg-2fa__navigation" size="xSmall">
+					<Flex>
+						<a
+							href="?screen=account-status"
+							onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }
+						>
+							<Icon icon={ arrowLeft } />
+							Back
+						</a>
+
+						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'One Time Passwords' ) }</h3>
+					</Flex>
+				</CardHeader>
+
+				<CardBody className={ 'wporg-2fa__' + screen }>
+					<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
+				</CardBody>
+			</Card>
 		);
 	}
 
 	return (
-		<Card>
-			<CardHeader className="wporg-2fa__navigation" size="xSmall">
-				<Flex>
-					<a href="?screen=account-status" onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }>
-						<Icon icon={ arrowLeft } />
-						Back
-					</a>
-
-					<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'One Time Passwords' ) }</h3>
-				</Flex>
-			</CardHeader>
-
-			<CardBody className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
-			</CardBody>
-		</Card>
+		<GlobalContext.Provider value={ { clickScreenLink, userRecord } }>
+			{ screenContent }
+		</GlobalContext.Provider>
 	);
 }
