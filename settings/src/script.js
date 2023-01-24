@@ -17,7 +17,6 @@ import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 
 export const GlobalContext = createContext( null );
-// todo change all components to use this instead of being passed userrecord etc
 
 window.addEventListener( 'DOMContentLoaded', renderSettings );
 
@@ -100,7 +99,7 @@ function Main( { userId } ) {
 	if ( 'account-status' === screen ) {
 		screenContent = (
 			<div className={ 'wporg-2fa__' + screen }>
-				<AccountStatus clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
+				<AccountStatus />
 			</div>
 		);
 
@@ -122,7 +121,7 @@ function Main( { userId } ) {
 				</CardHeader>
 
 				<CardBody className={ 'wporg-2fa__' + screen }>
-					<CurrentScreen clickScreenLink={ clickScreenLink } userRecord={ userRecord } />
+					<CurrentScreen />
 				</CardBody>
 			</Card>
 		);

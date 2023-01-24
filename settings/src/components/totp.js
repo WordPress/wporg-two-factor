@@ -13,29 +13,23 @@ import SetupProgressBar from './setup-progress-bar';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
-export default function TOTP( { userRecord, clickScreenLink } ) {
+export default function TOTP() {
+	const { userRecord }     = useContext( GlobalContext );
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
 	const totpStatus         = availableProviders.includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
 
-	return (
-		<>
-			{ 'disabled' === totpStatus &&
-				<Setup
-					userRecord={ userRecord }
-					clickScreenLink={ clickScreenLink }
-				/>
-			}
-
-			{ 'enabled' === totpStatus && <Manage /> }
-		</>
-	);
+	if ( 'enabled' === totpStatus ) {
+		return <Manage />;
+	} else {
+		return <Setup />;
+	}
 }
 
 /**
  * Setup the TOTP provider.
  */
-function Setup( { userRecord, clickScreenLink } ) {
-	const { setGlobalNotice }             = useContext( GlobalContext );
+function Setup() {
+	const { clickScreenLink, setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ secretKey, setSecretKey ]     = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ]     = useState( '' );
 	const [ verifyCode, setVerifyCode ]   = useState( '' );
@@ -58,7 +52,6 @@ function Setup( { userRecord, clickScreenLink } ) {
 	}, [] );
 
 	// Enable TOTP when button clicked.
-	// todo maybe move this to a sep func to reduce clutter in this func, but would have to pass in a lot of values/functions. same for fetchsetupdata
 	const handleEnable = useCallback( async ( event ) => {
 		event.preventDefault();
 
@@ -116,7 +109,6 @@ function Setup( { userRecord, clickScreenLink } ) {
 				qrCodeUrl={ qrCodeUrl }
 				secretKey={ secretKey }
 				cancelUrl={ cancelUrl }
-				clickScreenLink={ clickScreenLink }
 			/>
 
 			{ error &&
@@ -205,7 +197,8 @@ function createQrCode( data ) {
 /**
  * Render the form for entering the TOTP code.
  */
-function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey, cancelUrl, clickScreenLink } ) {
+function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey, cancelUrl } ) {
+	const { clickScreenLink } = useContext( GlobalContext );
 	const verifyCodeLength = 6;
 	const canSubmit        = qrCodeUrl && secretKey && verifyCode && verifyCode.length === verifyCodeLength;
 
@@ -258,7 +251,6 @@ function Manage() {
 	const [ error, setError ]             = useState( '' );
 
 	// Enable TOTP when button clicked.
-	// todo maybe move this to a sep func to reduce clutter in this func, but would have to pass in a lot of values/functions.
 	const handleDisable = useCallback( async ( event ) => {
 		event.preventDefault();
 

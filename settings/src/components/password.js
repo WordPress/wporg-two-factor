@@ -11,15 +11,21 @@ import { generatePassword } from '@automattic/generate-password';
 /**
  * WordPress dependencies
  */
-import { Button, Flex, Notice, TextControl }     from '@wordpress/components';
-import { useCallback, useEffect, useState }      from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, seen } from '@wordpress/icons';
-import apiFetch                                  from '@wordpress/api-fetch';
+import { Button, Flex, Notice, TextControl }            from '@wordpress/components';
+import { useCallback, useContext, useEffect, useState } from '@wordpress/element';
+import { Icon, cancelCircleFilled, check, seen }        from '@wordpress/icons';
+import apiFetch                                         from '@wordpress/api-fetch';
+
+/**
+ * Internal dependencies
+ */
+import { GlobalContext } from '../script';
 
 /**
  * Render the Password setting.
  */
-export default function Password( { userRecord } ) {
+export default function Password() {
+	const { userRecord }                        = useContext( GlobalContext );
 	const [ passwordStrong, setPasswordStrong ] = useState( false );
 	const [ saved, setSaved ]                   = useState( false );
 	const [ inputType, setInputType ]           = useState( 'password' );
@@ -144,7 +150,7 @@ export default function Password( { userRecord } ) {
  *
  * @returns {boolean}
  */
-function isPasswordStrong( password, userRecord ) {
+function isPasswordStrong( password, userData ) {
 	const { zxcvbn } = window; // Done here because it's loaded asyncronously.
 
 	if ( ! zxcvbn ) {
@@ -152,14 +158,14 @@ function isPasswordStrong( password, userRecord ) {
 	}
 
 	let blocklist = Object.values( pick(
-		userRecord,
+		userData,
 		[ 'email', 'description', 'first_name', 'last_name', 'name', 'nickname', 'slug', 'username' ]
 	) );
 	blocklist = blocklist.concat( [ 'wordpress', 'wporg', 'wordpressorg' ] );
 
 	// `3` is "safely unguessable: moderate protection from offline slow-hash scenario. (guesses < 10^10)"
 	// `4` is "very unguessable: strong protection from offline slow-hash scenario. (guesses >= 10^10)"
-	const minimumScore = userRecord['2fa_required'] ? 4 : 3;
+	const minimumScore = userData['2fa_required'] ? 4 : 3;
 	const strength     = zxcvbn( password, blocklist );
 
 	return strength.score >= minimumScore;

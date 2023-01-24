@@ -1,18 +1,24 @@
 /**
+ * WordPress dependencies
+ */
+import { useContext } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
+import { GlobalContext } from '../script';
 import SetupProgressBar from './setup-progress-bar';
 
 //
-export default function TOTP( { userRecord } ) {
+export default function TOTP() {
+	const { userRecord }    = useContext( GlobalContext );
 	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
-	return (
-		<>
-			{ 'disabled' === backupCodesStatus && <Setup /> }
-			{ 'enabled' === backupCodesStatus && <Manage /> }
-		</>
-	);
+	if ( 'enabled' === backupCodesStatus ) {
+		return <Manage />;
+	} else {
+		return <Setup />;
+	}
 }
 
 //

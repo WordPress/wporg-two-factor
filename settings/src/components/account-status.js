@@ -2,16 +2,23 @@
  * WordPress dependencies
  */
 import { Card, CardBody, CardHeader } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { GlobalContext } from '../script';
 
 /**
  * Render the Account Status.
  */
-export default function AccountStatus( { clickScreenLink, userRecord } ) {
+export default function AccountStatus() {
+	const { userRecord }    = useContext( GlobalContext );
 	const { record }        = userRecord;
 	const emailStatus       = record.pending_email ? 'pending' : 'ok';
-	const totpStatus        = record['2fa_available_providers'].includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
-	const backupCodesStatus = record['2fa_available_providers'].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
+	const totpStatus        = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const backupCodesStatus = record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
 	return (
 		<>
@@ -20,7 +27,6 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 				status="enabled"
 				headerText="Password"
 				bodyText="You have a password configured, but can change it at any time."
-				clickScreenLink={ clickScreenLink }
 			/>
 
 			<SettingStatusCard
@@ -32,7 +38,6 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 					`Your account email is pending a change to ${ record.pending_email }.` :
 					`Your account email address is ${ record.email }.`
 				}
-				clickScreenLink={ clickScreenLink }
 			/>
 
 			<SettingStatusCard
@@ -44,7 +49,6 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 					'You have two-factor authentication enabled using an app.' :
 					'You do not have two-factor authentication enabled.'
 				}
-				clickScreenLink={ clickScreenLink }
 			/>
 
 			<SettingStatusCard
@@ -52,7 +56,6 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 				status={ backupCodesStatus }
 				headerText="Two-Factor Backup Codes"
 				bodyText={ `You have ${ 'enabled' === backupCodesStatus ? '' : 'not' } verified your backup codes for two-factor authentication.` }
-				clickScreenLink={ clickScreenLink }
 			/>
 		</>
 	);
@@ -61,8 +64,8 @@ export default function AccountStatus( { clickScreenLink, userRecord } ) {
 /**
  * Render a card for the status of the given setting.
  */
-function SettingStatusCard( { screen, status, headerText, bodyText, clickScreenLink } ) {
-	// todo maybe use context for clickScreenLink instead of drilling
+function SettingStatusCard( { screen, status, headerText, bodyText } ) {
+	const { clickScreenLink } = useContext( GlobalContext );
 
 	let screenUrl = new URL( document.location.href );
 	screenUrl.searchParams.set( 'screen', screen );

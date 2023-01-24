@@ -3,13 +3,19 @@
  * WordPress dependencies
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useContext, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { GlobalContext } from '../script';
 
 /**
  * Render the Email setting.
  */
-export default function EmailAddress( { userRecord } ) {
-	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord
+export default function EmailAddress() {
+	const { userRecord }                                           = useContext( GlobalContext );
+	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord;
 	const [ emailError, setEmailError ]                            = useState( '' );
 	const [ justChangedEmail, setJustChangedEmail ]                = useState( false );
 
