@@ -4,12 +4,11 @@
 import { StrictMode, useCallback, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import { getUserRecord } from './utilities';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
@@ -31,9 +30,9 @@ function renderSettings() {
 	const root = ReactDOM.createRoot( wrapper );
 
 	root.render(
-	  <StrictMode>
-		<Main userId={ parseInt( wrapper.dataset.userId ) } />
-	  </StrictMode>
+		<StrictMode>
+			<Main userId={ parseInt( wrapper.dataset.userId ) } />
+		</StrictMode>
 	);
 }
 
@@ -116,18 +115,4 @@ function Main( { userId } ) {
 			</CardBody>
 		</Card>
 	);
-}
-
-/**
- * Fetch the user record.
- */
-function getUserRecord( userId ) {
-	let userRecord = useEntityRecord( 'root', 'user', userId );
-
-	// Polyfill in isSaving.
-	if ( undefined === userRecord.isSaving ) {
-		userRecord.isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
-	}
-
-	return userRecord;
 }
