@@ -25,9 +25,8 @@ import { GlobalContext } from '../script';
  * Render the Password setting.
  */
 export default function Password() {
-	const { userRecord }                        = useContext( GlobalContext );
+	const { setGlobalNotice, userRecord }       = useContext( GlobalContext );
 	const [ passwordStrong, setPasswordStrong ] = useState( false );
-	const [ saved, setSaved ]                   = useState( false );
 	const [ inputType, setInputType ]           = useState( 'password' );
 
 	// Check strength every time the password changes.
@@ -36,7 +35,7 @@ export default function Password() {
 			return;
 		}
 
-		setSaved( false );
+		setGlobalNotice( '' );
 		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
 	}, [ userRecord.editedRecord.password ] );
 
@@ -65,18 +64,11 @@ export default function Password() {
 		} );
 		apiFetch.nonceMiddleware.nonce = await response.text();
 
-		setSaved( true );
+		setGlobalNotice( 'New password saved.' );
 	}, [] );
 
 	return (
 		<>
-			{ saved &&
-				<Notice status="success" isDismissible={ false }>
-					<Icon icon={ check } />
-					New password saved.
-				</Notice>
-			}
-
 			<p>
 				To update your password enter a new one below.
 				Strong passwords are random, at least twenty characters long, and include uppercase letters and symbols.
