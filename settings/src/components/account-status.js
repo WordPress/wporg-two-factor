@@ -9,6 +9,7 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
  * Internal dependencies
  */
 import { GlobalContext } from '../script';
+import ScreenLink from './screen-link';
 
 /**
  * Render the Account Status.
@@ -65,27 +66,24 @@ export default function AccountStatus() {
  * Render a card for the status of the given setting.
  */
 function SettingStatusCard( { screen, status, headerText, bodyText } ) {
-	const { clickScreenLink } = useContext( GlobalContext );
-
-	let screenUrl = new URL( document.location.href );
-	screenUrl.searchParams.set( 'screen', screen );
-
 	return (
 		<Card className={ 'wporg-2fa__status-card wporg-2fa__status-card-' + screen }>
-			<a
-				href={ screenUrl.href }
-				onClick={ ( event ) => clickScreenLink( event, screen ) }
-			>
-				<CardHeader>
-					<StatusIcon status={ status } />
-					{ headerText }
-				</CardHeader>
+			<ScreenLink
+				screen={ screen }
+				anchorText={
+					<>
+						<CardHeader>
+							<StatusIcon status={ status } />
+							{ headerText }
+						</CardHeader>
 
-				<CardBody>
-					<p>{ bodyText }</p>
-					<Icon icon={ chevronRight } />
-				</CardBody>
-			</a>
+						<CardBody>
+							<p>{ bodyText }</p>
+							<Icon icon={ chevronRight } />
+						</CardBody>
+					</>
+				}
+			/>
 		</Card>
 	);
 }

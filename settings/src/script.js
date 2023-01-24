@@ -9,6 +9,7 @@ import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components
  * Internal dependencies
  */
 import { getUserRecord } from './utilities';
+import ScreenLink from './components/screen-link'
 import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
@@ -108,13 +109,15 @@ function Main( { userId } ) {
 			<Card>
 				<CardHeader className="wporg-2fa__navigation" size="xSmall">
 					<Flex>
-						<a
-							href="?screen=account-status"
-							onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }
-						>
-							<Icon icon={ arrowLeft } />
-							Back
-						</a>
+						<ScreenLink
+							screen="account-status"
+							anchorText={
+								<>
+									<Icon icon={ arrowLeft } />
+									Back
+								</>
+							}
+						/>
 
 						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'One Time Passwords' ) }</h3>
 					</Flex>

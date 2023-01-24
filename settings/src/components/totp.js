@@ -10,6 +10,7 @@ import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpres
  * Internal dependencies
  */
 import SetupProgressBar from './setup-progress-bar';
+import ScreenLink from './screen-link'
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
@@ -75,9 +76,6 @@ function Setup() {
 		}
 	} );
 
-	const cancelUrl = new URL( document.location.href );
-	cancelUrl.searchParams.set( 'screen', 'account-status' );
-
 	return (
 		<>
 			<SetupProgressBar step="totp" />
@@ -108,7 +106,6 @@ function Setup() {
 				setVerifyCode={ setVerifyCode }
 				qrCodeUrl={ qrCodeUrl }
 				secretKey={ secretKey }
-				cancelUrl={ cancelUrl }
 			/>
 
 			{ error &&
@@ -197,8 +194,7 @@ function createQrCode( data ) {
 /**
  * Render the form for entering the TOTP code.
  */
-function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey, cancelUrl } ) {
-	const { clickScreenLink } = useContext( GlobalContext );
+function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey } ) {
 	const verifyCodeLength = 6;
 	const canSubmit        = qrCodeUrl && secretKey && verifyCode && verifyCode.length === verifyCodeLength;
 
@@ -230,14 +226,7 @@ function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secret
 					Enable
 				</Button>
 
-				<Button
-					isLink
-					href={ cancelUrl.href }
-					onClick={ ( event ) => clickScreenLink( event, 'account-status' ) }
-				>
-					Cancel
-					{/* todo this should look like a button not a link */}
-				</Button>
+				<ScreenLink screen="account-status" anchorText="Cancel" buttonStyle="secondary" />
 			</div>
 		</form>
 	);
@@ -278,7 +267,7 @@ function Manage() {
 
 			<p>
 				Make sure you've created { ' ' }
-				<a href="?screen=backup-codes" onClick={ ( event ) => clickScreenLink( event, 'backup-codes' ) }>backup codes</a> { ' ' }
+				<ScreenLink screen="backup-codes" anchorText="backup codes" /> { ' ' }
 				and saved them in a safe location, in case you ever lose your device. You may also need them when transitioning to a new device.
 				Without them you may permenantly lose access to your account.
 			</p>
