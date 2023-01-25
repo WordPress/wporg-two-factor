@@ -1,18 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
-import { Button, CheckboxControl } from '@wordpress/components';
-import { Icon, warning } from '@wordpress/icons';
+import apiFetch                                         from '@wordpress/api-fetch';
+import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
+import { Button, CheckboxControl, Spinner }             from '@wordpress/components';
+import { Icon, warning }                                from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { GlobalContext } from '../script';
-import SetupProgressBar from './setup-progress-bar';
+import { refreshRecord } from '../utilities';
+import SetupProgressBar  from './setup-progress-bar';
+
 
 //
-export default function TOTP() {
+export default function BackupCodes() {
 	const { userRecord }    = useContext( GlobalContext );
 	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
@@ -25,7 +28,40 @@ export default function TOTP() {
 
 //
 function Setup() {
-	const hasPrinted = false; /* make state */
+	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const [ backupCodes, setBackupCodes ] = useState( [] );
+	const [ hasPrinted, setHasPrinted ]   = useState( false );
+
+	// Generate new backup codes and save them in usermeta.
+	useEffect( () => {
+		// useEffect callbacks can't be async directly, because that'd return the promise as a "cleanup" function.
+		const generateCodes = async () => {
+			// This will save the backup codes and enable the provider, which isn't really what we want, but that
+			// mimics the upstream plugin. It's probably better to fix it there first, and then update this, to
+			// make sure we stay in sync with upstream.
+			// See https://github.com/WordPress/two-factor/issues/507
+			const response = await apiFetch( {
+				path: '/two-factor/1.0/generate-backup-codes',
+				method: 'POST',
+				data: {
+					user_id: userRecord.record.id,
+					method: 'replace',
+					number: 10
+				}
+			} );
+
+			setBackupCodes( response.codes );
+		};
+
+		generateCodes();
+	}, [] );
+
+	// Finish the setup process.
+	const handleFinished = useCallback( () => {
+		// The codes have already been saved to usermeta, see `generateCodes()` above.
+		refreshRecord( userRecord ); // This will redirect to the Manage screen.
+		setGlobalNotice( 'Backup codes have been enabled.' );
+	} );
 
 	return (
 		<>
@@ -38,7 +74,7 @@ function Setup() {
 
 			<p>Please print the codes and keep them in a safe place.</p>
 
-			<CodeList />
+			<CodeList codes={ backupCodes } />
 
 			<p>
 				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
@@ -49,41 +85,42 @@ function Setup() {
 			<CheckboxControl
 				label="I have printed or saved these codes"
 				checked={ hasPrinted }
-				onChange={ console.log( 'todo update state' ) }
+				onChange={ setHasPrinted }
 			/>
 
 			<p>
 				<Button
 					isPrimary
 					disabled={ ! hasPrinted }
-					onClick={ console.log( 'todo save the codes to usermeta' ) }
+					onClick={ handleFinished }
 				>
 					All Finished
 				</Button>
+
+				{/* maybe need a cancel button here that deletes the codes?
+				i don't really wanna save them until they click 'all finished'
+				even if have cancel could still have problem if they just click back or close the page. they won't expect that simply
+				*/}
 			</p>
 		</>
 	);
 }
 
 /**
- * Fetch and display a list of backup codes
+ * Display a list of backup codes
  */
-function CodeList() {
-	const codes = [
-		53532411, 69155486, 84512889, 87518529, 71203631,
-		26050601, 78319488, 36118778, 89935526, 86454379
-	];
-	// fetch via xhr. maybe need to do this as useeffect in Setup so that the save function has access to the codes
-	// if so update jsdoc to reflect that not fetching, and add param to accept codes. empty array for loading
-
+function CodeList( { codes } ) {
 	return (
-		<code className="wporg-2fa__backup-codes-list">
-			{ ! codes &&
-				<p>Loading...</p>
+		<div className="wporg-2fa__backup-codes-list">
+			{ ! codes.length &&
+				<p>
+					Generating backup codes...
+					<Spinner />
+				</p>
 				/* test this */
 			}
 
-			{ codes &&
+			{ codes.length > 0 &&
 				<ol>
 					{ codes.map( ( code ) => {
 						return (
@@ -94,7 +131,7 @@ function CodeList() {
 					} ) }
 				</ol>
 			}
-		</code>
+		</div>
 	);
 }
 
