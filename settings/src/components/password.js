@@ -94,7 +94,8 @@ export default function Password() {
 				/>
 
 				<Button onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }>
-					{/* @todo style closer to mockup */ }
+					{/* @todo style closer to mockup.
+					 todo shrinks too small on mobile */ }
 					<Icon icon={ seen } />
 				</Button>
 			</Flex>

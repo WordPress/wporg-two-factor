@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import { Button, CheckboxControl } from '@wordpress/components';
+import { Icon, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,34 +25,76 @@ export default function TOTP() {
 
 //
 function Setup() {
+	const hasPrinted = false; /* make state */
+
 	return (
 		<>
 			<SetupProgressBar step="backup-codes" />
 
 			<p>
 				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
-				We ask that you print this list of ten unique, one-time-use backup codes and keep the list in a safe place.
+				Each code can only be used once.
 			</p>
 
-			<code>
-				backup codes
-			</code>
+			<p>Please print the codes and keep them in a safe place.</p>
+
+			<CodeList />
 
 			<p>
-				red exclamation mark icon
-				Without access to the app, your phone, or a backup code, you will lose access to your account.
+				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+				Without access to the one-time password app or a backup code, you will lose access to your account.
+				Once you navigate away from this page, you will not be able to view these codes again.
+			</p>
 
+			<CheckboxControl
+				label="I have printed or saved these codes"
+				checked={ hasPrinted }
+				onChange={ console.log( 'todo update state' ) }
+			/>
 
-				check box
-				I have printed or saved these codes
-
-				all finished primary button
-
-				copy icon button
-				print icon button
-				download icon button
+			<p>
+				<Button
+					isPrimary
+					disabled={ ! hasPrinted }
+					onClick={ console.log( 'todo save the codes to usermeta' ) }
+				>
+					All Finished
+				</Button>
 			</p>
 		</>
+	);
+}
+
+/**
+ * Fetch and display a list of backup codes
+ */
+function CodeList() {
+	const codes = [
+		53532411, 69155486, 84512889, 87518529, 71203631,
+		26050601, 78319488, 36118778, 89935526, 86454379
+	];
+	// fetch via xhr. maybe need to do this as useeffect in Setup so that the save function has access to the codes
+	// if so update jsdoc to reflect that not fetching, and add param to accept codes. empty array for loading
+
+	return (
+		<code className="wporg-2fa__backup-codes-list">
+			{ ! codes &&
+				<p>Loading...</p>
+				/* test this */
+			}
+
+			{ codes &&
+				<ol>
+					{ codes.map( ( code ) => {
+						return (
+							 <li key={ code }>
+								 { code }
+							 </li>
+						)
+					} ) }
+				</ol>
+			}
+		</code>
 	);
 }
 

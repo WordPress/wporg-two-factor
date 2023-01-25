@@ -1,0 +1,37 @@
+.wporg-2fa__backup-codes {
+	.wporg-2fa__backup-codes-list {
+		ol {
+			column-count: 2;
+			column-width: 110px;
+			margin: 0;
+			padding: 15px 20px;
+			background-color: #e1e1e1; /* use color var */
+		}
+
+		li::marker {
+			/* todo: a11y issues w/ contrast here? mockup calls for this to be lighter than the backup code
+			     -- presumably so that users don't mistakenly think it's part of the code --
+			     but darker than the background
+			    */
+			color: #8a8787; /* use color var*/
+		}
+
+	}
+
+	.wporg-2fa__print-codes-warning {
+		position: relative;
+		top: 8px;
+		width: 28px;
+		height: 28px;
+		fill: #d20000; /* use color var */
+	}
+}
+
+#bbpress-forums .wporg-2fa__backup-codes {
+	.wporg-2fa__backup-codes-list {
+		li {
+			list-style-type: decimal;
+			list-style-position: inside;
+		}
+	}
+}
