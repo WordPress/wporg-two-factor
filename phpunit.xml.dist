@@ -21,9 +21,18 @@
 		</testsuite>
 	</testsuites>
 
+	<!--
+	  == Because this is a security plugin, the goal for coverage is 100% for code that is testable and worth
+	  == testing. It's not worth refactoring gymnastics to make everything testable, though, and some things
+	  == just aren't important. @codeCoverageIgnore should be used liberally to indicate when a function is
+	  == not worth testing, because that ensures that the coverage % remains meaningful and only reflects
+	  == the code that we're trying to test.
+	  -->
 	<coverage processUncoveredFiles="false">
 		<include>
 			<file>wporg-two-factor.php</file>
+			<file>settings/settings.php</file>
+			<file>settings/rest-api.php</file>
 		</include>
 
 		<report>

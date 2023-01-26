@@ -101,6 +101,7 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 function user_requires_2fa( WP_User $user ) : bool {
 	global $trusted_deputies, $wcorg_subroles;
 
+	// @codeCoverageIgnoreStart
 	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
 		// 2FA is opt-in during beta testing.
 		// todo Remove this once we open it to all users.
@@ -109,6 +110,7 @@ function user_requires_2fa( WP_User $user ) : bool {
 			return false;
 		}
 	}
+    // @codeCoverageIgnoreEnd
 
 	$required = false;
 
@@ -164,6 +166,8 @@ function render_2fa_admin_notice() : void {
  * Get the notice for enabling 2FA.
  *
  * When used as a filter callback, this will prepend the 2FA notice to others notices.
+ *
+ * @codeCoverageIgnore
  */
 function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 	$two_factor_notice = sprintf(
@@ -179,6 +183,8 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 
 /**
  * Get the URL of the Edit Account screen.
+ *
+ * @codeCoverageIgnore
  */
 function get_edit_account_url() : string {
 	$user = wp_get_current_user();

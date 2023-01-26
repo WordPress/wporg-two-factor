@@ -17,6 +17,8 @@ add_filter( 'rest_pre_insert_user', __NAMESPACE__ . '\require_email_confirmation
  * This duplicates block_editor_rest_api_preload() as there is no generic function for performing this preloading.
  * WARNING: This will output Javascript immediately if called during the page load if the wp-api-fetch script has already been output.
  *
+ * @codeCoverageIgnore
+ *
  * @param array $preload_paths The REST API paths to be pre-loaded, must include prefixed slash.
  * @return void
  */
@@ -105,6 +107,8 @@ function rest_get_totp_setup( WP_REST_Request $request ) : array {
 
 /**
  * Register any user meta that needs to be exposed.
+ *
+ * @codeCoverageIgnore
  */
 function register_user_fields(): void {
 	// Expose the `_new_email` user meta through the rest api as a custom user field.
@@ -180,6 +184,8 @@ function register_user_fields(): void {
  * TODO: This should be moved to a WordPress.org mu-plugin.
  * TODO: This generates urls to /support/wp-admin/profile.php?newuseremail=%s
  *       bbPress also implements this functionality, through bbp_edit_user_email_send_notification()
+ *
+ * @codeCoverageIgnore
  *
  * @param array $insert_data The user data being updated.
  * @return array
