@@ -64,6 +64,7 @@ function Setup() {
 					user_id: userRecord.record.id,
 					key: secretKey,
 					code: verifyCode,
+					enable_provider: true,
 				},
 			} );
 

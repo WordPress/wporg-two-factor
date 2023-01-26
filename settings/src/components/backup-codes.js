@@ -51,7 +51,8 @@ function Setup( { setRegenerating } ) {
 				data: {
 					user_id: userRecord.record.id,
 					method: 'replace',
-					number: 10
+					number: 10,
+					enable_provider: true,
 				}
 			} );
 
