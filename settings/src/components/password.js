@@ -25,19 +25,22 @@ import { GlobalContext } from '../script';
  * Render the Password setting.
  */
 export default function Password() {
-	const { setGlobalNotice, userRecord }       = useContext( GlobalContext );
-	const [ passwordStrong, setPasswordStrong ] = useState( false );
-	const [ inputType, setInputType ]           = useState( 'password' );
+	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const [ inputType, setInputType ]     = useState( 'password' );
+	let passwordStrong                    = true; // Saved passwords have already passed the test.
 
-	// Check strength every time the password changes.
+	if ( userRecord.hasEdits ) {
+		passwordStrong = isPasswordStrong( userRecord.editedRecord.password, userRecord.record );
+	}
+
+	// Clear the "saved password" notice when password is being changed.
 	useEffect( () => {
-		if ( ! userRecord.editedRecord.password ) {
+		if ( ! userRecord.hasEdits ) {
 			return;
 		}
 
 		setGlobalNotice( '' );
-		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
-	}, [ userRecord.editedRecord.password ] );
+	}, [ userRecord.hasEdits ] );
 
 	/**
 	 * Handle clicking the `Generate Password` button.
