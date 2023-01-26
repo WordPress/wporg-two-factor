@@ -3,7 +3,7 @@
  */
 import apiFetch                                         from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
-import { Button, CheckboxControl, Spinner }             from '@wordpress/components';
+import { Button, CheckboxControl, Notice, Spinner }     from '@wordpress/components';
 import { Icon, warning }                                from '@wordpress/icons';
 
 /**
@@ -13,21 +13,26 @@ import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities';
 import SetupProgressBar  from './setup-progress-bar';
 
-
-//
+/**
+ * Setup and manage backup codes.
+ */
 export default function BackupCodes() {
-	const { userRecord }    = useContext( GlobalContext );
+	const { userRecord }                    = useContext( GlobalContext );
+	const [ regenerating, setRegenerating ] = useState( false );
+
 	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
-	if ( 'enabled' === backupCodesStatus ) {
-		return <Manage />;
+	if ( 'enabled' === backupCodesStatus && ! regenerating ) {
+		return <Manage setRegenerating={ setRegenerating } />;
 	} else {
-		return <Setup />;
+		return <Setup setRegenerating={ setRegenerating } />;
 	}
 }
 
-//
-function Setup() {
+/**
+ * Setup the Backup Codes provider.
+ */
+function Setup( { setRegenerating } ) {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ]   = useState( false );
@@ -59,8 +64,9 @@ function Setup() {
 	// Finish the setup process.
 	const handleFinished = useCallback( () => {
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
-		refreshRecord( userRecord ); // This will redirect to the Manage screen.
+		refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
+		setRegenerating( false );
 	} );
 
 	return (
@@ -76,11 +82,11 @@ function Setup() {
 
 			<CodeList codes={ backupCodes } />
 
-			<p>
+			<Notice status="warning" isDismissible={ false }>
 				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
 				Without access to the one-time password app or a backup code, you will lose access to your account.
 				Once you navigate away from this page, you will not be able to view these codes again.
-			</p>
+			</Notice>
 
 			<CheckboxControl
 				label="I have printed or saved these codes"
@@ -96,11 +102,6 @@ function Setup() {
 				>
 					All Finished
 				</Button>
-
-				{/* maybe need a cancel button here that deletes the codes?
-				i don't really wanna save them until they click 'all finished'
-				even if have cancel could still have problem if they just click back or close the page. they won't expect that simply
-				*/}
 			</p>
 		</>
 	);
@@ -117,7 +118,6 @@ function CodeList( { codes } ) {
 					Generating backup codes...
 					<Spinner />
 				</p>
-				/* test this */
 			}
 
 			{ codes.length > 0 &&
@@ -135,29 +135,36 @@ function CodeList( { codes } ) {
 	);
 }
 
-//
-function Manage() {
-	//make this DRY with the setup screen - modularize Setup so that this can call indivitual components
+/**
+ * Render the screen where users can manage Backup Codes.
+ */
+function Manage( { setRegenerating } ) {
+	const { userRecord } = useContext( GlobalContext );
+	const remaining      = userRecord.record[ '2fa_backup_codes_remaining' ];
 
 	return (
 		<>
-			Generate new backup codes button - on click populates area below with new codes
-
 			<p>
-				Backup codes let you access your account if your phone is lost or stolen, or even just accidentally run through the washing machine!
+				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
+				Each code can only be used once.
 			</p>
 
-			<p>
-				red exclamation mark icon
-				Backup codes have not been verified.
-			</p>
+			{ remaining > 5 &&
+				<p>You have <strong>{ remaining }</strong> backup codes remaining.</p>
+			}
 
-			<p>
-				Type a Backup Code to Verify
-				input field with placeholder "e.g. 12345678"
-			</p>
+			{ remaining <= 5 &&
+				<Notice status="warning" isDismissible={ false }>
+					<Icon icon={ warning } />
+					You only have <strong>{ remaining }</strong> backup codes remaining.
+					Please regenerate and save new ones before you run out.
+					If you don't, you won't be able to log into your account if you lose your phone.
+				</Notice>
+			}
 
-			Verify button
+			<Button isSecondary onClick={ () => { setRegenerating( true ) } }>
+				Generate new backup codes
+			</Button>
 		</>
 	);
 }

@@ -157,6 +157,20 @@ function register_user_fields(): void {
 			]
 		]
 	);
+
+	register_rest_field(
+		'user',
+		'2fa_backup_codes_remaining',
+		[
+			'get_callback' => function( $user ) {
+				return Two_Factor_Backup_Codes::codes_remaining_for_user( get_userdata( $user['id'] ) );
+			},
+			'schema' => [
+				'type'    => 'int',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
 }
 
 /**
