@@ -172,7 +172,7 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$super_admins[]       = self::$privileged_user->user_login;
 
 		wp_set_current_user( self::$privileged_user->ID, self::$privileged_user->user_login );
-		$expected = admin_url( 'profile.php' );
+		$expected = sprintf( 'https://wordpress.org/support/users/%s/edit/account/', self::$privileged_user->user_nicename );
 		$actual   = apply_filters( 'login_redirect', admin_url(), admin_url(), self::$privileged_user );
 
 		$this->assertTrue( user_requires_2fa( self::$privileged_user ) );
