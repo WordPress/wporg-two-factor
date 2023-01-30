@@ -1,11 +1,73 @@
-// todo style this closer to the mockup
-.wporg-2fa__setup-steps {
-	.is-enabled {
-		font-weight: bold;
-		color: blue; // todo use color var w/ correct color
+.wporg-2fa__progress-bar,
+#bbpress-forums .wporg-2fa__progress-bar,
+#bbpress-forums.bbpress-wrapper .wporg-2fa__progress-bar {
+	--color-enabled: #0475c4;
+	--color-disabled: #c2c3c6;
+	--color-disabled-text: #707070; // Darker than `color-disabled` to meet a11y contrast standards.
+
+	position: relative;
+	margin: 0 -24px; /* Separators need to stretch to edges of container. */
+
+	.wporg-2fa__setup-steps {
+		position: relative;
+		z-index: 2; /* On top of the separators. */
+		display: flex;
+		justify-content: space-evenly; /* Align the steps up with the separators. */
+
+		li {
+			text-align: center;
+		}
+
+		svg {
+			box-sizing: content-box;
+			padding: 15px;
+			border: 1px solid;
+			border-radius: 30px;
+		}
+
+		li.is-enabled {
+			font-weight: bold;
+			color: var(--color-enabled);
+
+			svg {
+				background-color: var(--color-enabled);
+				border-color: var(--color-enabled);
+				fill: white;
+			}
+		}
+
+		li.is-disabled {
+			color: var(--color-disabled-text);
+
+			svg {
+				background-color: white;
+				border-color: var(--color-disabled);
+				fill: var(--color-disabled);
+			}
+		}
 	}
 
-	.is-disabled {
-		color: grey; // todo use color var w/ correct color
+	.wporg-2fa__setup-step-separators {
+		display: flex;
+		justify-content: space-between; /* Align the separators up with the steps. */
+		position: absolute;
+		top: 30px;
+		z-index: 1; /* Under the steps. */
+		width: 100%;
+
+		li {
+			height: 3px;
+			flex-basis: 33%;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			&.is-enabled {
+				background-color: var(--color-enabled);
+			}
+
+			&.is-disabled {
+				background-color: var(--color-disabled);
+			}
+		}
 	}
 }
