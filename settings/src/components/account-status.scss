@@ -13,22 +13,23 @@
 		.components-card__body {
 			display: flex;
 			justify-content: space-between;
+			align-items: center;
 		}
 	}
 
 	.wporg-2fa__status-icon {
 		&.is-enabled,
 		&.is-ok {
-			fill: green;
+			fill: var(--color-success);
 		}
 
 		&.is-pending {
-			fill: orange;
+			fill: var(--color-warning);
 		}
 
 		&.is-disabled,
 		&.is-error {
-			fill: red;
+			fill: var(--color-error);
 		}
 	}
 }

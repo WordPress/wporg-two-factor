@@ -1,4 +1,7 @@
 .wp-block-wporg-two-factor-settings {
+	--color-success: #008a20;
+	--color-warning: #dfb104;
+	--color-error: #d63738;
 }
 
 .wp-block-wporg-two-factor-settings h3 {
@@ -11,8 +14,12 @@
 }
 
 .wporg-2fa__navigation {
-	a {
-		flex: none;
+	padding: 0 24px !important; /* Override Gutenberg auto-generated. */
+
+	svg {
+		position: relative;
+		top: 7px;
+		margin-right: 3px;
 	}
 
 	h3 {

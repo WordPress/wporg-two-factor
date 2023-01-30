@@ -14,6 +14,6 @@
 }
 
 .wporg-2fa__enabled-status {
-	color: green; // todo use color var
+	color: var(--color-success);
 	text-transform: uppercase;
 }
