@@ -16,6 +16,11 @@
 .wporg-2fa__navigation {
 	padding: 0 24px !important; /* Override Gutenberg auto-generated. */
 
+	a {
+		position: relative;
+		top: -4px;
+	}
+
 	svg {
 		position: relative;
 		top: 7px;
@@ -24,6 +29,7 @@
 
 	h3 {
 		flex: 1 1 auto;
+		margin: 25px 0;
 		text-align: center;
 		text-transform: capitalize;
 	}

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Card, CardBody, CardHeader } from '@wordpress/components';
+import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
 
@@ -71,17 +71,12 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 			<ScreenLink
 				screen={ screen }
 				anchorText={
-					<>
-						<CardHeader>
-							<StatusIcon status={ status } />
-							{ headerText }
-						</CardHeader>
-
-						<CardBody>
-							<p>{ bodyText }</p>
-							<Icon icon={ chevronRight } />
-						</CardBody>
-					</>
+					<CardBody>
+						<StatusIcon status={ status } />
+						<h3>{ headerText }</h3>
+						<p>{ bodyText }</p>
+						<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
+					</CardBody>
 				}
 			/>
 		</Card>
@@ -113,6 +108,7 @@ function StatusIcon( { status } ) {
 	return (
 		<Icon
 			icon={ icon }
+			size={ 32 }
 			className={ 'wporg-2fa__status-icon is-' + status }
 		/>
 	);

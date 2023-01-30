@@ -1,19 +1,49 @@
 .wporg-2fa__account-status {
 	.wporg-2fa__status-card {
-		margin-bottom: 40px;
-
 		a {
 			text-decoration: none;
 		}
 
 		.components-card__header {
 			justify-content: flex-start;
+			color: #1e1e1e;
+			font-size: 1.2em;
 		}
 
 		.components-card__body {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
+			display: grid;
+			grid-template-columns: min-content auto min-content;
+			grid-template-areas:
+				"status header      open"
+				"status description open"
+			;
+			grid-column-gap: 10px;
+			color: #5d5d5d;
+			padding: 18px 14px;
+
+			.wporg-2fa__status-icon {
+				grid-area: status;
+				align-self: center;
+			}
+
+			h3 {
+				grid-area: header;
+				align-self: end;
+				margin: 0;
+				font-size: 1.1em;
+			}
+
+			p {
+				grid-area: description;
+				align-self: start;
+				margin: 0;
+				color: #656971;
+			}
+
+			.wporg-2fa__status-card-open {
+				grid-area: open;
+				align-self: center;
+			}
 		}
 	}
 
