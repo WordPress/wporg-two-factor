@@ -82,7 +82,7 @@ export default function Password() {
 				For more information, read about <a href="https://wordpress.org/support/article/password-best-practices/">password best practices</a>.
 			</p>
 
-			<Flex>
+			<Flex className="wporg-2fa__password_container">
 				<TextControl
 					type={ inputType }
 					autoComplete="new-password"
@@ -96,9 +96,11 @@ export default function Password() {
 					onChange={ ( password ) => userRecord.edit( { password } ) }
 				/>
 
-				<Button onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }>
-					{/* @todo style closer to mockup.
-					 todo shrinks too small on mobile */ }
+				<Button
+					className="wporg-2fa__show-password"
+					size={ 24 }
+					onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }
+				>
 					<Icon icon={ seen } />
 				</Button>
 			</Flex>

@@ -19,6 +19,6 @@
 		/* todo for some reason this is getting overridden without !important by the core styles, even though the selector is more specific,
 		    and it's inline while the core styles are in a file */
 
-		fill: green; /* todo use var */
+		fill: var(--color-success);
 	}
 }
