@@ -63,6 +63,10 @@ function two_factor_providers( array $providers ) : array {
 function remove_super_admins_until_2fa_enabled() : void {
 	global $super_admins;
 
+	if ( empty( $super_admins ) ) {
+		return;
+	}
+
 	$user     = wp_get_current_user();
 	$position = array_search( $user->user_login, $super_admins, true );
 
