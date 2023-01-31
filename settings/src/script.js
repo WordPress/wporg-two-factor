@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { StrictMode, createContext, useCallback, useState } from '@wordpress/element';
+import { StrictMode, createContext, useCallback, useEffect, useState } from '@wordpress/element';
 import { Icon, arrowLeft } from '@wordpress/icons';
 import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
 
@@ -47,6 +47,7 @@ function Main( { userId } ) {
 	const userRecord                              = getUserRecord( userId );
 	const { record, edit, hasEdits, hasResolved } = userRecord;
 	const [ globalNotice, setGlobalNotice ]       = useState( '' );
+	let currentUrl                                = new URL( document.location.href );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -57,18 +58,33 @@ function Main( { userId } ) {
 		'backup-codes':   BackupCodes,
 	};
 
-	let currentUrl    = new URL( document.location.href );
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
 	if ( ! components[ initialScreen ] ) {
 		initialScreen = 'account-status';
+		currentUrl.searchParams.set( 'screen', initialScreen );
+		history.pushState( {}, '', currentUrl );
 	}
 
 	const [ screen, setScreen ] = useState( initialScreen );
 	const CurrentScreen         = components[ screen ];
 
-	currentUrl.searchParams.set( 'screen', screen );
-	history.pushState( {}, '', currentUrl );
+	// Listen for back/forward button clicks.
+	useEffect( () => {
+		window.addEventListener( 'popstate', handlePopState );
+
+		return () => { window.removeEventListener( 'popstate', handlePopState ) }
+	}, [] );
+
+	// Trigger a re-render when the back/forward buttons are clicked.
+	const handlePopState = useCallback( () => {
+		currentUrl = new URL( document.location.href );
+		const newScreen = currentUrl.searchParams.get( 'screen' );
+
+		if ( newScreen ) {
+			setScreen( newScreen );
+		}
+	}, [] );
 
 	/**
 	 * Update the screen without refreshing the page.
@@ -86,6 +102,10 @@ function Main( { userId } ) {
 		if ( hasEdits ) {
 			edit( record );
 		}
+
+		currentUrl = new URL( document.location.href );
+		currentUrl.searchParams.set( 'screen', screen );
+		history.pushState( {}, '', currentUrl );
 
 		setGlobalNotice( '' );
 		setScreen( screen );
