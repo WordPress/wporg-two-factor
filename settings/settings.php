@@ -25,12 +25,10 @@ function register_block() {
  * @codeCoverageIgnore
  */
 function replace_core_ui_with_custom() : void {
-	if ( ! is_admin() ) {
-		// @todo Remove the `if()` once the custom UI is fully functional, since the back-end upstream UI will no
-		// longer be needed, and may cause conflicts.
-		remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
-		remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
-	}
+	remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
+	remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
+	remove_action( 'personal_options_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
+	remove_action( 'edit_user_profile_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
 
 	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
 }

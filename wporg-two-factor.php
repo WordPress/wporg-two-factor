@@ -15,12 +15,18 @@ use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
 
-// Disabled until ready for launch.
-if ( 'production' === wp_get_environment_type() ) {
-	return;
+/**
+ * todo remove this when launch for all users.
+ * @codeCoverageIgnore
+ */
+function is_2fa_beta_tester() : bool {
+	$user         = wp_get_current_user();
+	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul' );
+
+	return in_array( $user->user_login, $beta_testers, true );
 }
 
-// Load the Two Factor plugin, so that only this plugin needs to be activated, and the above conditional is respected.
+// Load the Two Factor plugin, so that only this plugin needs to be activated.
 include_once( dirname( __DIR__ ) . '/two-factor/two-factor.php' );
 
 require_once __DIR__ . '/settings/settings.php';
@@ -29,6 +35,7 @@ add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
+
 
 /**
  * Determine which providers should be available to users.
@@ -105,8 +112,7 @@ function user_requires_2fa( WP_User $user ) : bool {
 	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
 		// 2FA is opt-in during beta testing.
 		// todo Remove this once we open it to all users.
-		$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth' );
-		if ( ! in_array( $user->user_login, $beta_testers, true ) ) {
+		if ( ! is_2fa_beta_tester() ) {
 			return false;
 		}
 	}
