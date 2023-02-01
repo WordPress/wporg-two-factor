@@ -202,4 +202,29 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$actual = apply_filters( 'login_redirect', $expected, $expected, self::$privileged_user);
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\set_primary_provider_for_user
+	 */
+	public function test_set_primary_provider_for_user() {
+		// Set backup codes as primary.
+		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
+		$backup_codes_provider->generate_codes( self::$regular_user );
+		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
+		update_user_meta( self::$regular_user->ID, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Backup_Codes' );
+
+		$expected = 'Two_Factor_Backup_Codes';
+		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+		$this->assertSame( $expected, $actual );
+
+		// Enable TOTP (as secondary).
+		$totp_provider = Two_Factor_Totp::get_instance();
+		$totp_provider->set_user_totp_key( self::$regular_user->ID, Two_Factor_Totp::generate_key() );
+		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
+
+		$expected = 'Two_Factor_Totp';
+		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+
+		$this->assertSame( $expected, $actual );
+	}
 }

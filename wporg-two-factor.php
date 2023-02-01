@@ -32,6 +32,7 @@ include_once( dirname( __DIR__ ) . '/two-factor/two-factor.php' );
 require_once __DIR__ . '/settings/settings.php';
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
+add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
@@ -51,6 +52,21 @@ function two_factor_providers( array $providers ) : array {
 	return array_intersect_key( $providers, $desired_providers );
 }
 
+/**
+ * Set the primary provider for users.
+ */
+function set_primary_provider_for_user( string $provider, int $user_id ) : string {
+	$user                = get_user_by( 'id', $user_id );
+	$available_providers = Two_Factor_Core::get_available_providers_for_user( $user );
+
+	if ( isset( $available_providers['Two_Factor_WebAuthn'] ) ) {
+		$provider = 'Two_Factor_WebAuthn';
+	} elseif ( isset( $available_providers['Two_Factor_Totp'] ) ) {
+		$provider = 'Two_Factor_Totp';
+	}
+
+	return $provider;
+}
 
 /**
  * Remove a user's Super Admins status if they don't have 2FA enabled.
