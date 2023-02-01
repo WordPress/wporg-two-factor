@@ -139,7 +139,7 @@ function Main( { userId } ) {
 							}
 						/>
 
-						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'One Time Passwords' ) }</h3>
+						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }</h3>
 					</Flex>
 				</CardHeader>
 

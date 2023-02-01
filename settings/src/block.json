@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "wporg-two-factor/settings",
 	"version": "0.1.0",
-	"title": "wporg Two Factor Settings",
+	"title": "wporg Two-Factor Settings",
 	"category": "widgets",
 	"icon": "lock",
 	"supports": {

@@ -13,7 +13,7 @@ export default function Edit() {
 		<div { ...useBlockProps() } >
 			<Placeholder
 				instructions={ __( 'Not rendered in editor.', 'wporg' ) }
-				label={ __( 'Two Factor Authentication', 'wporg' ) }
+				label={ __( 'Two-Factor Authentication', 'wporg' ) }
 			> </Placeholder>
 		</div>
 	);

@@ -275,11 +275,11 @@ function Manage() {
 
 			<p>
 				<strong>Status:</strong> { ' ' }
-				Two-step authentication is currently <span className="wporg-2fa__enabled-status">on</span>.
+				Two-factor authentication is currently <span className="wporg-2fa__enabled-status">on</span>.
 			</p>
 
 			<Button isPrimary onClick={ handleDisable }>
-				Disable Two Factor Authentication
+				Disable Two-Factor Authentication
 			</Button>
 
 			{ error &&

@@ -44,7 +44,7 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="totp"
 				status={ totpStatus }
-				headerText="Two Factor Authentication"
+				headerText="Two-Factor Authentication"
 				bodyText={ 'enabled' === totpStatus ?
 					/* @todo update this when hardware tokens become an additional option. */
 					'You have two-factor authentication enabled using an app.' :
