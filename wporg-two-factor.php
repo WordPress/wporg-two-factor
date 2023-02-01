@@ -21,7 +21,7 @@ defined( 'WPINC' ) || die();
  */
 function is_2fa_beta_tester() : bool {
 	$user         = wp_get_current_user();
-	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul' );
+	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley' );
 
 	return in_array( $user->user_login, $beta_testers, true );
 }
