@@ -4,12 +4,6 @@
 			text-decoration: none;
 		}
 
-		.components-card__header {
-			justify-content: flex-start;
-			color: $gray-900;
-			font-size: 1.2em;
-		}
-
 		.components-card__body {
 			display: grid;
 			grid-template-columns: min-content auto min-content;
