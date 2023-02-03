@@ -2,8 +2,8 @@
 #bbpress-forums .wporg-2fa__progress-bar,
 #bbpress-forums.bbpress-wrapper .wporg-2fa__progress-bar {
 	--color-enabled: #0475c4;
-	--color-disabled: #c2c3c6;
-	--color-disabled-text: #707070; // Darker than `color-disabled` to meet a11y contrast standards.
+	--color-disabled: #{$gray-400};
+	--color-disabled-text: #{$gray-700}; // Darker than `color-disabled` to meet a11y contrast standards.
 
 	position: relative;
 	margin: 0 -24px; /* Separators need to stretch to edges of container. */
@@ -32,7 +32,7 @@
 			svg {
 				background-color: var(--color-enabled);
 				border-color: var(--color-enabled);
-				fill: white;
+				fill: $white;
 			}
 		}
 

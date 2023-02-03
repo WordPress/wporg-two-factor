@@ -6,7 +6,7 @@
 
 		.components-card__header {
 			justify-content: flex-start;
-			color: #1e1e1e;
+			color: $gray-900;
 			font-size: 1.2em;
 		}
 
@@ -18,7 +18,6 @@
 				"status description open"
 			;
 			grid-column-gap: 10px;
-			color: #5d5d5d;
 			padding: 18px 14px;
 
 			.wporg-2fa__status-icon {
@@ -31,13 +30,14 @@
 				align-self: end;
 				margin: 0;
 				font-size: 1.1em;
+				color: $gray-900;
 			}
 
 			p {
 				grid-area: description;
 				align-self: start;
 				margin: 0;
-				color: #656971;
+				color: $gray-700;
 			}
 
 			.wporg-2fa__status-card-open {
@@ -50,16 +50,16 @@
 	.wporg-2fa__status-icon {
 		&.is-enabled,
 		&.is-ok {
-			fill: var(--color-success);
+			fill: $alert-green;
 		}
 
 		&.is-pending {
-			fill: var(--color-warning);
+			fill: $alert-yellow;
 		}
 
 		&.is-disabled,
 		&.is-error {
-			fill: var(--color-error);
+			fill: $alert-red;
 		}
 	}
 }

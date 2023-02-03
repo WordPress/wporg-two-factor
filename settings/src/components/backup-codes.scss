@@ -1,6 +1,6 @@
 .wporg-2fa__backup-codes {
 	.wporg-2fa__backup-codes-list {
-		background-color: #e1e1e1;
+		background-color: $gray-300;
 		margin: 1em 0;
 		padding: 15px 20px;
 
@@ -15,9 +15,8 @@
 			     -- presumably so that users don't mistakenly think it's part of the code --
 			     but darker than the background
 		    */
-			color: #8a8787; /* use color var*/
+			color: $gray-700;
 		}
-
 	}
 
 	.components-notice {
