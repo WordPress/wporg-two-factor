@@ -164,6 +164,13 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WordPressdotorg\Two_Factor\user_requires_2fa
+	 */
+	public function test_invalid_user_doesnt_require_2fa() : void {
+		$this->assertFalse( user_requires_2fa( false ) );
+	}
+
+	/**
 	 * @covers WordPressdotorg\Two_Factor\redirect_to_2fa_settings
 	 */
 	public function test_redirected_when_2fa_needed() {

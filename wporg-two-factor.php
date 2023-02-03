@@ -134,9 +134,16 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 
 /**
  * Check if the user has enough elevated privileges to require 2FA.
+ *
+ * @param WP_User $user
  */
-function user_requires_2fa( WP_User $user ) : bool {
+function user_requires_2fa( $user ) : bool {
 	global $trusted_deputies, $wcorg_subroles;
+
+	// This shouldn't happen, but there've been a few times where it has inexplicably.
+	if ( ! $user instanceof WP_User ) {
+		return false;
+	}
 
 	// @codeCoverageIgnoreStart
 	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
