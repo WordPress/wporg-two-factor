@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { StrictMode, createContext, useCallback, useEffect, useState } from '@wordpress/element';
-import { Icon, arrowLeft } from '@wordpress/icons';
+import { Icon, chevronLeft } from '@wordpress/icons';
 import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
 
 /**
@@ -133,7 +133,7 @@ function Main( { userId } ) {
 							screen="account-status"
 							anchorText={
 								<>
-									<Icon icon={ arrowLeft } />
+									<Icon icon={ chevronLeft } />
 									Back
 								</>
 							}
