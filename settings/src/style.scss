@@ -1,12 +1,16 @@
 @import '~@wordpress/base-styles/colors';
 
-.wp-block-wporg-two-factor-settings h3 {
-	font-size: 14px;
-	clear: none;
-}
+.wp-block-wporg-two-factor-settings {
+	position: relative;
 
-.wp-block-wporg-two-factor-settings .components-button {
-	margin-right: 20px;
+	h3 {
+		font-size: 14px;
+		clear: none;
+	}
+
+	.components-button {
+		margin-right: 20px;
+	}
 }
 
 .wporg-2fa__navigation {

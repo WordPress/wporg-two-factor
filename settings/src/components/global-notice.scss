@@ -1,5 +1,8 @@
 .wporg-2fa__global-notice {
-	margin-bottom: 20px;
+	position: absolute;
+	top: -60px;
+	right: 0;
+	z-index: 2;
 
 	&.components-snackbar,
 	.components-snackbar__content {
