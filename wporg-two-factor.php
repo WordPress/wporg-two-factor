@@ -215,7 +215,7 @@ function render_2fa_admin_notice() : void {
 function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 	$two_factor_notice = sprintf(
 		__(
-			'Your account requires extra security. Please <a href="%s">enable two-factor authentication</a>.',
+			'Your account has elevated privileges and requires extra security before you can continue. Please <a href="%s">enable two-factor authentication</a>.',
 			'wporg'
 		),
 		get_edit_account_url()
