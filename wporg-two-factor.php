@@ -26,9 +26,6 @@ function is_2fa_beta_tester() : bool {
 	return in_array( $user->user_login, $beta_testers, true );
 }
 
-// Load the Two Factor plugin, so that only this plugin needs to be activated.
-include_once( dirname( __DIR__ ) . '/two-factor/two-factor.php' );
-
 require_once __DIR__ . '/settings/settings.php';
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
