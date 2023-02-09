@@ -31,6 +31,10 @@ function replace_core_ui_with_custom() : void {
 	remove_action( 'edit_user_profile_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
 
 	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
+
+	// Hide account details on profile.php + user-edit.php.
+	add_action( 'load-profile.php', __NAMESPACE__ . '\remove_admin_profile_php' );
+	add_action( 'load-user-edit.php', __NAMESPACE__ . '\remove_admin_profile_php' );
 }
 
 /**
@@ -60,4 +64,28 @@ function render_custom_ui() : void {
 	preload_api_requests( $preload_paths );
 
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
+}
+
+/**
+ * Display a warning about where to manage ones profile details.
+ */
+function remove_admin_profile_php() {
+	$user = defined( 'IS_PROFILE_PAGE' ) ? wp_get_current_user() : get_user_by( 'id', $_REQUEST['user_id'] );
+
+	add_action( 'admin_notices', function() use ( $user ) {
+		echo '<div class="notice notice-info"><p>';
+		printf(
+			__( 'Your profile details can be managed through your <a href="%s">WordPress.org profile</a>.', 'wporg' ),
+			'https://profiles.wordpress.org/' . $user->user_nicename . '/profile/edit/'
+		);
+		echo '</p></div>';
+	} );
+
+	// Hide the fields through Javascript due to lack of core hooks.
+	wp_register_script( 'hide-settings', '', [ 'jquery' ], '', true );
+	wp_enqueue_script( 'hide-settings' );
+	wp_add_inline_script( 'hide-settings', "
+		jQuery( '#email, #description, #password').parents('table').hide().prev('h2').hide();
+		jQuery( '#user_login').parents('table').find('tr:not(.user-role-wrap)').hide().parents('table').prev('h2').hide();
+	" );
 }
