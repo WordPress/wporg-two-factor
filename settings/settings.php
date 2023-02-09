@@ -88,4 +88,14 @@ function remove_admin_profile_php() {
 		jQuery( '#email, #description, #password').parents('table').hide().prev('h2').hide();
 		jQuery( '#user_login').parents('table').find('tr:not(.user-role-wrap)').hide().parents('table').prev('h2').hide();
 	" );
+
+	// Prevent updates by overwriting with existing user data.
+	foreach ( [ 'first_name', 'last_name', 'nickname', 'display_name', 'email', 'url', 'aim', 'yim', 'jabber', 'description' ] as $field ) {
+		if ( isset( $_POST[ $field ] ) ) {
+			$_POST[ $field ] = wp_slash( $user->$field ?? $user->{"user_$field"} );
+		}
+	}
+
+	// Prevent password changes by unsetting the fields.
+	unset( $_POST['pass1'], $_POST['pass2'] );
 }
