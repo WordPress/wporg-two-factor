@@ -50,8 +50,6 @@ function Setup( { setRegenerating } ) {
 				method: 'POST',
 				data: {
 					user_id: userRecord.record.id,
-					method: 'replace',
-					number: 10,
 					enable_provider: true,
 				}
 			} );
