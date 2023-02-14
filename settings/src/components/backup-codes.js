@@ -123,8 +123,8 @@ function CodeList( { codes } ) {
 				<ol>
 					{ codes.map( ( code ) => {
 						return (
-							 <li key={ code }>
-								 { code }
+							 <li key={ code } className="wporg-2fa__token">
+								 { code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
 							 </li>
 						)
 					} ) }
