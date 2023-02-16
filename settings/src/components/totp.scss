@@ -1,5 +1,17 @@
 .wporg-2fa__qr-code {
 	text-align: center;
+
+	#bbpress-forums & {
+		> a {
+			display: inline-block;
+	
+			&:hover,
+			&:focus {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+				outline: 3px solid transparent;
+			}
+		}
+	}
 }
 
 .wporg-2fa__manual-code {

@@ -1,6 +1,10 @@
 /* Overwrite bbPress styles with Gutenberg styles */
-#bbpress-forums .wp-block-wporg-two-factor-settings a.components-button,
-#bbpress-forums .wp-block-wporg-two-factor-settings a.components-button:hover {
+#bbpress-forums .wp-block-wporg-two-factor-settings a.components-button.is-secondary {
 	box-shadow: inset 0 0 0 1px var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
 	text-decoration: none;
+
+	&:not(:disabled):focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+		outline: 3px solid transparent;
+	}
 }
