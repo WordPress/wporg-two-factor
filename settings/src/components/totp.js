@@ -139,7 +139,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 					{ ! qrCodeUrl && 'Loading...' }
 
 					{ qrCodeUrl &&
-						<a href={ qrCodeUrl }>
+						<a href={ qrCodeUrl } aria-label="Scan QR code">
 							<RawHTML>
 								{ createQrCode( qrCodeUrl ) }
 							</RawHTML>
