@@ -152,7 +152,7 @@ function Main( { userId } ) {
 
 	return (
 		<GlobalContext.Provider value={ { clickScreenLink, userRecord, setGlobalNotice } }>
-			<GlobalNotice notice={ globalNotice } />
+			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
 	);
