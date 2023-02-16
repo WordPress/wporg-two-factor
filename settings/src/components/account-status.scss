@@ -11,7 +11,7 @@
 
 			&:hover,
 			&:focus {
-				outline: 1px solid var(--wp-admin-theme-color);
+				outline: var(--wp-admin-border-width-focus) solid var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
 				outline-offset: 0;
 			}
 		}
