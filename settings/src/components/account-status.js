@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Card, CardBody } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
 
 /**
@@ -65,9 +65,16 @@ export default function AccountStatus() {
 /**
  * Render a card for the status of the given setting.
  */
-function SettingStatusCard( { screen, status, headerText, bodyText } ) {
+function SettingStatusCard({ screen, status, headerText, bodyText }) {
+	const [ isFocused, setIsFocused ] = useState( false );
+	const className = [
+		"wporg-2fa__status-card",
+		"wporg-2fa__status-card-" + screen,
+		...( isFocused ? [ "wporg-2fa__status-card__focused" ] : [] ),
+	].join( " " );
+
 	return (
-		<Card className={ 'wporg-2fa__status-card wporg-2fa__status-card-' + screen }>
+		<Card className={ className }>
 			<ScreenLink
 				screen={ screen }
 				anchorText={
@@ -78,6 +85,8 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 						<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
 					</CardBody>
 				}
+				onFocus={ () => setIsFocused( true ) }
+				onBlur={ () => setIsFocused( false ) }
 			/>
 		</Card>
 	);

@@ -8,7 +8,13 @@ import { useContext } from '@wordpress/element';
  */
 import { GlobalContext } from '../script';
 
-export default function ScreenLink( { screen, anchorText, buttonStyle = false } ) {
+export default function ScreenLink( {
+	screen,
+	anchorText,
+	buttonStyle = false,
+	onFocus = () => {},
+	onBlur = () => {},
+} ) {
 	const { clickScreenLink } = useContext( GlobalContext );
 	const classes = [];
 	let screenUrl = new URL( document.location.href );
@@ -28,6 +34,9 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false } 
 			href={ screenUrl.href }
 			onClick={ ( event ) => clickScreenLink( event, screen ) }
 			className={ classes.join( ' ' ) }
+			tabIndex={ 0 }
+			onFocus={ () => onFocus() }
+			onBlur={ () => onBlur() }
 		>
 			{ anchorText }
 		</a>
