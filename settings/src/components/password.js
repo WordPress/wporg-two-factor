@@ -79,7 +79,7 @@ export default function Password() {
 
 			<p>
 				For convenience, use a password manager to store and automatically enter passwords.
-				For more information, read about <a href="https://wordpress.org/support/article/password-best-practices/">password best practices</a>.
+				For more information, read about <a href="https://wordpress.org/documentation/article/password-best-practices/">password best practices</a>.
 			</p>
 
 			<Flex className="wporg-2fa__password_container">
