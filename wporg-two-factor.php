@@ -240,5 +240,20 @@ function get_edit_account_url() : string {
 }
 
 // Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
-remove_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
-remove_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
+// Hotfix for https://github.com/WordPress/gutenberg/pull/48268
+add_filter( 'block_type_metadata', function( $metadata ) {
+	if ( isset( $metadata['viewScript'] ) && ! empty( $metadata['file'] ) && ! str_contains( $metadata['file'], 'plugins/gutenberg/' ) ) {
+		$metadata['_viewScript'] = $metadata['viewScript'];
+		$metadata['viewScript'] = [];
+	}
+
+	return $metadata;
+}, 9 );
+add_filter( 'block_type_metadata', function( $metadata ) {
+	if ( isset( $metadata['_viewScript'] ) ) {
+		$metadata['viewScript'] = $metadata['_viewScript'];
+		unset( $metadata['_viewScript'] );
+	}
+
+	return $metadata;
+}, 11 );
