@@ -1,7 +1,19 @@
 .wporg-2fa__account-status {
 	.wporg-2fa__status-card {
+		&:hover,
+		&:focus-within {
+			z-index: 1;
+		}
+
 		a {
+			display: block;
 			text-decoration: none;
+
+			&:hover,
+			&:focus {
+				outline: var(--wp-admin-border-width-focus) solid var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+				outline-offset: 0;
+			}
 		}
 
 		.components-card__body {

@@ -100,6 +100,7 @@ export default function Password() {
 					className="wporg-2fa__show-password"
 					size={ 24 }
 					onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }
+					aria-label="Show password"
 				>
 					<Icon icon={ seen } />
 				</Button>
