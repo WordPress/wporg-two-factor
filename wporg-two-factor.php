@@ -238,7 +238,3 @@ function get_edit_account_url() : string {
 
 	return $url;
 }
-
-// Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
-remove_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
-remove_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
