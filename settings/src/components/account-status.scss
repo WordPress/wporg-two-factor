@@ -1,7 +1,7 @@
 .wporg-2fa__account-status {
 	.wporg-2fa__status-card {
 		&:hover,
-		&.wporg-2fa__status-card__focused {
+		&:focus-within {
 			z-index: 1;
 		}
 
