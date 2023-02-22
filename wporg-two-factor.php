@@ -244,7 +244,7 @@ function get_edit_account_url() : string {
 add_filter( 'block_type_metadata', function( $metadata ) {
 	if ( isset( $metadata['viewScript'] ) && ! empty( $metadata['file'] ) && ! str_contains( $metadata['file'], 'plugins/gutenberg/' ) ) {
 		$metadata['_viewScript'] = $metadata['viewScript'];
-		$metadata['viewScript'] = [];
+		unset( $metadata['viewScript'] );
 	}
 
 	return $metadata;
