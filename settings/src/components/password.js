@@ -27,11 +27,7 @@ import { GlobalContext } from '../script';
 export default function Password() {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ inputType, setInputType ]     = useState( 'password' );
-	let passwordStrong                    = true; // Saved passwords have already passed the test.
-
-	if ( userRecord.hasEdits ) {
-		passwordStrong = isPasswordStrong( userRecord.editedRecord.password, userRecord.record );
-	}
+	const [ passwordStrong, setPasswordStrong ] = useState( true );
 
 	// Clear the "saved password" notice when password is being changed.
 	useEffect( () => {
@@ -41,6 +37,10 @@ export default function Password() {
 
 		setGlobalNotice( '' );
 	}, [ userRecord.hasEdits ] );
+
+	useEffect( () => {
+		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
+	}, [ userRecord.editedRecord.password ] );
 
 	/**
 	 * Handle clicking the `Generate Password` button.
@@ -55,9 +55,14 @@ export default function Password() {
 		setInputType( 'text' );
 	}, [] );
 
-	// Handle clicking the `Save Password` button.
+	// Handle form submission.
 	const handleFormSubmit = useCallback( async ( event ) => {
 		event.preventDefault();
+
+		if ( ! passwordStrong || userRecord.isSaving ) {
+			return;
+		}
+
 		await userRecord.save();
 
 		// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
@@ -69,7 +74,7 @@ export default function Password() {
 		apiFetch.nonceMiddleware.nonce = await response.text();
 
 		setGlobalNotice( 'New password saved.' );
-	}, [] );
+	}, [ passwordStrong ] );
 
 	return (
 		<form onSubmit={ handleFormSubmit }>
