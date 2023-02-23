@@ -196,6 +196,28 @@ function require_email_confirmation( $insert_data, $request ) {
 	if ( isset( $insert_data->user_email ) ) {
 		$post_backup = $_POST;
 
+		// Switch out the core wp-admin confirmation url with bbPress's.
+		if ( function_exists( 'bbp_get_user_profile_edit_url' ) ) {
+			add_filter( 'new_user_email_content', function( $email_text ) {
+				$user_hash   = get_user_meta( $_POST['user_id'], '_new_email', true );
+				$confirm_url = add_query_arg(
+					[
+						'action'       => 'bbp-update-user-email',
+						'newuseremail' => $user_hash['hash']
+					],
+					bbp_get_user_profile_edit_url( $_POST['user_id'] )
+				);
+
+				$email_text = str_replace(
+					'###ADMIN_URL###',
+					esc_url_raw( $confirm_url ),
+					$email_text
+				);
+
+				return $email_text;
+			} );
+		}
+
 		// The POST fields needed by send_confirmation_on_profile_email().
 		$_POST['user_id'] = $insert_data->ID;
 		$_POST['email']   = $insert_data->user_email;
