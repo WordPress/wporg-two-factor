@@ -39,6 +39,10 @@ export default function Password() {
 	}, [ userRecord.hasEdits ] );
 
 	useEffect( () => {
+		if ( ! userRecord.editedRecord.password ) {
+			return;
+		}
+
 		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
 	}, [ userRecord.editedRecord.password ] );
 
@@ -130,6 +134,7 @@ export default function Password() {
 				<Button
 					isPrimary
 					disabled={ passwordStrong && ! userRecord.isSaving ? '' : 'disabled' }
+					type="submit"
 				>
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
 				</Button>
