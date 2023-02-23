@@ -56,7 +56,8 @@ export default function Password() {
 	}, [] );
 
 	// Handle clicking the `Save Password` button.
-	const savePasswordHandler = useCallback( async () => {
+	const handleFormSubmit = useCallback( async ( event ) => {
+		event.preventDefault();
 		await userRecord.save();
 
 		// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
@@ -71,7 +72,7 @@ export default function Password() {
 	}, [] );
 
 	return (
-		<>
+		<form onSubmit={ handleFormSubmit }>
 			<p>
 				To update your password enter a new one below.
 				Strong passwords are random, at least twenty characters long, and include uppercase letters and symbols.
@@ -124,7 +125,6 @@ export default function Password() {
 				<Button
 					isPrimary
 					disabled={ passwordStrong && ! userRecord.isSaving ? '' : 'disabled' }
-					onClick={ savePasswordHandler }
 				>
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
 				</Button>
@@ -138,7 +138,7 @@ export default function Password() {
 					</Button>
 				}
 			</p>
-		</>
+		</form>
 	);
 }
 
