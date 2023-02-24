@@ -61,7 +61,7 @@ export default function Password() {
 	}, [] );
 
 	// Handle form submission.
-	const handleFormSubmit = useCallback( async ( event ) => {
+	const formSubmitHandler = useCallback( async ( event ) => {
 		event.preventDefault();
 
 		if ( ! passwordStrong || userRecord.isSaving ) {
@@ -82,7 +82,7 @@ export default function Password() {
 	}, [ passwordStrong ] );
 
 	return (
-		<form onSubmit={ handleFormSubmit }>
+		<form onSubmit={ formSubmitHandler }>
 			<p>
 				To update your password enter a new one below.
 				Strong passwords are random, at least twenty characters long, and include uppercase letters and symbols.
