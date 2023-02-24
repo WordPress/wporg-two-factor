@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -117,10 +117,10 @@ describe( 'Password', () => {
 		} );
 
 		const input = getByLabelText( 'New Password' );
-		const password = 'this is a password';
-		fireEvent.change( input, { target: { value: password } } );
+		const newPassword = 'this is a password';
+		fireEvent.change( input, { target: { value: newPassword } } );
 		expect( mockContext.userRecord.edit ).toHaveBeenCalledWith( {
-			password: password,
+			password: newPassword,
 		} );
 	} );
 } );
