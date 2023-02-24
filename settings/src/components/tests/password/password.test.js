@@ -78,7 +78,7 @@ describe( 'Password', () => {
 		} );
 
 		it( 'should display the weak password notice', () => {
-			// State: he user has updated their password to something weak
+			// State: the user has updated their password to something weak
 			// although the strength is not tested here.
 			mockContext.userRecord.editedRecord.password = 'weak';
 			mockContext.userRecord.hasEdits = true;
