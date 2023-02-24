@@ -45,64 +45,87 @@ const mockContext = {
 		record: {
 			'2fa_required': true,
 		},
+		isSaving: false,
 	},
 	setGlobalNotice: jest.fn(),
 };
 
 describe( 'Password', () => {
 	afterEach( () => {
-		jest.resetAllMocks();
+		mockContext.userRecord.edit.mockReset();
+		mockContext.userRecord.save.mockReset();
+		mockContext.setGlobalNotice.mockReset();
 	} );
 
-	it( 'should display the weak password notice', () => {
-		// State: he user has updated their password to something weak
-		// although the strength is not tested here.
-		mockContext.userRecord.editedRecord.password = 'weak';
-		mockContext.userRecord.hasEdits = true;
+	describe( 'Messaging', () => {
+		const weakPasswordRegex = /That password is too easy to compromise/i;
+		const strongPasswordRegex =
+			/Your password is strong enough to be saved./i;
 
-		useContext.mockReturnValue( mockContext );
+		it( 'should not display any notice on load', () => {
+			useContext.mockReturnValue( mockContext );
 
-		// We'll mock the password estimator to return a score of 1.
-		mockPasswordEstimator( 1 );
+			const { queryAllByText } = render( <Password />, {
+				wrapper: ( { children } ) => (
+					<GlobalContext.Provider value={ mockContext }>
+						{ children }
+					</GlobalContext.Provider>
+				),
+			} );
 
-		const { queryAllByText } = render( <Password />, {
-			wrapper: ( { children } ) => (
-				<GlobalContext.Provider value={ mockContext }>
-					{ children }
-				</GlobalContext.Provider>
-			),
+			expect( queryAllByText( weakPasswordRegex ) ).toHaveLength( 0 );
+			expect( queryAllByText( strongPasswordRegex ) ).toHaveLength( 0 );
 		} );
 
-		// We may have this message multiple times, because of 'speak'.
-		expect(
-			queryAllByText( /That password is too easy to compromise/i ).length
-		).toBeGreaterThanOrEqual( 1 );
-	} );
+		it( 'should display the weak password notice', () => {
+			// State: he user has updated their password to something weak
+			// although the strength is not tested here.
+			mockContext.userRecord.editedRecord.password = 'weak';
+			mockContext.userRecord.hasEdits = true;
 
-	it( 'should display the strong password notice', () => {
-		// State: the user has updated their password to something strong
-		// although the strength is not tested here.
-		mockContext.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
-		mockContext.userRecord.hasEdits = true;
+			useContext.mockReturnValue( mockContext );
 
-		useContext.mockReturnValue( mockContext );
+			// We'll mock the password estimator to return a score of 1.
+			mockPasswordEstimator( 1 );
 
-		// We'll mock the password estimator to return a score of 10.
-		mockPasswordEstimator( 10 );
+			const { queryAllByText } = render( <Password />, {
+				wrapper: ( { children } ) => (
+					<GlobalContext.Provider value={ mockContext }>
+						{ children }
+					</GlobalContext.Provider>
+				),
+			} );
 
-		const { queryAllByText } = render( <Password />, {
-			wrapper: ( { children } ) => (
-				<GlobalContext.Provider value={ mockContext }>
-					{ children }
-				</GlobalContext.Provider>
-			),
+			// We may have this message multiple times, because of 'speak'.
+			expect(
+				queryAllByText( weakPasswordRegex ).length
+			).toBeGreaterThanOrEqual( 1 );
 		} );
 
-		// We may have this message multiple times, because of 'speak'.
-		expect(
-			queryAllByText( /Your password is strong enough to be saved./i )
-				.length
-		).toBeGreaterThanOrEqual( 1 );
+		it( 'should display the strong password notice', () => {
+			// State: the user has updated their password to something strong
+			// although the strength is not tested here.
+			mockContext.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
+			mockContext.userRecord.hasEdits = true;
+
+			useContext.mockReturnValue( mockContext );
+
+			// We'll mock the password estimator to return a score of 10.
+			mockPasswordEstimator( 10 );
+
+			const { queryAllByText } = render( <Password />, {
+				wrapper: ( { children } ) => (
+					<GlobalContext.Provider value={ mockContext }>
+						{ children }
+					</GlobalContext.Provider>
+				),
+			} );
+
+			// We may have this message multiple times, because of 'speak'.
+			expect(
+				queryAllByText( strongPasswordRegex ).length
+			).toBeGreaterThanOrEqual( 1 );
+		} );
 	} );
 
 	it( 'should update the user record password', () => {
@@ -122,5 +145,33 @@ describe( 'Password', () => {
 		expect( mockContext.userRecord.edit ).toHaveBeenCalledWith( {
 			password: newPassword,
 		} );
+	} );
+
+	it( 'should submit form on button press', () => {
+		// State: the user has updated their password to something strong
+		// although the strength is not tested here.
+		mockContext.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
+		mockContext.userRecord.hasEdits = true;
+
+		useContext.mockReturnValue( mockContext );
+
+		// We'll mock the password estimator to return a score of 10.
+		mockPasswordEstimator( 10 );
+
+		const { getAllByRole } = render( <Password />, {
+			wrapper: ( { children } ) => (
+				<GlobalContext.Provider value={ mockContext }>
+					{ children }
+				</GlobalContext.Provider>
+			),
+		} );
+
+		const buttons = getAllByRole( 'button' );
+		const saveButton = buttons.filter(
+			( button ) => button.type === 'submit'
+		)[ 0 ];
+		fireEvent.click( saveButton );
+
+		expect( mockContext.userRecord.save ).toBeCalled();
 	} );
 } );
