@@ -39,7 +39,8 @@ export default function Password() {
 	}, [ userRecord.hasEdits ] );
 
 	useEffect( () => {
-		if ( ! userRecord.editedRecord.password ) {
+		// We don't want to check if the user hasn't edited the password in this session
+		if ( ! userRecord.hasEdits || ! userRecord.editedRecord.password ) {
 			return;
 		}
 
