@@ -50,6 +50,10 @@ const mockContext = {
 };
 
 describe( 'Password', () => {
+	afterEach( () => {
+		jest.resetAllMocks();
+	} );
+
 	it( 'should display the weak password notice', () => {
 		// State: he user has updated their password to something weak
 		// although the strength is not tested here.
@@ -58,7 +62,7 @@ describe( 'Password', () => {
 
 		useContext.mockReturnValue( mockContext );
 
-        // We'll mock the password estimator to return a score of 1.
+		// We'll mock the password estimator to return a score of 1.
 		mockPasswordEstimator( 1 );
 
 		const { queryAllByText } = render( <Password />, {
@@ -83,7 +87,7 @@ describe( 'Password', () => {
 
 		useContext.mockReturnValue( mockContext );
 
-        // We'll mock the password estimator to return a score of 10.
+		// We'll mock the password estimator to return a score of 10.
 		mockPasswordEstimator( 10 );
 
 		const { queryAllByText } = render( <Password />, {
