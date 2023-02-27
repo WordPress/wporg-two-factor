@@ -30,7 +30,7 @@ require_once __DIR__ . '/settings/settings.php';
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
-add_filter( 'two_factor_totp_title', __NAMESPACE__ . '\set_totp_title', 10, 2 );
+add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
@@ -67,12 +67,12 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 }
 
 /**
- * Set the title for the entry in the user's TOTP app.
+ * Set the issuer for the entry in the user's TOTP app.
  *
  * @codeCoverageIgnore
  */
-function set_totp_title( string $title, WP_User $user ) : string {
-	return 'WordPress.org:' . $user->user_login;
+function set_totp_issuer( string $title ) : string {
+	return 'WordPress.org';
 }
 
 /**
