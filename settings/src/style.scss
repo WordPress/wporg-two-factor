@@ -37,6 +37,20 @@
 	}
 }
 
+.components-notice {
+	margin-left: 0;
+	margin-right: 0;
+
+	.components-notice__content {
+		display: flex;
+		gap: 8px;
+
+		svg {
+			flex-shrink: 0;
+		}
+	}
+}
+
 @import "components/account-status";
 @import "components/password";
 @import "components/email-address";
