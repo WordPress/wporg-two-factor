@@ -10,7 +10,7 @@ export const mockPasswordEstimator = ( returnValue = 0 ) => {
 	Object.defineProperty( window, 'zxcvbn', {
 		value: () => {
 			return {
-				score: returnValue, // at less than 4
+				score: returnValue, // at less than or equal to 4
 			};
 		},
 		writable: true,
