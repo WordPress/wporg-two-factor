@@ -155,8 +155,8 @@ describe( 'Password', () => {
 
 		useContext.mockReturnValue( mockContext );
 
-		// We'll mock the password estimator to return a score of 10.
-		mockPasswordEstimator( 10 );
+		// We'll mock the password estimator to return a score of 4.
+		mockPasswordEstimator( 4 );
 
 		const { getAllByRole } = render( <Password />, {
 			wrapper: ( { children } ) => (
