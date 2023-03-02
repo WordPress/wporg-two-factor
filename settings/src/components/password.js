@@ -27,7 +27,14 @@ import { GlobalContext } from '../script';
 export default function Password() {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ inputType, setInputType ]     = useState( 'password' );
-	const [ passwordStrong, setPasswordStrong ] = useState( true );
+	let passwordStrong = true; // Saved passwords have already passed the test.
+
+	if ( userRecord.hasEdits ) {
+		passwordStrong = isPasswordStrong(
+			userRecord.editedRecord.password,
+			userRecord.record
+		);
+	}
 
 	// Clear the "saved password" notice when password is being changed.
 	useEffect( () => {
@@ -37,15 +44,6 @@ export default function Password() {
 
 		setGlobalNotice( '' );
 	}, [ userRecord.hasEdits ] );
-
-	useEffect( () => {
-		// We don't want to check if the user hasn't edited the password in this session
-		if ( ! userRecord.hasEdits || ! userRecord.editedRecord.password ) {
-			return;
-		}
-
-		setPasswordStrong( isPasswordStrong( userRecord.editedRecord.password, userRecord.record ) );
-	}, [ userRecord.editedRecord.password ] );
 
 	/**
 	 * Handle clicking the `Generate Password` button.
