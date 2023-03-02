@@ -24,33 +24,36 @@ jest.mock( '@wordpress/element', () => ( {
 
 // Mock the return value of any api calls
 jest.mock( '@wordpress/api-fetch' );
-apiFetch.mockReturnValueOnce(
-	Promise.resolve( {
-		text: jest.fn(),
-	} )
-);
 
 // We set this after making a request.
 apiFetch.nonceMiddleware = { nonce: '' };
 
 // Default mock context
-const mockContext = {
-	userRecord: {
-		editedRecord: {
-			password: 'password',
-		},
-		edit: jest.fn(),
-		save: jest.fn(),
-		hasEdits: false,
-		record: {
-			'2fa_required': true,
-		},
-		isSaving: false,
-	},
-	setGlobalNotice: jest.fn(),
+let mockContext =  {
+    userRecord: {
+        editedRecord: {
+            password: 'password',
+        },
+        edit: jest.fn(),
+        save: jest.fn(),
+        hasEdits: false,
+        record: {
+            '2fa_required': true,
+        },
+        isSaving: false,
+    },
+    setGlobalNotice: jest.fn(),
 };
 
 describe( 'Password', () => {
+	beforeAll( () => {
+		apiFetch.mockReturnValue(
+			Promise.resolve( {
+				text: jest.fn(),
+			} )
+		);
+	} );
+
 	afterEach( () => {
 		mockContext.userRecord.edit.mockReset();
 		mockContext.userRecord.save.mockReset();
@@ -171,6 +174,23 @@ describe( 'Password', () => {
 			( button ) => button.type === 'submit'
 		)[ 0 ];
 		fireEvent.click( saveButton );
+
+		expect( mockContext.userRecord.save ).toBeCalled();
+	} );
+
+	it( 'should submit form on enter', () => {
+		useContext.mockReturnValue( mockContext );
+
+		const { getByLabelText } = render( <Password />, {
+			wrapper: ( { children } ) => (
+				<GlobalContext.Provider value={ mockContext }>
+					{ children }
+				</GlobalContext.Provider>
+			),
+		} );
+
+		const input = getByLabelText( 'New Password' );
+		fireEvent.submit( input );
 
 		expect( mockContext.userRecord.save ).toBeCalled();
 	} );
