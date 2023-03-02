@@ -27,13 +27,10 @@ import { GlobalContext } from '../script';
 export default function Password() {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ inputType, setInputType ]     = useState( 'password' );
-	let passwordStrong = true; // Saved passwords have already passed the test.
+	let passwordStrong                    = true; // Saved passwords have already passed the test.
 
 	if ( userRecord.hasEdits ) {
-		passwordStrong = isPasswordStrong(
-			userRecord.editedRecord.password,
-			userRecord.record
-		);
+		passwordStrong = isPasswordStrong( userRecord.editedRecord.password, userRecord.record );
 	}
 
 	// Clear the "saved password" notice when password is being changed.
