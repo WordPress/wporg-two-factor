@@ -55,6 +55,10 @@ WordPress.org-specific customizations for the Two Factor plugin
 1. Open `wp-admin/options-general.php?page=bbpress` and uncheck `Prefix all forum content with the Forum Root slug (Recommended)`, then save.
 1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
 
+## Testing
+
+Front-end unit tests can be run in `/settings` using the `npm run test:unit` command.
+
 ## Security
 
 Please privately report any potential security issues to the [WordPress HackerOne](https://hackerone.com/wordpress) program.
