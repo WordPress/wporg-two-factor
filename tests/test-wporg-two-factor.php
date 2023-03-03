@@ -220,8 +220,8 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
 		update_user_meta( self::$regular_user->ID, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Backup_Codes' );
 
-		$expected = 'Two_Factor_Backup_Codes';
-		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+		$expected = null;
+		$actual   = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
 		$this->assertSame( $expected, $actual );
 
 		// Enable TOTP (as secondary).
@@ -231,6 +231,12 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 		$expected = 'Two_Factor_Totp';
 		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+
+		$this->assertSame( $expected, $actual );
+
+		// Validate that Backup Codes are now available as secondary.
+		$expected = [ 'Two_Factor_Backup_Codes', 'Two_Factor_Totp' ];
+		$actual   = array_keys( Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user->ID ) );
 
 		$this->assertSame( $expected, $actual );
 	}
