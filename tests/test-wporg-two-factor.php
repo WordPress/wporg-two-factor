@@ -236,7 +236,7 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 		// Validate that Backup Codes are now available as secondary.
 		$expected = [ 'Two_Factor_Backup_Codes', 'Two_Factor_Totp' ];
-		$actual   = array_keys( Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user->ID ) );
+		$actual   = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
 
 		$this->assertSame( $expected, $actual );
 	}
