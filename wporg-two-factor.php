@@ -34,7 +34,7 @@ add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
-add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\disable_only_backup_codes', 10, 2 );
+
 
 /**
  * Determine which providers should be available to users.
@@ -237,27 +237,6 @@ function get_edit_account_url() : string {
 	}
 
 	return $url;
-}
-
-
-/**
- * Disable 2FA for users who only have backup codes enabled.
- *
- * @param string|null $primary_provider The currently selected Primary provider.
- * @param int         $user_id          The user ID.
- * @return string|null The primary provider, or null.
- */
-function disable_only_backup_codes( $primary_provider, $user_id ) {
-	if ( 'Two_Factor_Backup_Codes' === $primary_provider ) {
-		$user      = get_user_by( 'id', $user_id );
-		$providers = $user ? Two_Factor_Core::get_enabled_providers_for_user( $user ) : [];
-
-		if ( 1 === count( $providers ) ) {
-			$primary_provider = null;
-		}
-	}
-
-	return $primary_provider;
 }
 
 // Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
