@@ -217,21 +217,21 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		// Set backup codes as primary.
 		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
 		$backup_codes_provider->generate_codes( self::$regular_user );
-		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
-		update_user_meta( self::$regular_user->ID, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Backup_Codes' );
+		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
 
 		$expected = null;
 		$actual   = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+		$this->assertTrue( $enabled );
 		$this->assertSame( $expected, $actual );
 
 		// Enable TOTP (as secondary).
 		$totp_provider = Two_Factor_Totp::get_instance();
 		$totp_provider->set_user_totp_key( self::$regular_user->ID, Two_Factor_Totp::generate_key() );
-		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
+		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
 
 		$expected = 'Two_Factor_Totp';
 		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
-
+		$this->assertTrue( $enabled );
 		$this->assertSame( $expected, $actual );
 
 		// Validate that Backup Codes are now available as secondary.
