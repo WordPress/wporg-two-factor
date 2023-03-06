@@ -29,20 +29,20 @@ jest.mock( '@wordpress/api-fetch' );
 apiFetch.nonceMiddleware = { nonce: '' };
 
 // Default mock context
-let mockContext =  {
-    userRecord: {
-        editedRecord: {
-            password: 'password',
-        },
-        edit: jest.fn(),
-        save: jest.fn(),
-        hasEdits: false,
-        record: {
-            '2fa_required': true,
-        },
-        isSaving: false,
-    },
-    setGlobalNotice: jest.fn(),
+const mockContext = {
+	userRecord: {
+		editedRecord: {
+			password: 'password',
+		},
+		edit: jest.fn(),
+		save: jest.fn(),
+		hasEdits: false,
+		record: {
+			'2fa_required': true,
+		},
+		isSaving: false,
+	},
+	setGlobalNotice: jest.fn(),
 };
 
 describe( 'Password', () => {
@@ -175,7 +175,7 @@ describe( 'Password', () => {
 		)[ 0 ];
 		fireEvent.click( saveButton );
 
-		expect( mockContext.userRecord.save ).toBeCalled();
+		expect( mockContext.userRecord.save ).toHaveBeenCalled();
 	} );
 
 	it( 'should submit form on enter', () => {
@@ -192,6 +192,6 @@ describe( 'Password', () => {
 		const input = getByLabelText( 'New Password' );
 		fireEvent.submit( input );
 
-		expect( mockContext.userRecord.save ).toBeCalled();
+		expect( mockContext.userRecord.save ).toHaveBeenCalled();
 	} );
 } );
