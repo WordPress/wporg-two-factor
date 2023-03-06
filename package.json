@@ -1,0 +1,27 @@
+{
+  "name": "wporg-two-factor",
+  "version": "1.0.0",
+  "description": "WordPress.org Two Factor",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "env": "wp-env",
+    "postinstall": "npm run env run composer install && cd settings && npm install --force",
+    "test": "npm run env run phpunit phpunit -- -c html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WordPress/wporg-two-factor.git"
+  },
+  "author": "",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/WordPress/wporg-two-factor/issues"
+  },
+  "homepage": "https://github.com/WordPress/wporg-two-factor#readme",
+  "dependencies": {
+    "@wordpress/base-styles": "^4.17.0",
+    "@wordpress/env": "^5.13.0"
+  }
+}

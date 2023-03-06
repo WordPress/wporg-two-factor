@@ -1,0 +1,12 @@
+{
+	"plugins": [
+		".",
+		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
+		"https://downloads.wordpress.org/plugin/bbpress.latest-stable.zip",
+		"WordPress/wporg-mu-plugins#build",
+		"WordPress/two-factor"
+	],
+	"mappings": {
+		"wp-content/mu-plugins/mu-plugin.php": "./.wp-env/mu-plugin.php"
+	}
+}

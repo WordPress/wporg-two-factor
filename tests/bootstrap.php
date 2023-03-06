@@ -21,6 +21,8 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 	exit( 1 );
 }
 
+require_once dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
+
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
