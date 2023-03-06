@@ -1,4 +1,7 @@
 {
+	"config": {
+		"WP_DEFAULT_THEME": "wporg-support"
+	},
 	"plugins": [
 		".",
 		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
@@ -7,6 +10,7 @@
 		"WordPress/two-factor"
 	],
 	"mappings": {
+		"wp-content/themes/wporg-support": "WordPress/wordpress.org/wordpress.org/public_html/wp-content/themes/pub/wporg-support/",
 		"wp-content/mu-plugins/mu-plugin.php": "./.wp-env/mu-plugin.php"
 	}
 }
