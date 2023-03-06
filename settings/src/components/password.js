@@ -74,7 +74,7 @@ export default function Password() {
 		apiFetch.nonceMiddleware.nonce = await response.text();
 
 		setGlobalNotice( 'New password saved.' );
-	}, [ passwordStrong ] );
+	}, [ passwordStrong, userRecord.isSaving ] );
 
 	return (
 		<form onSubmit={ formSubmitHandler }>
