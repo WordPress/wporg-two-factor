@@ -11,14 +11,21 @@
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start --webpack-copy-php"
+		"start": "wp-scripts start --webpack-copy-php",
+		"test:unit": "wp-scripts test-unit-js"
 	},
 	"dependencies": {
 		"@automattic/generate-password": "^0.1.0"
 	},
 	"devDependencies": {
+		"@testing-library/react": "^14.0.0",
+		"@wordpress/api-fetch": "^6.24.0",
 		"@wordpress/base-styles": "^4.17.0",
-		"@wordpress/icons": "^9.14.0",
+		"@wordpress/components": "^23.4.0",
+		"@wordpress/core-data": "^6.4.0",
+		"@wordpress/data": "^8.4.0",
+		"@wordpress/element": "^5.4.0",
+		"@wordpress/icons": "^9.18.0",
 		"@wordpress/scripts": "^24.6.0"
 	}
 }
