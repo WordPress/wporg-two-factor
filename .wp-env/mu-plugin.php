@@ -14,7 +14,7 @@ if ( ! function_exists( 'is_special_user' ) ) {
 	}
 }
 
-require_once WP_PLUGIN_DIR. '/wporg-mu-plugins/mu-plugins/loader.php';
+require_once __DIR__ . '/pub/mu-plugins/loader.php';
 
 // Enable dummy provider for convenience when testing locally.
 add_filter( 'two_factor_providers', function( $providers ) {
