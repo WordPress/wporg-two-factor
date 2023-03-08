@@ -16,9 +16,11 @@ if ( ! function_exists( 'is_special_user' ) ) {
 
 require_once __DIR__ . '/pub/mu-plugins/loader.php';
 
-// Enable dummy provider for convenience when testing locally.
+// Enable dummy provider for convenience when running locally.
 add_filter( 'two_factor_providers', function( $providers ) {
-	$providers['Two_Factor_Dummy'] = TWO_FACTOR_DIR . 'providers/class-two-factor-dummy.php';
+	if ( ! defined( 'WP_TESTS_DOMAIN' ) ) {
+		$providers['Two_Factor_Dummy'] = TWO_FACTOR_DIR . 'providers/class-two-factor-dummy.php';
+	}
 
 	return $providers;
 }, 100 ); // Must run _after_ wporg-two-factor.
