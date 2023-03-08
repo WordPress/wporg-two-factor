@@ -61,6 +61,11 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 		$provider = 'Two_Factor_WebAuthn';
 	} elseif ( isset( $available_providers['Two_Factor_Totp'] ) ) {
 		$provider = 'Two_Factor_Totp';
+	} elseif ( 'Two_Factor_Backup_Codes' === $provider && 1 === count( $available_providers ) ) {
+		/*
+		 * If we only have Backup Codes enabled, 2FA is disabled on WordPress.org.
+		 */
+		$provider = '';
 	}
 
 	return $provider;
