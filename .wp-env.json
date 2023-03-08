@@ -1,7 +1,4 @@
 {
-	"config": {
-		"WP_DEFAULT_THEME": "wporg-support"
-	},
 	"plugins": [
 		".",
 		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",

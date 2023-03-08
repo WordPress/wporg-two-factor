@@ -38,3 +38,9 @@ add_action( 'init', function() {
 		'top'
 	);
 } );
+
+// Activate the wporg-support theme.
+add_action( 'wp_install', function() {
+	update_option( 'template', 'wporg-support' );
+	update_option( 'stylesheet', 'wporg-support' );
+} );
