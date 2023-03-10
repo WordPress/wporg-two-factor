@@ -19,6 +19,7 @@ export default function NumericControl( props ) {
 			inputMode="numeric"
 			autoComplete={ props.autoComplete || 'off' }
 			pattern={ props.pattern || "[0-9 ]*" }
+			title={ props.title || "Only numbers and spaces are allowed" }
 			onChange={ ( event ) => {
 				// Most callers will only need the value, so make it convenient for them.
 				props.onChange( event.target.value, event );

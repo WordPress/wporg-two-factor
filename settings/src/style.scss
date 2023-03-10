@@ -8,6 +8,19 @@
 		clear: none;
 	}
 
+	/* Restore wporg-support styles that bbPress overrides */
+	.bbp-single-user & {
+		input[type="text"],
+		input[type="email"],
+		input[type="search"],
+		input[type="password"],
+		input[type="number"] {
+			padding: 6px 10px;
+			font-size: 14px;
+			font-family: "Open Sans", sans-serif;
+		}
+	}
+
 	.components-button {
 		margin-right: 20px;
 	}
