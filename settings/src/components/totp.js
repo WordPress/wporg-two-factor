@@ -2,15 +2,16 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Notice, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { Button, Notice } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import SetupProgressBar from './setup-progress-bar';
-import ScreenLink from './screen-link'
+import SetupProgressBar  from './setup-progress-bar';
+import ScreenLink        from './screen-link'
+import NumericControl    from './numeric-control';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
@@ -197,28 +198,18 @@ function createQrCode( data ) {
  */
 function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey } ) {
 	const verifyCodeLength = 6;
-	const canSubmit        = qrCodeUrl && secretKey && verifyCode && verifyCode.length === verifyCodeLength;
+	const cleanVerifyCode  = verifyCode.replaceAll( /\s/g, '' );
+	const canSubmit        = qrCodeUrl && secretKey && cleanVerifyCode.length === verifyCodeLength;
 
 	return (
 		<form onSubmit={ handleEnable }>
-			<NumberControl
-				className="wporg-2fa__verify-code"
-				placeholder="123456"
-				min="0"
-				max="999999"
-				maxLength={ verifyCodeLength /* todo this isn't working. gutenberg bug? */ }
+			<NumericControl
+				className="wporg-2fa__verify-code wporg-2fa__token"
+				placeholder="123 456"
 				value={ verifyCode }
 				onChange={
-					/*
-					 * The value is passed as a string when clicking the button with a mouse, but as an int when
-					 * pressing enter on the keyboard. If it's left as an int, the button will be disabled because
-					 * `canSubmit` checks the `.length` property. That prevents the form from submitting, so it
-					 * needs to be normalized to a string.
-					 */
-					( code ) => setVerifyCode( code.toString() )
+					( code ) => setVerifyCode( code )
 				}
-				hideHTMLArrows={ false }
-				spinControls="none"
 				required={ true }
 			/>
 
