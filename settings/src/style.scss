@@ -58,8 +58,13 @@
 	margin-left: 0;
 	margin-right: 0;
 
+	&.is-error, &.is-success {
+		margin: 0;
+	}
+
 	.components-notice__content {
 		display: flex;
+		align-items: center;
 		gap: 8px;
 
 		svg {
