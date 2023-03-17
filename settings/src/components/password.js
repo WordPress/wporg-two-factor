@@ -101,7 +101,6 @@ export default function Password() {
 					placeholder="Q1jtBPRmROv51KOtbZ5aIKrc"
 					onChange={ ( password ) => userRecord.edit( { password } ) }
 				/>
-
 				<Button
 					className="wporg-2fa__show-password"
 					size={ 24 }
