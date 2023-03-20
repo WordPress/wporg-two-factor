@@ -213,7 +213,7 @@ function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secret
 				required={ true }
 			/>
 
-			<div>
+			<div class="wporg-2fa__submit-btn-wrapper">
 				<Button type="submit" isPrimary disabled={ ! canSubmit }>
 					Enable
 				</Button>
