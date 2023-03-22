@@ -3,7 +3,7 @@
  *
  * window.zxcvbn is also used, but can't be enqueued via an `import` because the handle doesn't have a 'wp-'
  * prefix. Instead, it's enqueued via `block.json`. It also can't be declared/destructured here because it's
- * loaded asyncronously.
+ * loaded asynchronously.
  */
 import { pick } from 'lodash';
 import { generatePassword } from '@automattic/generate-password';
@@ -200,7 +200,7 @@ export default function Password() {
  * @return {boolean} true if the password is strong, false otherwise
  */
 function isPasswordStrong( password, userData ) {
-	const { zxcvbn } = window; // Done here because it's loaded asyncronously.
+	const { zxcvbn } = window; // Done here because it's loaded asynchronously.
 
 	if ( ! zxcvbn ) {
 		return false; // Not loaded yet.
