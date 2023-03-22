@@ -15,7 +15,8 @@
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"dependencies": {
-		"@automattic/generate-password": "^0.1.0"
+		"@automattic/generate-password": "^0.1.0",
+		"lodash": "^4.17.21"
 	},
 	"devDependencies": {
 		"@testing-library/react": "^14.0.0",
