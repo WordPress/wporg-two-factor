@@ -44,11 +44,6 @@ export default function Password() {
 
 	/**
 	 * Handle clicking the `Generate Password` button.
-	 *
-	 * @todo When starting from a fresh page load, there's a flash of the red "too easy" notice before it shows
-	 * the success notice. It happens between the time when `edit()` is called and the `useEffect` callback fires
-	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
-	 * Or maybe the condition that renders the notice can include something like `hasResolved`?
 	 */
 	const generatePasswordHandler = useCallback( async () => {
 		userRecord.edit( { password: generatePassword( 24, true, true ) } );
