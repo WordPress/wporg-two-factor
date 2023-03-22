@@ -56,7 +56,7 @@ export default function Password() {
 	}, [] );
 
 	// Handle form submission.
-	const formSubmitHandler = useCallback( async ( event ) => {
+	const handleFormSubmit = useCallback( async ( event ) => {
 		event.preventDefault();
 
 		if ( ! passwordStrong || userRecord.isSaving ) {
@@ -76,8 +76,16 @@ export default function Password() {
 		setGlobalNotice( 'New password saved.' );
 	}, [ passwordStrong, userRecord.isSaving ] );
 
+	const handlePasswordChange = useCallback(
+		( password ) => userRecord.edit( { password } ), []
+	);
+
+	const handlePasswordToggle = useCallback(
+		() => setInputType(inputType === "password" ? "text" : "password"), [ inputType ]
+	);
+
 	return (
-		<form onSubmit={ formSubmitHandler }>
+		<form onSubmit={ handleFormSubmit }>
 			<p>
 				To update your password enter a new one below.
 				Strong passwords are random, at least twenty characters long, and include uppercase letters and symbols.
@@ -99,12 +107,12 @@ export default function Password() {
 					size="62"
 					value={ userRecord.editedRecord.password ?? '' }
 					placeholder="Q1jtBPRmROv51KOtbZ5aIKrc"
-					onChange={ ( password ) => userRecord.edit( { password } ) }
+					onChange={ handlePasswordChange }
 				/>
 				<Button
 					className="wporg-2fa__show-password"
 					size={ 24 }
-					onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }
+					onClick={ handlePasswordToggle }
 					aria-label={ inputType === "password" ? "Show Password" : "Hide Password" }
 					title={ inputType === "password" ? "Show Password" : "Hide Password" }
 				>
