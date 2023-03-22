@@ -11,10 +11,10 @@ import { generatePassword } from '@automattic/generate-password';
 /**
  * WordPress dependencies
  */
-import { Button, Flex, Notice, TextControl }            from '@wordpress/components';
-import { useCallback, useContext, useEffect, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, seen }        from '@wordpress/icons';
-import apiFetch                                         from '@wordpress/api-fetch';
+import { Button, Flex, Notice, TextControl }             from '@wordpress/components';
+import { useCallback, useContext, useEffect, useState }  from '@wordpress/element';
+import { Icon, cancelCircleFilled, check, seen, unseen } from '@wordpress/icons';
+import apiFetch                                          from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -105,9 +105,10 @@ export default function Password() {
 					className="wporg-2fa__show-password"
 					size={ 24 }
 					onClick={ () => setInputType( inputType === 'password' ? 'text' : 'password' ) }
-					aria-label="Show password"
+					aria-label={ inputType === "password" ? "Show Password" : "Hide Password" }
+					title={ inputType === "password" ? "Show Password" : "Hide Password" }
 				>
-					<Icon icon={ seen } />
+  					<Icon icon={inputType === "password" ? seen : unseen} />
 				</Button>
 			</Flex>
 
