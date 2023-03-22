@@ -64,7 +64,7 @@ export default function Password() {
 	 * to update the `passwordStrong` state. Is there a way to tell React to wait until both are done to re-render?
 	 * Or maybe the condition that renders the notice can include something like `hasResolved`?
 	 */
-	const generatePasswordHandler = useCallback( async () => {
+	const handlePasswordGenerate = useCallback( async () => {
 		userRecord.edit( { password: generatePassword( 24, true, true ) } );
 		setInputType( 'text' );
 	}, [] );
@@ -181,7 +181,7 @@ export default function Password() {
 				</Button>
 
 				{ window.crypto?.getRandomValues && (
-					<Button isSecondary onClick={ generatePasswordHandler }>
+					<Button isSecondary onClick={ handlePasswordGenerate }>
 						Generate strong password
 					</Button>
 				) }
