@@ -12,7 +12,8 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start --webpack-copy-php",
-		"test:unit": "wp-scripts test-unit-js"
+		"test:unit": "wp-scripts test-unit-js",
+		"test:unit:watch": "wp-scripts test-unit-js --watch"
 	},
 	"dependencies": {
 		"@automattic/generate-password": "^0.1.0"

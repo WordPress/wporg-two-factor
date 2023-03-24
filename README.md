@@ -57,7 +57,7 @@ WordPress.org-specific customizations for the Two Factor plugin
 
 ## Testing
 
-Front-end unit tests can be run in `/settings` using the `npm run test:unit` command.
+Front-end unit tests can be run in `/settings` using the `npm run test:unit` or `npm run test:unit:watch` commands.
 
 Back-end unit tests can be run in `/` using the `composer run test` or `composer run test:watch` commands. `composer run coverage` will generate a coverage report.
 
