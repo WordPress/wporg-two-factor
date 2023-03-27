@@ -3,7 +3,7 @@
  */
 import { StrictMode, createContext, useCallback, useEffect, useState } from '@wordpress/element';
 import { Icon, chevronLeft } from '@wordpress/icons';
-import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
+import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
