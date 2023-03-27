@@ -13,7 +13,8 @@
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start --webpack-copy-php",
 		"test:unit": "wp-scripts test-unit-js",
-		"test:unit:watch": "wp-scripts test-unit-js --watch"
+		"test:unit:watch": "wp-scripts test-unit-js --watch",
+		"prepare": "cd .. && husky install settings/.husky"
 	},
 	"dependencies": {
 		"@automattic/generate-password": "^0.1.0"
@@ -27,6 +28,16 @@
 		"@wordpress/data": "^8.4.0",
 		"@wordpress/element": "^5.4.0",
 		"@wordpress/icons": "^9.18.0",
-		"@wordpress/scripts": "^24.6.0"
+		"@wordpress/scripts": "^24.6.0",
+		"lint-staged": "^13.2.0",
+		"husky": "^8.0.0"
+	},
+	"lint-staged": {
+		"*.js": [
+			"npm run lint:js"
+		],
+		"*.{css,scss}": [
+			"npm run lint:css"
+		]
 	}
 }
