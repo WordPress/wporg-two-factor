@@ -128,7 +128,6 @@ function Main( { userId } ) {
 		screenContent = (
 			<Card>
 				<CardHeader className="wporg-2fa__navigation" size="xSmall">
-					<Flex>
 						<ScreenLink
 							screen="account-status"
 							anchorText={
@@ -140,7 +139,6 @@ function Main( { userId } ) {
 						/>
 
 						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }</h3>
-					</Flex>
 				</CardHeader>
 
 				<CardBody className={ 'wporg-2fa__' + screen }>

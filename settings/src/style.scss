@@ -27,25 +27,23 @@
 }
 
 .wporg-2fa__navigation {
-	padding: 0 24px !important; /* Override Gutenberg auto-generated. */
+	padding: 24px 0 !important; /* Override Gutenberg auto-generated. */
+	justify-content: center !important;
+	position: relative;
 
 	a {
-		position: relative;
-		top: -4px;
-		color: #4ca6cf;
+		display: flex;
+    	align-items: center;
+		position: absolute;
+		left: 24px;
 	}
 
 	svg {
-		position: relative;
-		top: 7px;
-		margin-right: -3px;
 		fill: #4ca6cf;
 	}
 
 	h3 {
-		flex: 1 1 auto;
-		margin: 25px 0;
-		text-align: center;
+		margin: unset;
 		text-transform: capitalize;
 	}
 }
