@@ -1,3 +1,17 @@
+.wporg-2fa__totp_intro_container {
+	padding: 20px;
+
+	.components-button {
+		padding: 0;
+		margin: 0;
+		align-self: end;
+	}
+
+	p {
+		all: unset;
+	}
+}
+
 .wporg-2fa__qr-code {
 	text-align: center;
 
