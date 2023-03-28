@@ -123,10 +123,6 @@ function Setup( { setIsNextClick } ) {
 			<SetupProgressBar step="totp-setup" />
 
 			<Flex expanded={false} direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_setup-container">
-				<strong>
-					Scan QR Code
-				</strong>
-
 				<SetupMethod
 					setupMethod={ setupMethod }
 					setSetupMethod={ setSetupMethod }
@@ -162,10 +158,13 @@ function Setup( { setIsNextClick } ) {
  */
 function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'qr-code' === setupMethod ) {
-		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [] );
+		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setupMethod ] );
 
 		return (
 			<>
+				<strong>
+					Scan QR Code
+				</strong>
 				<p>
 					Scan this QR code with the authenticator app.&nbsp;
 
@@ -192,20 +191,22 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'manual' === setupMethod ) {
 		const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
 
-		return (
-			<>
-				<p>
-					Enter this time code into your mobile app.<br />
+		const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setupMethod ]);
 
-					<Button isLink onClick={ () => setSetupMethod( 'qr-code' ) }>
+		return (
+			<div className="wporg-2fa__manual">
+				<p>
+					<strong>Enter this time code into your app.</strong>&nbsp;
+
+					<Button variant="link" onClick={ handleClick }>
 						Prefer to scan a QR code?
 					</Button>
 				</p>
 
-				<code className="wporg-2fa__manual-code">
+				<code>
 					{ readableSecretKey }
 				</code>
-			</>
+			</div>
 		);
 	}
 }
