@@ -11,7 +11,7 @@ import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpres
  */
 import SetupProgressBar  from './setup-progress-bar';
 import ScreenLink        from './screen-link'
-import NumericControl    from './numeric-control';
+import AutoTabbingInput  from './auto-tabbing-input';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
@@ -38,7 +38,7 @@ function Intro( { setIsNextClick }) {
 	return (
 		<>
 			<SetupProgressBar step="totp-intro" />
-			<Flex direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_intro_container">
+			<Flex direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_intro-container">
 				<strong>
 					Verify Codes
 				</strong>
@@ -57,7 +57,7 @@ function Intro( { setIsNextClick }) {
 					for your phone.
 				</p>
 
-				<Button onClick={ handleClick }>Next</Button>
+				<Button variant="link" onClick={ handleClick }>Next</Button>
 			</Flex>
 		</>
 	);
@@ -70,9 +70,9 @@ function Setup( { setIsNextClick } ) {
 	const { clickScreenLink, setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ secretKey, setSecretKey ]     = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ]     = useState( '' );
-	const [ verifyCode, setVerifyCode ]   = useState( '' );
 	const [ error, setError ]             = useState( '' );
 	const [ setupMethod, setSetupMethod ] = useState( 'qr-code' );
+	const [ inputs, setInputs ]			  = useState( Array( 6 ).fill( '' ) );
 
 	// Fetch the data needed to setup TOTP.
 	useEffect( () => {
@@ -92,6 +92,8 @@ function Setup( { setIsNextClick } ) {
 	// Enable TOTP when button clicked.
 	const handleEnable = useCallback( async ( event ) => {
 		event.preventDefault();
+		
+		const code = inputs.join( '' );
 
 		try {
 			await apiFetch( {
@@ -100,7 +102,7 @@ function Setup( { setIsNextClick } ) {
 				data: {
 					user_id: userRecord.record.id,
 					key: secretKey,
-					code: verifyCode,
+					code,
 					enable_provider: true,
 				},
 			} );
@@ -118,33 +120,39 @@ function Setup( { setIsNextClick } ) {
 
 	return (
 		<>
-			<SetupProgressBar step="totp-verify" />
+			<SetupProgressBar step="totp-setup" />
 
-			<SetupMethod
-				setupMethod={ setupMethod }
-				setSetupMethod={ setSetupMethod }
-				qrCodeUrl={ qrCodeUrl }
-				secretKey={ secretKey }
-			/>
+			<Flex direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_setup-container">
+				<strong>
+					Scan QR Code
+				</strong>
 
-			<p>Then enter the six digit code provided by the app:</p>
+				<SetupMethod
+					setupMethod={ setupMethod }
+					setSetupMethod={ setSetupMethod }
+					qrCodeUrl={ qrCodeUrl }
+					secretKey={ secretKey }
+				/>
 
-			<SetupForm
-				handleEnable={ handleEnable }
-				verifyCode={ verifyCode }
-				setVerifyCode={ setVerifyCode }
-				qrCodeUrl={ qrCodeUrl }
-				secretKey={ secretKey }
-			/>
+				<strong>Enter the six digit code provided by the app</strong>
 
-			{ error &&
-				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
-					{ error }
-				</Notice>
-			}
+				<SetupForm
+					handleEnable={ handleEnable }
+					qrCodeUrl={ qrCodeUrl }
+					secretKey={ secretKey }
+					inputs={inputs}
+					setInputs={setInputs}
+				/>
 
-			<Button onClick={ handleClick }>Previous</Button>
+				<Button variant="link" onClick={ handleClick }>Previous</Button>
+
+				{ error &&
+					<Notice status="error" isDismissible={ false }>
+						<Icon icon={ cancelCircleFilled } />
+						{ error }
+					</Notice>
+				}
+			</Flex>
 		</>
 	);
 }
@@ -154,14 +162,15 @@ function Setup( { setIsNextClick } ) {
  */
 function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'qr-code' === setupMethod ) {
+		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [] );
+
 		return (
 			<>
 				<p>
-					Scan this QR code with the authenticator app on your mobile device.
-					<br />
+					Scan this QR code with the authenticator app.&nbsp;
 
-					<Button isLink onClick={ () => setSetupMethod( 'manual' ) }>
-						Can't scan the code?
+					<Button variant="link" onClick={ handleClick }>
+						Can't scan the QR code?
 					</Button>
 				</p>
 
@@ -225,25 +234,19 @@ function createQrCode( data ) {
 /**
  * Render the form for entering the TOTP code.
  */
-function SetupForm( { handleEnable, verifyCode, setVerifyCode, qrCodeUrl, secretKey } ) {
-	const verifyCodeLength = 6;
-	const cleanVerifyCode  = verifyCode.replaceAll( /\s/g, '' );
-	const canSubmit        = qrCodeUrl && secretKey && cleanVerifyCode.length === verifyCodeLength;
+function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs } ) {
+	const [ isInputComplete, setIsInputComplete ] = useState(false);
+
+	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
+
+	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
 	return (
 		<form onSubmit={ handleEnable }>
-			<NumericControl
-				className="wporg-2fa__verify-code wporg-2fa__token"
-				placeholder="123 456"
-				value={ verifyCode }
-				onChange={
-					( code ) => setVerifyCode( code )
-				}
-				required={ true }
-			/>
+			<AutoTabbingInput inputs={inputs} setInputs={setInputs} onComplete={handleComplete}/>
 
 			<div className="wporg-2fa__submit-btn-wrapper">
-				<Button type="submit" isPrimary disabled={ ! canSubmit }>
+				<Button type="submit" variant="primary" disabled={ ! canSubmit }>
 					Enable
 				</Button>
 
@@ -290,7 +293,7 @@ function Manage() {
 				Make sure you've created { ' ' }
 				<ScreenLink screen="backup-codes" anchorText="backup codes" /> { ' ' }
 				and saved them in a safe location, in case you ever lose your device. You may also need them when transitioning to a new device.
-				Without them you may permenantly lose access to your account.
+				Without them you may permanently lose access to your account.
 			</p>
 
 			<p>

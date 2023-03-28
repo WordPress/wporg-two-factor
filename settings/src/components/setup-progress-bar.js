@@ -13,10 +13,10 @@ export default function SetupProgressBar( { step } ) {
 					Introduction
 				</li>
 
-				<li className={ 'totp-verify' === step ? 'is-enabled' : 'is-disabled' }>
+				<li className={ 'totp-setup' === step ? 'is-enabled' : 'is-disabled' }>
 					<Icon icon={ lock } />
 					<br />
-					Verify Codes
+					Scan QR Code
 				</li>
 
 				<li className={ 'backup-codes' === step ? 'is-enabled' : 'is-disabled' }>

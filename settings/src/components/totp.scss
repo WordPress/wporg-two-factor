@@ -1,14 +1,27 @@
-.wporg-2fa__totp_intro_container {
+.wporg-2fa__totp_intro-container {
 	padding: 20px;
 
 	.components-button {
 		padding: 0;
 		margin: 0;
 		align-self: end;
+		text-decoration: none !important;
 	}
 
 	p {
 		all: unset;
+	}
+}
+
+.wporg-2fa__totp_setup-container {
+	padding: 20px;
+
+	p {
+		all: unset;
+	}
+
+	strong:nth-of-type(2) {
+		align-self: center;
 	}
 }
 
@@ -32,11 +45,6 @@
 	font-family: monospace;
 	font-weight: bold;
 	letter-spacing: 0.1em;
-}
-
-.wporg-2fa__verify-code {
-	width: 23ch;
-	margin-bottom: 20px;
 }
 
 .wporg-2fa__submit-btn-wrapper {
