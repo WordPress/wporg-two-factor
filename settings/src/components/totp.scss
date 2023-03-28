@@ -15,6 +15,7 @@
 
 .wporg-2fa__totp_setup-container {
 	padding: 20px;
+	position: relative;
 
 	p {
 		all: unset;
@@ -22,6 +23,13 @@
 
 	strong:nth-of-type(2) {
 		align-self: center;
+	}
+
+	> .components-button {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		text-decoration: none !important;
 	}
 }
 
@@ -49,10 +57,39 @@
 }
 
 .wporg-2fa__submit-btn-wrapper {
-	margin-bottom: 15px;
+	width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+	* {
+		flex: 1;
+		justify-content: center;
+	}
+
+	a {
+		background: $white !important;
+		box-shadow: (0 0 0 1px #3858E9) !important;
+		color: #3858E9 !important;
+	}
+
+	button {
+		background: #3858E9 !important;
+		border-color: #3858E9 !important;
+		color: $white !important;
+		margin-right: 0 !important;
+	}
 }
 
 .wporg-2fa__enabled-status {
 	color: $alert-green;
 	text-transform: uppercase;
+}
+
+.wporg-2fa__setup-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	align-self: center;
+	width: fit-content;
 }

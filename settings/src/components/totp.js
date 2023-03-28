@@ -38,7 +38,7 @@ function Intro( { setIsNextClick }) {
 	return (
 		<>
 			<SetupProgressBar step="totp-intro" />
-			<Flex direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_intro-container">
+			<Flex expanded={false} direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_intro-container">
 				<strong>
 					Verify Codes
 				</strong>
@@ -122,7 +122,7 @@ function Setup( { setIsNextClick } ) {
 		<>
 			<SetupProgressBar step="totp-setup" />
 
-			<Flex direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_setup-container">
+			<Flex expanded={false} direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_setup-container">
 				<strong>
 					Scan QR Code
 				</strong>
@@ -242,15 +242,15 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs } ) 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
 	return (
-		<form onSubmit={ handleEnable }>
+		<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 			<AutoTabbingInput inputs={inputs} setInputs={setInputs} onComplete={handleComplete}/>
 
 			<div className="wporg-2fa__submit-btn-wrapper">
-				<Button type="submit" variant="primary" disabled={ ! canSubmit }>
+				<ScreenLink screen="account-status" anchorText="Cancel" buttonStyle="secondary" />
+
+				<Button type="submit" disabled={ ! canSubmit }>
 					Enable
 				</Button>
-
-				<ScreenLink screen="account-status" anchorText="Cancel" buttonStyle="secondary" />
 			</div>
 		</form>
 	);
