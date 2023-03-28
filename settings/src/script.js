@@ -141,7 +141,7 @@ function Main( { userId } ) {
 						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }</h3>
 				</CardHeader>
 
-				<CardBody className={ 'wporg-2fa__screen_wrapper wporg-2fa__' + screen }>
+				<CardBody className={ 'wporg-2fa__screen-wrapper wporg-2fa__' + screen }>
 					<CurrentScreen />
 				</CardBody>
 			</Card>
