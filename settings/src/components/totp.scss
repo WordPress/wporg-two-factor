@@ -31,6 +31,13 @@
 		bottom: 0;
 		text-decoration: none !important;
 	}
+
+	> .components-notice {
+		position: absolute;
+		width: 100%;
+		left: 0;
+		bottom: -60px;
+	}
 }
 
 .wporg-2fa__qr-code {
