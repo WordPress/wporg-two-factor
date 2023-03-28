@@ -1,5 +1,6 @@
 .wporg-2fa__auto-tabbing-input {
 	margin-bottom: 16px;
+	display: flex;
 
 	input {
 		width: 40px;
@@ -7,6 +8,7 @@
 		text-align: center;
 		border: 1px solid #949494;
 		border-radius: 2px;
+		padding: 0px !important;
 		
 		&:not(:last-child) {
 			margin-right: 24px;

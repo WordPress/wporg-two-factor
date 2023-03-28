@@ -53,7 +53,8 @@
 }
 
 .wporg-2fa__screen-wrapper {
-	height: 665px !important;
+	min-height: 665px !important;
+    height: unset !important;
 }
 
 .components-notice {
