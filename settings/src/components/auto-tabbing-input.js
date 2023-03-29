@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
 import NumericControl    from './numeric-control';
 
 const AutoTabbingInput = ( props ) => {
-    const  { inputs, setInputs, onComplete } = props;
+    const  { inputs, setInputs, onComplete, error } = props;
 
     const handleChange = useCallback( (value, event, index, inputRef) => {
 
@@ -47,7 +47,7 @@ const AutoTabbingInput = ( props ) => {
     }, []);
 
     return (
-        <div className="wporg-2fa__auto-tabbing-input">
+        <div className={"wporg-2fa__auto-tabbing-input" + ( error ? " is-error" : "" )}>
           {inputs.map((value, index) => (
             <NumericControl
                 {...props}
