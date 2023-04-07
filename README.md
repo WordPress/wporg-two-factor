@@ -44,7 +44,7 @@ WordPress.org-specific customizations for the Two Factor plugin
 	}
 	add_action( 'init', __NAMESPACE__ . '\add_rewrite_rules' );
 	```
-1. Install, build, and activate the `wporg-support` theme.
+1. Install, build, and activate the [wporg-support](https://meta.svn.wordpress.org/sites/trunk/wordpress.org/public_html/wp-content/themes/pub/wporg-support/) theme.
 1. Install `bbPress` and `Gutenberg`. You might need to clone & build `trunk` branch of `Gutenberg` if we happen to be using any new features.
 1. `git clone` https://github.com/WordPress/two-factor/ into `wp-content/plugins` and follow their setup instructions.
 1. `git clone` this repo into `wp-content/plugins`
@@ -53,7 +53,7 @@ WordPress.org-specific customizations for the Two Factor plugin
 1. Activate all four plugins.
 1. If you want to make JS changes, then `cd settings && npm start`
 1. Open `wp-admin/options-general.php?page=bbpress` and uncheck `Prefix all forum content with the Forum Root slug (Recommended)`, then save.
-1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
+1. Visit `users/{username}/edit/account` to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
 
 ## Testing
 
