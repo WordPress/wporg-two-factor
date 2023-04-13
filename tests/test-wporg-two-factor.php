@@ -225,14 +225,18 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 
 		// Enable TOTP (as secondary).
-		$totp_provider = Two_Factor_Totp::get_instance();
-		$totp_provider->set_user_totp_key( self::$regular_user->ID, Two_Factor_Totp::generate_key() );
-		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
-
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_provider->set_user_totp_key( self::$regular_user->ID, $totp_provider->generate_key() );
+		$enabled       = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
 		$this->assertTrue( $enabled );
 
-		$provider = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+		// Validate that the TOTP key was stored in an encrypted form.
+		$totp_key       = $totp_provider->get_user_totp_key( self::$regular_user->ID );
+		$totp_user_meta = get_user_meta( self::$regular_user->ID, $totp_provider::SECRET_META_KEY, true );
+		$this->assertNotSame( $totp_key, $totp_user_meta );
 
+		// Validate that TOTP is now the primary provider.
+		$provider       = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
 		$expected_class = 'WordPressdotorg\Two_Factor\Encrypted_Totp_Provider';
 		$actual_class   = get_class( $provider );
 		$this->assertSame( $expected_class, $actual_class );
