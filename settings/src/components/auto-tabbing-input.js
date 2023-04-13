@@ -51,6 +51,7 @@ const AutoTabbingInput = ( props ) => {
           {inputs.map((value, index) => (
             <NumericControl
                 {...props}
+                value={value}
                 key={index}
                 index={index}
                 onChange={handleChange}

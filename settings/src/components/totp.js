@@ -139,6 +139,7 @@ function Setup( { setIsNextClick } ) {
 					inputs={inputs}
 					setInputs={setInputs}
 					error={error}
+					setError={setError}
 				/>
 
 				<Button variant="link" onClick={ handleClick }>Previous</Button>
@@ -236,10 +237,14 @@ function createQrCode( data ) {
 /**
  * Render the form for entering the TOTP code.
  */
-function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error } ) {
+function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
 	const [ isInputComplete, setIsInputComplete ] = useState(false);
 
 	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
+	const handleCancelClick = useCallback( () => { 
+		setInputs( Array( 6 ).fill( '' ) );
+		setError('');
+	}, [])
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
@@ -248,8 +253,9 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 			<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
 			<div className="wporg-2fa__submit-btn-wrapper">
-				<ScreenLink screen="account-status" anchorText="Cancel" buttonStyle="secondary" />
-
+				<Button variant="secondary" onClick={ handleCancelClick }>
+					Cancel
+				</Button>
 				<Button type="submit" variant="primary" disabled={ ! canSubmit }>
 					Enable
 				</Button>
