@@ -230,10 +230,14 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$enabled       = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
 		$this->assertTrue( $enabled );
 
-		// Validate that the TOTP key was stored in an encrypted form.
-		$totp_key       = $totp_provider->get_user_totp_key( self::$regular_user->ID );
-		$totp_user_meta = get_user_meta( self::$regular_user->ID, $totp_provider::SECRET_META_KEY, true );
-		$this->assertNotSame( $totp_key, $totp_user_meta );
+		// Validate that the TOTP key was stored in an encrypted form, if encryption methods are available.
+		// Pending https://github.com/WordPress/wporg-mu-plugins/pull/390 merge.
+		if ( function_exists( 'wporg_is_encrypted' ) ) {
+			$totp_key       = $totp_provider->get_user_totp_key( self::$regular_user->ID );
+			$totp_user_meta = get_user_meta( self::$regular_user->ID, $totp_provider::SECRET_META_KEY, true );
+			$this->assertNotSame( $totp_key, $totp_user_meta );
+			$this->assertTrue( wporg_is_encrypted( $totp_user_meta ) );
+		}
 
 		// Validate that TOTP is now the primary provider.
 		$provider       = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
