@@ -1,0 +1,29 @@
+.wporg-2fa__auto-tabbing-input {
+	margin-bottom: 16px;
+	display: flex;
+
+	input {
+		width: 40px;
+		height: 40px;
+		text-align: center;
+		border: 1px solid #949494;
+		border-radius: 2px;
+		padding: 0px !important;
+
+		&:focus {
+			outline-color: $blue-50;
+		}
+		
+		&:not(:last-child) {
+			margin-right: 24px;
+		}
+	}
+
+	&.is-error input {
+		border: 1px solid $alert-red !important;
+		box-shadow: unset !important;
+		&:focus {
+			outline: unset;
+		}
+	}
+}

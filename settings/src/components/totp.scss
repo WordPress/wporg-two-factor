@@ -1,5 +1,48 @@
+.wporg-2fa__totp_intro-container {
+	padding: 20px;
+
+	.components-button {
+		padding: 0;
+		margin: 0;
+		align-self: end;
+		text-decoration: none !important;
+	}
+
+	p {
+		all: unset;
+	}
+}
+
+.wporg-2fa__totp_setup-container {
+	padding: 20px;
+	position: relative;
+
+	p {
+		all: unset;
+	}
+
+	strong:last-of-type {
+		align-self: center;
+	}
+
+	> .components-button {
+		position: absolute;
+		right: 0;
+		bottom: -10px;
+		text-decoration: none !important;
+	}
+
+	> .components-notice {
+		position: absolute;
+		width: 100%;
+		left: 0;
+		bottom: -65px;
+	}
+}
+
 .wporg-2fa__qr-code {
 	text-align: center;
+	height: 225px;
 
 	#bbpress-forums & {
 		> a {
@@ -14,22 +57,49 @@
 	}
 }
 
-.wporg-2fa__manual-code {
-	font-family: monospace;
-	font-weight: bold;
-	letter-spacing: 0.1em;
-}
+.wporg-2fa__manual {
+	display: flex;
+    flex-direction: column;
+    width: fit-content;
+    align-self: center;
+	align-items: center;
 
-.wporg-2fa__verify-code {
-	width: 23ch;
-	margin-bottom: 20px;
+	code {
+		font-family: 'IBM Plex Mono';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 15px;
+		line-height: 20px;
+		margin-top: 16px;
+	}
+	
 }
 
 .wporg-2fa__submit-btn-wrapper {
-	margin-bottom: 15px;
+	width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+	* {
+		flex: 1;
+		justify-content: center;
+	}
+
+	button + button {
+		margin-right: 0 !important;
+	}
 }
 
 .wporg-2fa__enabled-status {
 	color: $alert-green;
 	text-transform: uppercase;
+}
+
+.wporg-2fa__setup-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	align-self: center;
+	width: fit-content;
 }
