@@ -229,10 +229,17 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$totp_provider->set_user_totp_key( self::$regular_user->ID, Two_Factor_Totp::generate_key() );
 		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
 
-		$expected = 'WordPressdotorg\Two_Factor\Encrypted_Totp_Provider';
-		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
 		$this->assertTrue( $enabled );
-		$this->assertSame( $expected, $actual );
+
+		$provider = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+
+		$expected_class = 'WordPressdotorg\Two_Factor\Encrypted_Totp_Provider';
+		$actual_class   = get_class( $provider );
+		$this->assertSame( $expected_class, $actual_class );
+
+		$expected_key = 'Two_Factor_Totp';
+		$actual_key   = $provider->get_key();
+		$this->assertSame( $expected_key, $provider->get_key() );
 
 		// Validate that Backup Codes are now available as secondary.
 		$expected = [ 'Two_Factor_Backup_Codes', 'Two_Factor_Totp' ];
