@@ -21,8 +21,8 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 	 * @return bool True if the key was saved, false otherwise.
 	 */
 	public function set_user_totp_key( $user_id, $key ) {
-		if ( function_exists( 'wporg_encrypt' ) ) {
-			$key = wporg_encrypt( $key, 'two-factor' );
+		if ( function_exists( 'wporg_authenticated_encrypt' ) ) {
+			$key = wporg_authenticated_encrypt( $key, (string) $user_id, 'two-factor' );
 		}
 
 		return parent::set_user_totp_key( $user_id, (string) $key );
@@ -41,7 +41,7 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 
 		if ( $key && function_exists( 'wporg_is_encrypted' ) ) {
 			if ( wporg_is_encrypted( $key ) ) {
-				$key = (string) wporg_decrypt( $key, 'two-factor' );
+				$key = (string) wporg_authenticated_decrypt( $key, (string) $user_id, 'two-factor' );
 			} else {
 				// Upgrade the key to be encrypted.
 				$this->set_user_totp_key( $user_id, $key );
