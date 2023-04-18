@@ -32,7 +32,16 @@
 	text-align: center;
 
 	& > .components-notice.is-error {
-		margin-bottom: 16px;
+		opacity: 0;
+		height: 0;
+		margin-bottom: -32px; /* padding + gap */
+
+		&.show {
+			transition: opacity 0.5s ease;
+			margin-bottom: 16px;
+			height: auto;
+			opacity: 1;
+		}
 	}
 }
 

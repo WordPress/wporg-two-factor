@@ -215,12 +215,10 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 
 	return (
 		<Flex expanded={false} direction='column' align='center' gap="16px" className="wporg-2fa__setup-form-container">
-			{ error &&
-				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
-					{ error }
-				</Notice>
-			}
+			<Notice status="error" isDismissible={ false } className={ error ? "show" : ""}>
+				<Icon icon={ cancelCircleFilled } />
+				{ error }
+			</Notice>
 
 			<strong>Enter the six digit code provided by the app</strong>
 
