@@ -109,8 +109,6 @@ function Setup() {
 					secretKey={ secretKey }
 				/>
 
-				<strong>Enter the six digit code provided by the app</strong>
-
 				<SetupForm
 					handleEnable={ handleEnable }
 					qrCodeUrl={ qrCodeUrl }
@@ -120,13 +118,6 @@ function Setup() {
 					error={error}
 					setError={setError}
 				/>
-
-				{ error &&
-					<Notice status="error" isDismissible={ false }>
-						<Icon icon={ cancelCircleFilled } />
-						{ error }
-					</Notice>
-				}
 			</Flex>
 		</>
 	);
@@ -223,18 +214,29 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
 	return (
-		<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
-			<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
+		<Flex expanded={false} direction='column' align='center' gap="16px" className="wporg-2fa__setup-form-container">
+			{ error &&
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ error }
+				</Notice>
+			}
 
-			<div className="wporg-2fa__submit-btn-wrapper">
-				<Button variant="secondary" onClick={ handleCancelClick }>
-					Clear
-				</Button>
-				<Button type="submit" variant="primary" disabled={ ! canSubmit }>
-					Enable
-				</Button>
-			</div>
-		</form>
+			<strong>Enter the six digit code provided by the app</strong>
+
+			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
+				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
+
+				<div className="wporg-2fa__submit-btn-wrapper">
+					<Button variant="secondary" onClick={ handleCancelClick }>
+						Clear
+					</Button>
+					<Button type="submit" variant="primary" disabled={ ! canSubmit }>
+						Enable
+					</Button>
+				</div>
+			</form>
+		</Flex>
 	);
 }
 

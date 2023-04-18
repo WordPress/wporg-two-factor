@@ -22,10 +22,17 @@
 	}
 
 	> .components-notice {
-		position: absolute;
 		width: 100%;
-		left: 0;
-		bottom: -65px;
+	}
+}
+
+.wporg-2fa__setup-form-container {
+	width: fit-content;
+    align-self: center;
+	text-align: center;
+
+	& > .components-notice.is-error {
+		margin-bottom: 16px;
 	}
 }
 
@@ -52,6 +59,7 @@
     width: fit-content;
     align-self: center;
 	align-items: center;
+	margin-bottom: 16px;
 
 	code {
 		font-family: 'IBM Plex Mono';
