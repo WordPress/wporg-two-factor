@@ -228,7 +228,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 
 			<div className="wporg-2fa__submit-btn-wrapper">
 				<Button variant="secondary" onClick={ handleCancelClick }>
-					Cancel
+					Clear
 				</Button>
 				<Button type="submit" variant="primary" disabled={ ! canSubmit }>
 					Enable
