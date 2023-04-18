@@ -17,11 +17,15 @@
 	padding: 20px;
 	position: relative;
 
-	p {
-		all: unset;
+	& > strong:first-of-type {
+		font-size: 18px;
 	}
 
-	strong:last-of-type {
+	p {
+		margin-top: unset;
+	}
+
+	& > strong:last-of-type {
 		align-self: center;
 	}
 
