@@ -122,7 +122,24 @@ function Setup( { setIsNextClick } ) {
 		<>
 			<SetupProgressBar step="totp-setup" />
 
-			<Flex expanded={false} direction='column' align="top" justify="top" gap="16px" className="wporg-2fa__totp_setup-container">
+			<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
+				<strong>
+					Setup authenticator app
+				</strong>
+
+				<p>
+					Two-Factor Authentication adds an extra layer of security to your account.			
+					Use a phone app like 
+					<a href="https://authy.com/"> Authy </a>  
+					or
+					<a href='https://googleauthenticator.net/'> Google Authenticator </a>
+					to get 2FA codes when logging in to WordPress.org.
+				</p>
+				
+				<strong>
+					{'qr-code' === setupMethod ? "Scan QR Code" : "Enter Time Code" }
+				</strong>
+
 				<SetupMethod
 					setupMethod={ setupMethod }
 					setSetupMethod={ setSetupMethod }
@@ -164,11 +181,8 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 
 		return (
 			<>
-				<strong>
-					Scan QR Code
-				</strong>
 				<p>
-					Scan this QR code with the authenticator app.&nbsp;
+					Use an authenticator app from your phone to scan.&nbsp;
 
 					<Button variant="link" onClick={ handleClick }>
 						Can't scan the QR code?
