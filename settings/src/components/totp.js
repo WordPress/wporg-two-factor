@@ -132,7 +132,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 
 		return (
 			<>
-				<p>
+				<p className='wporg-2fa__totp_setup-instruction'>
 					Use an authenticator app from your phone to scan.&nbsp;
 
 					<Button variant="link" onClick={ handleClick }>
@@ -163,7 +163,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 		return (
 			<div className="wporg-2fa__manual">
 				<p>
-					<strong>Enter this time code into your app.</strong>&nbsp;
+					Enter this time code into your app.&nbsp;
 
 					<Button variant="link" onClick={ handleClick }>
 						Prefer to scan a QR code?
