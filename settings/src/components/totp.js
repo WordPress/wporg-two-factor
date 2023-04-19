@@ -9,7 +9,6 @@ import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpres
 /**
  * Internal dependencies
  */
-import SetupProgressBar  from './setup-progress-bar';
 import ScreenLink        from './screen-link'
 import AutoTabbingInput  from './auto-tabbing-input';
 import { refreshRecord } from '../utilities';
@@ -82,8 +81,6 @@ function Setup() {
 
 	return (
 		<>
-			<SetupProgressBar step="totp-setup" />
-
 			<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
 				<strong>
 					Setup authenticator app
