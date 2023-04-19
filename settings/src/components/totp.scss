@@ -40,7 +40,7 @@
 		height: 0;
 		margin-bottom: -32px; /* padding + gap */
 
-		&.show {
+		&.is-shown {
 			transition: opacity 0.5s ease;
 			margin-bottom: 16px;
 			height: auto;

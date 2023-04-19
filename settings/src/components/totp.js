@@ -212,7 +212,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 
 	return (
 		<Flex expanded={false} direction='column' align='center' gap="16px" className="wporg-2fa__setup-form-container">
-			<Notice status="error" isDismissible={ false } className={ error ? "show" : ""}>
+			<Notice status="error" isDismissible={ false } className={ error ? "is-shown" : ""}>
 				<Icon icon={ cancelCircleFilled } />
 				{ error }
 			</Notice>
