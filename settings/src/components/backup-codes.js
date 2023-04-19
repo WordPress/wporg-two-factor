@@ -11,7 +11,6 @@ import { Icon, warning }                                from '@wordpress/icons';
  */
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities';
-import SetupProgressBar  from './setup-progress-bar';
 
 /**
  * Setup and manage backup codes.
@@ -70,8 +69,6 @@ function Setup( { setRegenerating } ) {
 
 	return (
 		<>
-			<SetupProgressBar step="backup-codes" />
-
 			<p>
 				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
 				Each code can only be used once.
