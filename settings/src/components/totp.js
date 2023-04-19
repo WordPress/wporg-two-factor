@@ -82,10 +82,6 @@ function Setup() {
 	return (
 		<>
 			<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
-				<strong>
-					Setup authenticator app
-				</strong>
-
 				<p>
 					Two-Factor Authentication adds an extra layer of security to your account.			
 					Use a phone app like 
