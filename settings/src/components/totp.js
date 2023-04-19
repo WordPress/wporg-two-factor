@@ -225,7 +225,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
-				<div className="wporg-2fa__submit-btn-wrapper">
+				<div className="wporg-2fa__submit-btn-container">
 					<Button variant="secondary" onClick={ handleCancelClick }>
 						Clear
 					</Button>
