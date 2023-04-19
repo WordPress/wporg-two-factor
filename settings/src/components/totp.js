@@ -80,39 +80,33 @@ function Setup() {
 	} );
 
 	return (
-		<>
-			<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
-				<p>
-					Two-Factor Authentication adds an extra layer of security to your account.			
-					Use a phone app like 
-					<a href="https://authy.com/"> Authy </a>  
-					or
-					<a href='https://googleauthenticator.net/'> Google Authenticator </a>
-					to get 2FA codes when logging in to WordPress.org.
-				</p>
-				
-				<strong>
-					{'qr-code' === setupMethod ? "Scan QR Code" : "Enter Time Code" }
-				</strong>
+		<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
+			<p className='wporg-2fa__totp_setup-instruction'>
+				Two-Factor Authentication adds an extra layer of security to your account.			
+				Use a phone app like 
+				<a href="https://authy.com/"> Authy </a>  
+				or
+				<a href='https://googleauthenticator.net/'> Google Authenticator </a>
+				when logging in to WordPress.org.
+			</p>
 
-				<SetupMethod
-					setupMethod={ setupMethod }
-					setSetupMethod={ setSetupMethod }
-					qrCodeUrl={ qrCodeUrl }
-					secretKey={ secretKey }
-				/>
+			<SetupMethod
+				setupMethod={ setupMethod }
+				setSetupMethod={ setSetupMethod }
+				qrCodeUrl={ qrCodeUrl }
+				secretKey={ secretKey }
+			/>
 
-				<SetupForm
-					handleEnable={ handleEnable }
-					qrCodeUrl={ qrCodeUrl }
-					secretKey={ secretKey }
-					inputs={inputs}
-					setInputs={setInputs}
-					error={error}
-					setError={setError}
-				/>
-			</Flex>
-		</>
+			<SetupForm
+				handleEnable={ handleEnable }
+				qrCodeUrl={ qrCodeUrl }
+				secretKey={ secretKey }
+				inputs={inputs}
+				setInputs={setInputs}
+				error={error}
+				setError={setError}
+			/>
+		</Flex>
 	);
 }
 
@@ -124,14 +118,12 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setupMethod ] );
 
 		return (
-			<>
-				<p className='wporg-2fa__totp_setup-instruction'>
-					Use an authenticator app from your phone to scan.&nbsp;
+			<Flex expanded={false} direction='column' gap="16px" className="wporg-2fa__totp_setup-method-container">
+				<p><strong>Scan the QR code with your authentication app&nbsp;</strong></p>
 
-					<Button variant="link" onClick={ handleClick }>
-						Can't scan the QR code?
-					</Button>
-				</p>
+				<Button variant="link" onClick={ handleClick }>
+					Can't scan the QR code?
+				</Button>
 
 				<div className="wporg-2fa__qr-code">
 					{ ! qrCodeUrl && 'Loading...' }
@@ -144,7 +136,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 						</a>
 					}
 				</div>
-			</>
+			</Flex>
 		);
 	}
 
@@ -155,13 +147,11 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 
 		return (
 			<div className="wporg-2fa__manual">
-				<p>
-					Enter this time code into your app.&nbsp;
+				<p><strong>Enter this time code into your app&nbsp;</strong></p>
 
-					<Button variant="link" onClick={ handleClick }>
-						Prefer to scan a QR code?
-					</Button>
-				</p>
+				<Button variant="link" onClick={ handleClick }>
+					Prefer to scan a QR code?
+				</Button>
 
 				<code>
 					{ readableSecretKey }
@@ -213,9 +203,9 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 				{ error }
 			</Notice>
 
-			<strong>Enter the six digit code provided by the app</strong>
-
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
+				<p>Enter the six digit code provided by the app:</p>
+
 				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
 				<div className="wporg-2fa__submit-btn-container">
