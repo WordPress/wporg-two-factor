@@ -1,6 +1,10 @@
 @import '~@wordpress/base-styles/colors';
 @import '~@wordpress/base-styles/colors.native';
 
+#main {
+	margin-bottom: 2rem;
+}
+
 .wp-block-wporg-two-factor-settings {
 	position: relative;
 
