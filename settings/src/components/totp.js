@@ -188,11 +188,14 @@ function createQrCode( data ) {
 function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
 	const [ isInputComplete, setIsInputComplete ] = useState(false);
 
+	useEffect( () => {
+		if ( error && inputs.every( input => input === '') ) {
+			setError( '' );
+		}
+	}, [ error, inputs ] );
+
 	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
-	const handleClearClick = useCallback( () => { 
-		setInputs( Array( 6 ).fill( '' ) );
-		setError('');
-	}, [])
+	const handleClearClick = useCallback( () => setInputs( Array( 6 ).fill( '' ) ), [])
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
