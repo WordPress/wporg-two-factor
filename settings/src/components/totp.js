@@ -129,7 +129,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 					{ ! qrCodeUrl && 'Loading...' }
 
 					{ qrCodeUrl &&
-						<a href={ qrCodeUrl } aria-label="Scan QR code">
+						<a href={ qrCodeUrl } aria-label="QR code to scan">
 							<RawHTML>
 								{ createQrCode( qrCodeUrl ) }
 							</RawHTML>
@@ -212,10 +212,10 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
 				<div className="wporg-2fa__submit-btn-container">
-					<Button variant="secondary" onClick={ handleClearClick }>
+					<Button variant="secondary" onClick={ handleClearClick } aria-label="Clear all inputs">
 						Clear
 					</Button>
-					<Button type="submit" variant="primary" disabled={ ! canSubmit }>
+					<Button type="submit" variant="primary" disabled={ ! canSubmit } aria-label="Submit input digits">
 						Enable
 					</Button>
 				</div>

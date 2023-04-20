@@ -129,6 +129,7 @@ function Main( { userId } ) {
 				<CardHeader className="wporg-2fa__navigation" size="xSmall">
 						<ScreenLink
 							screen="account-status"
+							ariaLabel="Back to the account status page"
 							anchorText={
 								<>
 									<Icon icon={ chevronLeft } />
