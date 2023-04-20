@@ -189,7 +189,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 	const [ isInputComplete, setIsInputComplete ] = useState(false);
 
 	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
-	const handleCancelClick = useCallback( () => { 
+	const handleClearClick = useCallback( () => { 
 		setInputs( Array( 6 ).fill( '' ) );
 		setError('');
 	}, [])
@@ -209,7 +209,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
 				<div className="wporg-2fa__submit-btn-container">
-					<Button variant="secondary" onClick={ handleCancelClick }>
+					<Button variant="secondary" onClick={ handleClearClick }>
 						Clear
 					</Button>
 					<Button type="submit" variant="primary" disabled={ ! canSubmit }>
