@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { StrictMode, createContext, useCallback, useEffect, useState } from '@wordpress/element';
+import { StrictMode, createContext, useCallback, useEffect, useState, createRoot } from '@wordpress/element';
 import { Icon, chevronLeft } from '@wordpress/icons';
 import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
 
@@ -30,8 +30,7 @@ function renderSettings() {
 		return;
 	}
 
-	// todo import from wp.element once https://github.com/WordPress/gutenberg/pull/46467 lands
-	const root = ReactDOM.createRoot( wrapper );
+	const root = createRoot( wrapper );
 
 	root.render(
 		<StrictMode>
