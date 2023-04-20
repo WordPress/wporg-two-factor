@@ -109,7 +109,7 @@ function Main( { userId } ) {
 
 		setGlobalNotice( '' );
 		setScreen( screen );
-	}, [] );
+	}, [ hasEdits ] );
 
 	if ( ! hasResolved ) {
 		return <Spinner />;
