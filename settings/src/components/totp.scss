@@ -25,7 +25,7 @@
 }
 
 .wporg-2fa__totp_setup-method-container {
-	width: 360px;
+	max-width: 360px;
 	align-self: center;
 
 	.components-button {
@@ -79,7 +79,7 @@
     width: fit-content;
     align-self: center;
 	margin-bottom: 16px;
-	width: 360px;
+	max-width: 360px;
 
 	.components-button {
 		width: fit-content;
