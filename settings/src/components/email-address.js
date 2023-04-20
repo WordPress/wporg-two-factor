@@ -4,6 +4,10 @@
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
+import {
+	Icon,
+	cancelCircleFilled,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -92,7 +96,7 @@ export default function EmailAddress() {
 				onChange={ (email) => edit( { email } ) }
 			/>
 
-			{ emailError && <p className="email-error">{ emailError }</p> }
+			{ emailError && <Notice status="error" isDismissible={ false }><Icon icon={ cancelCircleFilled } />{ emailError }</Notice> }
 
 			<p>
 				<Button
