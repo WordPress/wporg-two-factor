@@ -73,7 +73,7 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 				anchorText={
 					<CardBody>
 						<StatusIcon status={ status } />
-						<h3>{ headerText }</h3>
+						<h3 aria-label={headerText + '.'}>{ headerText }</h3>
 						<p>{ bodyText }</p>
 						<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
 					</CardBody>
