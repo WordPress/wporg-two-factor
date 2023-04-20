@@ -1,6 +1,7 @@
 <?php
 
 use function WordPressdotorg\Two_Factor\{ user_requires_2fa };
+use function WordPressdotorg\MU_Plugins\Encryption\{ generate_encryption_key };
 
 defined( 'WPINC' ) || die();
 
@@ -19,6 +20,17 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 			'user_login' => 'regular_user',
 			'role'       => 'contributor',
 		) );
+
+		// Generate an encryption key for testing with.
+		if ( ! function_exists( 'wporg_encryption_keys' ) ) {
+			function wporg_encryption_keys() {
+				static $keys = null;
+
+				return $keys ?? $keys = [
+					'two-factor' => generate_encryption_key(),
+				];
+			}
+		}
 	}
 
 	/**
