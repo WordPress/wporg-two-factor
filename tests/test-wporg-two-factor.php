@@ -65,7 +65,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		// This should start counting at one instead of zero, to match `Two_Factor_Core`.
 		update_user_meta( $user_id, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, array( 1 => 'Two_Factor_Totp' ) );
 		update_user_meta( $user_id, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Totp' );
-		update_user_meta( $user_id, Two_Factor_Totp::SECRET_META_KEY, 'foo bar bax quiz' );
+
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_provider->set_user_totp_key( $user_id, $totp_provider->generate_key() );
 
 		$this->assertTrue( Two_Factor_Core::is_user_using_two_factor( $user_id ) );
 	}
