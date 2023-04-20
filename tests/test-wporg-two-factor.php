@@ -265,4 +265,30 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * Verify that the TOTP key is encrypted if a non-encrypted key is encounted.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\Encrypted_Totp_Provider::get_user_totp_key
+	 * @covers WordPressdotorg\Two_Factor\Encrypted_Totp_Provider::set_user_totp_key
+	 */
+	public function test_totp_key_upgraded_to_encrypted() {
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_key      = $totp_provider->generate_key();
+
+		// Set the user meta with the unencrypted key
+		update_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, $totp_key );
+		$meta_value = get_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, true );
+		$this->assertSame( $totp_key, $meta_value );
+
+		// Fetch the key, triggering the encryption upgrade.
+		$returned_key = $totp_provider->get_user_totp_key( self::$regular_user->ID );
+		$this->assertSame( $totp_key, $returned_key );
+
+		// Check the user meta has been encrypted.
+		$meta_value = get_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, true );
+		$this->assertNotSame( $totp_key, $meta_value );
+		$this->assertTrue( wporg_is_encrypted( $meta_value ) );
+
+	}
 }
