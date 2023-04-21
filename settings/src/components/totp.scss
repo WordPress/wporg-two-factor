@@ -1,5 +1,4 @@
 .wporg-2fa__totp_setup-container {
-	padding: 20px;
 	position: relative;
 
 	p {
@@ -21,6 +20,7 @@
 		max-width: 550px;
 		margin-bottom: 32px;
 		align-self: center;
+		margin-top: revert;
 	}
 }
 
@@ -123,4 +123,8 @@
 	align-self: center;
 	width: fit-content;
 	text-align: left;
+	
+	& > * {
+		margin-bottom: 16px;
+	}
 }
