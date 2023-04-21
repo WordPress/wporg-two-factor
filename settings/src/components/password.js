@@ -154,7 +154,7 @@ export default function Password() {
 				</Notice>
 			) }
 
-			{ userRecord.hasEdits && ! passwordStrong && (
+			{ userRecord.hasEdits && userRecord.editedRecord.password && ! passwordStrong && (
 				<Notice status="error" isDismissible={ false }>
 					<Icon icon={ cancelCircleFilled } />
 					That password is too easy to compromise. Please make it
