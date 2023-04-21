@@ -165,11 +165,7 @@ export default function Password() {
 			<p>
 				<Button
 					isPrimary
-					disabled={
-						passwordStrong && ! userRecord.isSaving
-							? ''
-							: 'disabled'
-					}
+					disabled={ ! userRecord.editedRecord.password }
 					type="submit"
 				>
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
