@@ -189,7 +189,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 	const [ isInputComplete, setIsInputComplete ] = useState(false);
 
 	useEffect( () => {
-		if ( error && inputs.every( input => input === '') ) {
+		if ( error && inputs.some( input => input === '') ) {
 			setError( '' );
 		}
 	}, [ error, inputs ] );
