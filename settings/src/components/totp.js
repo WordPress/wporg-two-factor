@@ -188,11 +188,14 @@ function createQrCode( data ) {
 function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
 	const [ isInputComplete, setIsInputComplete ] = useState(false);
 
+	useEffect( () => {
+		if ( error && inputs.some( input => input === '') ) {
+			setError( '' );
+		}
+	}, [ error, inputs ] );
+
 	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
-	const handleCancelClick = useCallback( () => { 
-		setInputs( Array( 6 ).fill( '' ) );
-		setError('');
-	}, [])
+	const handleClearClick = useCallback( () => setInputs( Array( 6 ).fill( '' ) ), [])
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
@@ -209,7 +212,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
 
 				<div className="wporg-2fa__submit-btn-container">
-					<Button variant="secondary" onClick={ handleCancelClick }>
+					<Button variant="secondary" onClick={ handleClearClick }>
 						Clear
 					</Button>
 					<Button type="submit" variant="primary" disabled={ ! canSubmit }>
