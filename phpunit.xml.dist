@@ -30,6 +30,7 @@
 	  -->
 	<coverage processUncoveredFiles="false">
 		<include>
+			<directory>./providers</directory>
 			<file>wporg-two-factor.php</file>
 			<file>class-encrypted-totp-provider.php</file>
 			<file>settings/settings.php</file>

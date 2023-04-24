@@ -26,6 +26,7 @@ function is_2fa_beta_tester() : bool {
 	return in_array( $user->user_login, $beta_testers, true );
 }
 
+require_once __DIR__ . '/providers/webauthn/class-two-factor-webauthn.php';
 require_once __DIR__ . '/settings/settings.php';
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
@@ -42,12 +43,22 @@ add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enab
 function two_factor_providers( array $providers ) : array {
 	// Match the name => file path format of input var, but the path isn't needed.
 	$desired_providers = array(
-		'Two_Factor_WebAuthn'     => '',
 		'Two_Factor_Totp'         => '',
 		'Two_Factor_Backup_Codes' => '',
 	);
+	$providers = array_intersect_key( $providers, $desired_providers );
 
-	return array_intersect_key( $providers, $desired_providers );
+	// This isn't ready or safe to run on production/staging right now, but is too big for a single PR.
+	// See https://github.com/WordPress/wporg-two-factor/issues/114
+	if ( 'local' === wp_get_environment_type() ) {
+		// Make WebAuthn show up first in the wp-admin UI, since it's the most secure.
+		$providers = array_merge(
+			array( 'Two_Factor_WebAuthn' => __DIR__ . '/providers/webauthn/class-two-factor-webauthn.php' ),
+			$providers
+		);
+	}
+
+	return $providers;
 }
 
 /**
