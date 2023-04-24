@@ -49,9 +49,9 @@ WordPress.org-specific customizations for the Two Factor plugin
 1. `git clone` https://github.com/WordPress/two-factor/ into `wp-content/plugins` and follow their setup instructions.
 1. `git clone` this repo into `wp-content/plugins`
 1. `cd wporg-two-factor && composer install`
-1. `cd settings && npm install && npm run build`
+1. `yarn && yarn workspaces run build`
 1. Activate all four plugins.
-1. If you want to make JS changes, then `cd settings && npm start`
+1. If you want to make JS changes, then `yarn workspaces run start`
 1. Open `wp-admin/options-general.php?page=bbpress` and uncheck `Prefix all forum content with the Forum Root slug (Recommended)`, then save.
 1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
 
