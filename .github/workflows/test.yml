@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Setup PHP and Composer
         uses: shivammathur/setup-php@v2
@@ -23,10 +23,10 @@ jobs:
           tools: composer:v2
 
       - name: Install NPM dependencies
-        run: npm install
+        run: yarn
 
       - name: Start the Docker testing environment
-        run: npm run env start --xdebug=coverage
+        run: yarn wp-env start --xdebug=coverage
 
       - name: Test
-        run: npm run test
+        run: yarn test
