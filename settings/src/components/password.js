@@ -38,6 +38,7 @@ import { GlobalContext } from '../script';
 export default function Password() {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ inputType, setInputType ] = useState( 'password' );
+	const [ hasAttemptedSave, setHasAttemptedSave ] = useState( false );
 	let passwordStrong = true; // Saved passwords have already passed the test.
 
 	if ( userRecord.hasEdits ) {
@@ -68,6 +69,8 @@ export default function Password() {
 	const handleFormSubmit = useCallback(
 		async ( event ) => {
 			event.preventDefault();
+
+			setHasAttemptedSave( true );
 
 			if ( ! passwordStrong || userRecord.isSaving ) {
 				return;
@@ -154,7 +157,7 @@ export default function Password() {
 				</Notice>
 			) }
 
-			{ userRecord.hasEdits && ! passwordStrong && (
+			{ userRecord.hasEdits && userRecord.editedRecord.password && hasAttemptedSave && ! passwordStrong && (
 				<Notice status="error" isDismissible={ false }>
 					<Icon icon={ cancelCircleFilled } />
 					That password is too easy to compromise. Please make it
@@ -165,11 +168,7 @@ export default function Password() {
 			<p>
 				<Button
 					isPrimary
-					disabled={
-						passwordStrong && ! userRecord.isSaving
-							? ''
-							: 'disabled'
-					}
+					disabled={ ! userRecord.editedRecord.password }
 					type="submit"
 				>
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
