@@ -24,12 +24,13 @@ jobs:
           tools: composer:v2
 
       - name: Install NPM dependencies
-        run: |
-          chmod -R 767 ./
-          yarn
+        run: yarn
 
       - name: Start the Docker testing environment
         run: yarn wp-env start --xdebug=coverage
+
+      - name: Install NPM dependencies
+        run: yarn setup:tests
 
       - name: Test
         run: yarn test
