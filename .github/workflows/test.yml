@@ -27,8 +27,8 @@ jobs:
 
       - name: Start the Docker testing environment
         run: |
-        chmod -R 767 ./
-        yarn wp-env start --xdebug=coverage
+          chmod -R 767 ./
+          yarn wp-env start --xdebug=coverage
 
       - name: Test
         run: yarn test
