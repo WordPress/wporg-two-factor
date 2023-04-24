@@ -9,7 +9,7 @@
   "scripts": {
     "wp-env": "wp-env",
     "setup:tests": "yarn wp-env run composer install",
-    "test": "npm run wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
+    "test": "yarn wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
   },
   "repository": {
     "type": "git",
