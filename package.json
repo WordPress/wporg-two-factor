@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "wp-env": "wp-env",
-    "postinstall": "cd settings && npm install --force && cd .. && wp-env start && wp-env run composer install",
+    "postinstall": "yarn wp-env start && yarn wp-env run composer install",
     "test": "npm run wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
   },
   "repository": {
