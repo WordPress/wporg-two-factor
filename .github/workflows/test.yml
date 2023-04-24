@@ -22,11 +22,8 @@ jobs:
           php-version: '7.4'
           tools: composer:v2
 
-      - name: Install NPM dependencies
-        run: yarn
-
       - name: Start the Docker testing environment
-        run: yarn wp-env start --xdebug=coverage
+        run: yarn && yarn wp-env start --xdebug=coverage
 
       - name: Test
         run: yarn test
