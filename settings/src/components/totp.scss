@@ -35,6 +35,11 @@
 	p {
 		margin: 0;
 	}
+
+	@media screen and (max-width: 480px) {
+		max-width: unset;
+		width: 100%;
+	}
 }
 
 .wporg-2fa__setup-form-container {
@@ -53,6 +58,10 @@
 			height: auto;
 			opacity: 1;
 		}
+	}
+
+	@media screen and (max-width: 480px) {
+		width: 100%;
 	}
 }
 
@@ -121,10 +130,13 @@
 	flex-direction: column;
 	justify-content: center;
 	align-self: center;
-	width: fit-content;
 	text-align: left;
 	
 	& > * {
 		margin-bottom: 16px;
+	}
+
+	@media screen and (max-width: 480px) {
+		width: 100%;
 	}
 }
