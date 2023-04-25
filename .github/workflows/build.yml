@@ -2,7 +2,7 @@ name: Build and push to build branch.
 
 on:
     push:
-        branches: [StevenDufresne-patch-1]
+        branches: [trunk]
 
 jobs:
     build:
