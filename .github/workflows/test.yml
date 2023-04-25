@@ -11,10 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Install NodeJS
+        uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
         with:
-          cache: 'npm'
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
 
       - name: Setup PHP and Composer
         uses: shivammathur/setup-php@v2
@@ -23,10 +24,13 @@ jobs:
           tools: composer:v2
 
       - name: Install NPM dependencies
-        run: npm install
+        run: yarn
 
       - name: Start the Docker testing environment
-        run: npm run env start --xdebug=coverage
+        run: yarn wp-env start --xdebug=coverage
+
+      - name: Setup environment tools
+        run: yarn setup:tools
 
       - name: Test
-        run: npm run test
+        run: yarn test

@@ -5,10 +5,11 @@
   "directories": {
     "test": "tests"
   },
+  "private": true,
   "scripts": {
-    "env": "wp-env",
-    "postinstall": "cd settings && npm install --force && cd .. && wp-env start && wp-env run composer install",
-    "test": "wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
+    "wp-env": "wp-env",
+    "setup:tools": "yarn wp-env run composer install",
+    "test": "yarn wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
   "dependencies": {
     "@wordpress/base-styles": "^4.17.0",
     "@wordpress/env": "^5.13.0"
-  }
+  },
+  "workspaces": [
+    "settings"
+  ]
 }
