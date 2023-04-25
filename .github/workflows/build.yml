@@ -2,7 +2,7 @@ name: Build and push to build branch.
 
 on:
     push:
-        branches: [main]
+        branches: [trunk]
 
 jobs:
     build:
@@ -27,11 +27,8 @@ jobs:
 
             - name: Trim the repo down to just the plugin files
               run: |
+                  rm -rf node_modules
                   rm -rf settings/node_modules
-                  mv settings $RUNNER_TEMP
-                  git rm -rfq .
-                  rm -rf *
-                  mv $RUNNER_TEMP/settings/* .
 
             - name: Add all the plugin files
               run: |
