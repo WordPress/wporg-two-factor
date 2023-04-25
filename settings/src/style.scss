@@ -5,8 +5,13 @@
 	margin-bottom: 2rem;
 }
 
-a[data-content*="notice-info-link"] {
-	text-decoration: underline;
+#bbp-your-profile {
+	.components-notice,
+	.notice {
+		a {
+			text-decoration: underline;
+		}
+	}
 }
 
 .wp-block-wporg-two-factor-settings {

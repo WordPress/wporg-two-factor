@@ -44,7 +44,7 @@ function render_custom_ui() : void {
 		return;
 	}
 
-	echo '<div class="notice notice-info notice-alt"><p>This interface and functionality is currently a <em>beta release</em>, while it is currently operational it\'s not yet officially released. Please report any issues you encounter to <a href="https://github.com/WordPress/wporg-two-factor/issues" data-content="notice-info-link">WordPress/wporg-two-factor on GitHub</a>.</p></div>';
+	echo '<div class="notice notice-info notice-alt"><p>This interface and functionality is currently a <em>beta release</em>, while it is currently operational it\'s not yet officially released. Please report any issues you encounter to <a href="https://github.com/WordPress/wporg-two-factor/issues">WordPress/wporg-two-factor on GitHub</a>.</p></div>';
 
 	$user_id    = bbp_get_displayed_user_id();
 	$json_attrs = json_encode( [ 'userId' => $user_id ] );
