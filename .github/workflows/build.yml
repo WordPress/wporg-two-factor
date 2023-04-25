@@ -29,7 +29,6 @@ jobs:
               run: |
                   rm -rf node_modules
                   rm -rf settings/node_modules
-                  rm -r .*
 
             - name: Add all the plugin files
               run: |
