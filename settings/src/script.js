@@ -95,9 +95,6 @@ function Main( { userId } ) {
 		event.preventDefault();
 
 		// Reset to initial after navigating away from a page.
-		// @todo This no longer works, maybe `userRecord` is not passed by reference between screens?
-		// Also, some screens will have additional state that should be reset, but this won't have any way of
-		// knowing that. So maybe just remove this?
 		if ( hasEdits ) {
 			edit( record );
 		}

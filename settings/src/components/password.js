@@ -40,6 +40,9 @@ export default function Password() {
 	const [ inputType, setInputType ] = useState( 'password' );
 	const [ hasAttemptedSave, setHasAttemptedSave ] = useState( false );
 	let passwordStrong = true; // Saved passwords have already passed the test.
+	// Originally, password wasn't set in record, but we need it to be an empty string for 
+	// resetting to initial after navigating away from password setting page.
+	userRecord.record.password = '';
 
 	if ( userRecord.hasEdits ) {
 		passwordStrong = isPasswordStrong(
