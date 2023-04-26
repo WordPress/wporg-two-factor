@@ -1,5 +1,4 @@
 .wporg-2fa__totp_setup-container {
-	padding: 20px;
 	position: relative;
 
 	p {
@@ -21,11 +20,12 @@
 		max-width: 550px;
 		margin-bottom: 32px;
 		align-self: center;
+		margin-top: revert;
 	}
 }
 
 .wporg-2fa__totp_setup-method-container {
-	width: 360px;
+	max-width: 360px;
 	align-self: center;
 
 	.components-button {
@@ -34,6 +34,11 @@
 
 	p {
 		margin: 0;
+	}
+
+	@media screen and (max-width: 480px) {
+		max-width: unset;
+		width: 100%;
 	}
 }
 
@@ -53,6 +58,10 @@
 			height: auto;
 			opacity: 1;
 		}
+	}
+
+	@media screen and (max-width: 480px) {
+		width: 100%;
 	}
 }
 
@@ -79,7 +88,7 @@
     width: fit-content;
     align-self: center;
 	margin-bottom: 16px;
-	width: 360px;
+	max-width: 360px;
 
 	.components-button {
 		width: fit-content;
@@ -121,6 +130,13 @@
 	flex-direction: column;
 	justify-content: center;
 	align-self: center;
-	width: fit-content;
 	text-align: left;
+	
+	& > * {
+		margin-bottom: 16px;
+	}
+
+	@media screen and (max-width: 480px) {
+		width: 100%;
+	}
 }
