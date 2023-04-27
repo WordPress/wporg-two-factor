@@ -12,6 +12,11 @@ export function getUserRecord( userId ) {
 		userRecord.isSaving = useSelect( ( select ) => select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId ) );
 	}
 
+	// Initialize the password as an empty string, necessary for resetting incomplete state when leaving the password setting page.
+	if ( userRecord.record && undefined === userRecord.record.password ) {
+		userRecord.record.password = '';
+	}
+
 	return userRecord;
 }
 

@@ -80,7 +80,7 @@ describe( 'Password', () => {
 			expect( queryAllByText( strongPasswordRegex ) ).toHaveLength( 0 );
 		} );
 
-		it( 'should display the weak password notice', () => {
+		it( 'should display the weak password notice after submitting', () => {
 			// State: the user has updated their password to something weak
 			// although the strength is not tested here.
 			mockContext.userRecord.editedRecord.password = 'weak';
@@ -91,13 +91,20 @@ describe( 'Password', () => {
 			// We'll mock the password estimator to return a score of 1.
 			mockPasswordEstimator( 1 );
 
-			const { queryAllByText } = render( <Password />, {
+			const { queryAllByText, getAllByRole } = render( <Password />, {
 				wrapper: ( { children } ) => (
 					<GlobalContext.Provider value={ mockContext }>
 						{ children }
 					</GlobalContext.Provider>
 				),
 			} );
+
+			// Find the submit button and click it.
+			const buttons = getAllByRole( 'button' );
+			const saveButton = buttons.filter(
+				( button ) => button.type === 'submit'
+			)[ 0 ];
+			fireEvent.click( saveButton );
 
 			// We may have this message multiple times, because of 'speak'.
 			expect(
