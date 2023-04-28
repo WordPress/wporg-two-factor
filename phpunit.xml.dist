@@ -31,6 +31,7 @@
 	<coverage processUncoveredFiles="false">
 		<include>
 			<file>wporg-two-factor.php</file>
+			<file>class-encrypted-totp-provider.php</file>
 			<file>settings/settings.php</file>
 			<file>settings/rest-api.php</file>
 		</include>
