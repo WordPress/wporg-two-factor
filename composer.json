@@ -13,7 +13,9 @@
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
 	},
-	"require": {},
+	"require": {
+		"madwizard/webauthn": "~0.9.1"
+	},
 	"require-dev" : {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
 		"wp-coding-standards/wpcs": "2.3.*",
