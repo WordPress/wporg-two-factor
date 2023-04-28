@@ -133,11 +133,11 @@ function Setup() {
 /**
  * Render both methods for setting up TOTP in an app.
  *
- * @param root0
- * @param root0.setupMethod
- * @param root0.setSetupMethod
- * @param root0.qrCodeUrl
- * @param root0.secretKey
+ * @param props
+ * @param props.setupMethod
+ * @param props.setSetupMethod
+ * @param props.qrCodeUrl
+ * @param props.secretKey
  */
 function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'qr-code' === setupMethod ) {
@@ -226,14 +226,14 @@ function createQrCode( data ) {
 /**
  * Render the form for entering the TOTP code.
  *
- * @param root0
- * @param root0.handleEnable
- * @param root0.qrCodeUrl
- * @param root0.secretKey
- * @param root0.inputs
- * @param root0.setInputs
- * @param root0.error
- * @param root0.setError
+ * @param props
+ * @param props.handleEnable
+ * @param props.qrCodeUrl
+ * @param props.secretKey
+ * @param props.inputs
+ * @param props.setInputs
+ * @param props.error
+ * @param props.setError
  */
 function SetupForm( {
 	handleEnable,

@@ -82,11 +82,11 @@ export default function AccountStatus() {
 /**
  * Render a card for the status of the given setting.
  *
- * @param root0
- * @param root0.screen
- * @param root0.status
- * @param root0.headerText
- * @param root0.bodyText
+ * @param props
+ * @param props.screen
+ * @param props.status
+ * @param props.headerText
+ * @param props.bodyText
  */
 function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 	return (
@@ -117,8 +117,8 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 /**
  * Render the icon for the given status
  *
- * @param root0
- * @param root0.status
+ * @param props
+ * @param props.status
  */
 function StatusIcon( { status } ) {
 	let icon;

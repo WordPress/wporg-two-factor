@@ -44,8 +44,8 @@ export default function BackupCodes() {
 /**
  * Setup the Backup Codes provider.
  *
- * @param root0
- * @param root0.setRegenerating
+ * @param props
+ * @param props.setRegenerating
  */
 function Setup( { setRegenerating } ) {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
@@ -127,8 +127,8 @@ function Setup( { setRegenerating } ) {
 /**
  * Display a list of backup codes
  *
- * @param root0
- * @param root0.codes
+ * @param props
+ * @param props.codes
  */
 function CodeList( { codes } ) {
 	return (
@@ -158,8 +158,8 @@ function CodeList( { codes } ) {
 /**
  * Render the screen where users can manage Backup Codes.
  *
- * @param root0
- * @param root0.setRegenerating
+ * @param props
+ * @param props.setRegenerating
  */
 function Manage( { setRegenerating } ) {
 	const { userRecord } = useContext( GlobalContext );

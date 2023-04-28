@@ -51,8 +51,8 @@ function renderSettings() {
 /**
  * Render the correct component based on the URL.
  *
- * @param root0
- * @param root0.userId
+ * @param props
+ * @param props.userId
  */
 function Main( { userId } ) {
 	const userRecord = getUserRecord( userId );
