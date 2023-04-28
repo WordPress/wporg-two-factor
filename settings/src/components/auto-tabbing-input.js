@@ -34,31 +34,19 @@ const AutoTabbingInput = ( props ) => {
 			return newInputs;
 		} );
 
-		if (
-			value &&
-			'' !== value.trim() &&
-			inputRef.current.nextElementSibling
-		) {
+		if ( value && '' !== value.trim() && inputRef.current.nextElementSibling ) {
 			inputRef.current.nextElementSibling.focus();
 		}
 	}, [] );
 
 	const handleKeyDown = useCallback( ( value, event, index, inputRef ) => {
-		if (
-			event.key === 'Backspace' &&
-			! value &&
-			inputRef.current.previousElementSibling
-		) {
+		if ( event.key === 'Backspace' && ! value && inputRef.current.previousElementSibling ) {
 			inputRef.current.previousElementSibling.focus();
 		}
 	}, [] );
 
 	return (
-		<div
-			className={
-				'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' )
-			}
-		>
+		<div className={ 'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' ) }>
 			{ inputs.map( ( value, index ) => (
 				<NumericControl
 					{ ...props }

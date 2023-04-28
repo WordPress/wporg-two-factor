@@ -3,13 +3,7 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import {
-	Icon,
-	cancelCircleFilled,
-	check,
-	chevronRight,
-	warning,
-} from '@wordpress/icons';
+import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,9 +18,7 @@ export default function AccountStatus() {
 	const { userRecord } = useContext( GlobalContext );
 	const { record } = userRecord;
 	const emailStatus = record.pending_email ? 'pending' : 'ok';
-	const totpStatus = record[ '2fa_available_providers' ].includes(
-		'Two_Factor_Totp'
-	)
+	const totpStatus = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' )
 		? 'enabled'
 		: 'disabled';
 	const backupCodesStatus = record[ '2fa_available_providers' ].includes(
@@ -90,11 +82,7 @@ export default function AccountStatus() {
  */
 function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 	return (
-		<Card
-			className={
-				'wporg-2fa__status-card wporg-2fa__status-card-' + screen
-			}
-		>
+		<Card className={ 'wporg-2fa__status-card wporg-2fa__status-card-' + screen }>
 			<ScreenLink
 				screen={ screen }
 				anchorText={
@@ -139,11 +127,5 @@ function StatusIcon( { status } ) {
 			icon = cancelCircleFilled;
 	}
 
-	return (
-		<Icon
-			icon={ icon }
-			size={ 32 }
-			className={ 'wporg-2fa__status-icon is-' + status }
-		/>
-	);
+	return <Icon icon={ icon } size={ 32 } className={ 'wporg-2fa__status-icon is-' + status } />;
 }

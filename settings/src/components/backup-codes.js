@@ -2,18 +2,8 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import {
-	useContext,
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
-import {
-	Button,
-	CheckboxControl,
-	Notice,
-	Spinner,
-} from '@wordpress/components';
+import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
+import { Button, CheckboxControl, Notice, Spinner } from '@wordpress/components';
 import { Icon, warning } from '@wordpress/icons';
 
 /**
@@ -29,9 +19,9 @@ export default function BackupCodes() {
 	const { userRecord } = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
-	const backupCodesStatus = userRecord.record[
-		'2fa_available_providers'
-	].includes( 'Two_Factor_Backup_Codes' )
+	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes(
+		'Two_Factor_Backup_Codes'
+	)
 		? 'enabled'
 		: 'disabled';
 
@@ -86,9 +76,9 @@ function Setup( { setRegenerating } ) {
 	return (
 		<>
 			<p>
-				Backup codes let you access your account if your primary
-				two-factor authentication method is unavailable, like if your
-				phone is lost or stolen. Each code can only be used once.
+				Backup codes let you access your account if your primary two-factor authentication
+				method is unavailable, like if your phone is lost or stolen. Each code can only be
+				used once.
 			</p>
 
 			<p>Please print the codes and keep them in a safe place.</p>
@@ -96,13 +86,10 @@ function Setup( { setRegenerating } ) {
 			<CodeList codes={ backupCodes } />
 
 			<Notice status="warning" isDismissible={ false }>
-				<Icon
-					icon={ warning }
-					className="wporg-2fa__print-codes-warning"
-				/>
-				Without access to the one-time password app or a backup code,
-				you will lose access to your account. Once you navigate away
-				from this page, you will not be able to view these codes again.
+				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+				Without access to the one-time password app or a backup code, you will lose access
+				to your account. Once you navigate away from this page, you will not be able to view
+				these codes again.
 			</Notice>
 
 			<CheckboxControl
@@ -112,11 +99,7 @@ function Setup( { setRegenerating } ) {
 			/>
 
 			<p>
-				<Button
-					isPrimary
-					disabled={ ! hasPrinted }
-					onClick={ handleFinished }
-				>
+				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
 					All Finished
 				</Button>
 			</p>
@@ -168,25 +151,23 @@ function Manage( { setRegenerating } ) {
 	return (
 		<>
 			<p>
-				Backup codes let you access your account if your primary
-				two-factor authentication method is unavailable, like if your
-				phone is lost or stolen. Each code can only be used once.
+				Backup codes let you access your account if your primary two-factor authentication
+				method is unavailable, like if your phone is lost or stolen. Each code can only be
+				used once.
 			</p>
 
 			{ remaining > 5 && (
 				<p>
-					You have <strong>{ remaining }</strong> backup codes
-					remaining.
+					You have <strong>{ remaining }</strong> backup codes remaining.
 				</p>
 			) }
 
 			{ remaining <= 5 && (
 				<Notice status="warning" isDismissible={ false }>
 					<Icon icon={ warning } />
-					You only have <strong>{ remaining }</strong> backup codes
-					remaining. Please regenerate and save new ones before you
-					run out. If you don&apos;t, you won&apos;t be able to log
-					into your account if you lose your phone.
+					You only have <strong>{ remaining }</strong> backup codes remaining. Please
+					regenerate and save new ones before you run out. If you don&apos;t, you
+					won&apos;t be able to log into your account if you lose your phone.
 				</Notice>
 			) }
 

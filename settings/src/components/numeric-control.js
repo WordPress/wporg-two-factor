@@ -24,16 +24,13 @@ export default function NumericControl( props ) {
 
 	const handleChange = useCallback(
 		// Most callers will only need the value, so make it convenient for them.
-		( event ) =>
-			onChange && onChange( event.target.value, event, index, inputRef ),
+		( event ) => onChange && onChange( event.target.value, event, index, inputRef ),
 		[]
 	);
 
 	const handleKeyDown = useCallback(
 		// Most callers will only need the value, so make it convenient for them.
-		( event ) =>
-			onKeyDown &&
-			onKeyDown( event.target.value, event, index, inputRef ),
+		( event ) => onKeyDown && onKeyDown( event.target.value, event, index, inputRef ),
 		[]
 	);
 

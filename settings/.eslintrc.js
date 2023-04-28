@@ -3,5 +3,12 @@ module.exports = {
 
 	rules: {
 		'jsdoc/require-param-type': 0,
+		'prettier/prettier': [
+			'error',
+			{
+				...require( '@wordpress/prettier-config' ),
+				printWidth: 100,
+			},
+		],
 	},
 };

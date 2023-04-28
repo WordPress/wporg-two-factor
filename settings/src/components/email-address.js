@@ -30,8 +30,7 @@ export default function EmailAddress() {
 			let message = error.message;
 
 			if ( 'rest_user_invalid_email' === error.code ) {
-				message =
-					'Sorry, that email is already in use by another account.';
+				message = 'Sorry, that email is already in use by another account.';
 			} else if ( 'rest_invalid_param' === error.code ) {
 				message = 'Sorry, it looks like that email is invalid.';
 			}
@@ -56,13 +55,10 @@ export default function EmailAddress() {
 					status="warning"
 					className="actions-on-right"
 					isDismissible={ false }
-					actions={ [
-						{ label: 'Cancel change', onClick: handleDiscard },
-					] }
+					actions={ [ { label: 'Cancel change', onClick: handleDiscard } ] }
 				>
 					<p>
-						There is a pending email change to{ ' ' }
-						{ record.pending_email }.<br />
+						There is a pending email change to { record.pending_email }.<br />
 						Please check your email for a confirmation link.
 					</p>
 				</Notice>
@@ -73,15 +69,12 @@ export default function EmailAddress() {
 					status="success"
 					className="actions-on-right"
 					isDismissible={ false }
-					actions={ [
-						{ label: 'Cancel change', onClick: handleDiscard },
-					] }
+					actions={ [ { label: 'Cancel change', onClick: handleDiscard } ] }
 				>
 					<p>
 						Please check your email for a confirmation email.
 						<br />
-						If { record.pending_email } is incorrect, simply enter a
-						new email below.
+						If { record.pending_email } is incorrect, simply enter a new email below.
 					</p>
 				</Notice>
 			) }

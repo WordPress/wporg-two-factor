@@ -4,13 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, Flex } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import {
-	RawHTML,
-	useCallback,
-	useContext,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,9 +17,7 @@ import { GlobalContext } from '../script';
 export default function TOTP() {
 	const { userRecord } = useContext( GlobalContext );
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
-	const totpStatus = availableProviders.includes( 'Two_Factor_Totp' )
-		? 'enabled'
-		: 'disabled';
+	const totpStatus = availableProviders.includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
 
 	if ( 'enabled' === totpStatus ) {
 		return <Manage />;
@@ -38,8 +30,7 @@ export default function TOTP() {
  * Setup the TOTP provider.
  */
 function Setup() {
-	const { clickScreenLink, setGlobalNotice, userRecord } =
-		useContext( GlobalContext );
+	const { clickScreenLink, setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ secretKey, setSecretKey ] = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ] = useState( '' );
 	const [ error, setError ] = useState( '' );
@@ -51,9 +42,7 @@ function Setup() {
 		// useEffect callbacks can't be async directly, because that'd return the promise as a "cleanup" function.
 		const fetchSetupData = async () => {
 			const response = await apiFetch( {
-				path:
-					'/wporg-two-factor/1.0/totp-setup?user_id=' +
-					userRecord.record.id,
+				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userRecord.record.id,
 			} );
 
 			setSecretKey( response.secret_key );
@@ -99,14 +88,11 @@ function Setup() {
 			className="wporg-2fa__totp_setup-container"
 		>
 			<p className="wporg-2fa__totp_setup-instruction">
-				Two-Factor Authentication adds an extra layer of security to
-				your account. Use a phone app like
+				Two-Factor Authentication adds an extra layer of security to your account. Use a
+				phone app like
 				<a href="https://authy.com/"> Authy </a>
 				or
-				<a href="https://googleauthenticator.net/">
-					{ ' ' }
-					Google Authenticator{ ' ' }
-				</a>
+				<a href="https://googleauthenticator.net/"> Google Authenticator </a>
 				when logging in to WordPress.org.
 			</p>
 
@@ -141,10 +127,7 @@ function Setup() {
  */
 function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'qr-code' === setupMethod ) {
-		const handleClick = useCallback(
-			() => setSetupMethod( 'manual' ),
-			[ setupMethod ]
-		);
+		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setupMethod ] );
 
 		return (
 			<Flex
@@ -154,9 +137,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 				className="wporg-2fa__totp_setup-method-container"
 			>
 				<p>
-					<strong>
-						Scan the QR code with your authentication app&nbsp;
-					</strong>
+					<strong>Scan the QR code with your authentication app&nbsp;</strong>
 				</p>
 
 				<Button variant="link" onClick={ handleClick }>
@@ -181,10 +162,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'manual' === setupMethod ) {
 		const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
 
-		const handleClick = useCallback(
-			() => setSetupMethod( 'qr-code' ),
-			[ setupMethod ]
-		);
+		const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setupMethod ] );
 
 		return (
 			<div className="wporg-2fa__manual">
@@ -235,15 +213,7 @@ function createQrCode( data ) {
  * @param props.error
  * @param props.setError
  */
-function SetupForm( {
-	handleEnable,
-	qrCodeUrl,
-	secretKey,
-	inputs,
-	setInputs,
-	error,
-	setError,
-} ) {
+function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
 	const [ isInputComplete, setIsInputComplete ] = useState( false );
 
 	useEffect( () => {
@@ -252,14 +222,8 @@ function SetupForm( {
 		}
 	}, [ error, inputs ] );
 
-	const handleComplete = useCallback(
-		( isComplete ) => setIsInputComplete( isComplete ),
-		[]
-	);
-	const handleClearClick = useCallback(
-		() => setInputs( Array( 6 ).fill( '' ) ),
-		[]
-	);
+	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [] );
+	const handleClearClick = useCallback( () => setInputs( Array( 6 ).fill( '' ) ), [] );
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
@@ -271,11 +235,7 @@ function SetupForm( {
 			gap="16px"
 			className="wporg-2fa__setup-form-container"
 		>
-			<Notice
-				status="error"
-				isDismissible={ false }
-				className={ error ? 'is-shown' : '' }
-			>
+			<Notice status="error" isDismissible={ false } className={ error ? 'is-shown' : '' }>
 				<Icon icon={ cancelCircleFilled } />
 				{ error }
 			</Notice>
@@ -331,18 +291,16 @@ function Manage() {
 	return (
 		<>
 			<p>
-				You&apos;ve enabled two-factor authentication on your account —
-				smart move! When you log in to WordPress.org, you&apos;ll need
-				to enter your username and password, and then enter a unique
-				passcode generated by an app on your mobile device.
+				You&apos;ve enabled two-factor authentication on your account — smart move! When you
+				log in to WordPress.org, you&apos;ll need to enter your username and password, and
+				then enter a unique passcode generated by an app on your mobile device.
 			</p>
 
 			<p>
 				Make sure you&apos;ve created{ ' ' }
-				<ScreenLink screen="backup-codes" anchorText="backup codes" />{ ' ' }
-				and saved them in a safe location, in case you ever lose your
-				device. You may also need them when transitioning to a new
-				device. Without them you may permanently lose access to your
+				<ScreenLink screen="backup-codes" anchorText="backup codes" /> and saved them in a
+				safe location, in case you ever lose your device. You may also need them when
+				transitioning to a new device. Without them you may permanently lose access to your
 				account.
 			</p>
 

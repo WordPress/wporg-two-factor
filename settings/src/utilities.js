@@ -12,11 +12,7 @@ export function getUserRecord( userId ) {
 	// Polyfill in isSaving.
 	if ( undefined === userRecord.isSaving ) {
 		userRecord.isSaving = useSelect( ( select ) =>
-			select( coreDataStore ).isSavingEntityRecord(
-				'root',
-				'user',
-				userId
-			)
+			select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId )
 		);
 	}
 

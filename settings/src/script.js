@@ -32,9 +32,7 @@ window.addEventListener( 'DOMContentLoaded', renderSettings );
  * Render the initial view into the DOM.
  */
 function renderSettings() {
-	const wrapper = document.querySelector(
-		'.wp-block-wporg-two-factor-settings'
-	);
+	const wrapper = document.querySelector( '.wp-block-wporg-two-factor-settings' );
 	if ( ! wrapper ) {
 		return;
 	}
@@ -166,13 +164,8 @@ function Main( { userId } ) {
 	}
 
 	return (
-		<GlobalContext.Provider
-			value={ { clickScreenLink, userRecord, setGlobalNotice } }
-		>
-			<GlobalNotice
-				notice={ globalNotice }
-				setNotice={ setGlobalNotice }
-			/>
+		<GlobalContext.Provider value={ { clickScreenLink, userRecord, setGlobalNotice } }>
+			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
 	);
