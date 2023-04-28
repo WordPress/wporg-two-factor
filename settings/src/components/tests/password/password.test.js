@@ -1,3 +1,5 @@
+/* global jest, describe, beforeAll, afterEach, it, expect */
+
 /**
  * External dependencies
  */

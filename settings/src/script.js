@@ -106,7 +106,7 @@ function Main( { userId } ) {
 	 * behaviors that are broken otherwise.
 	 */
 	const clickScreenLink = useCallback(
-		( event, screen ) => {
+		( event, nextScreen ) => {
 			event.preventDefault();
 
 			// Reset to initial after navigating away from a page.
@@ -119,7 +119,7 @@ function Main( { userId } ) {
 			history.pushState( {}, '', currentUrl );
 
 			setGlobalNotice( '' );
-			setScreen( screen );
+			setScreen( nextScreen );
 		},
 		[ hasEdits ]
 	);

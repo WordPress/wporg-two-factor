@@ -1,3 +1,5 @@
+/* global jest, it, describe, beforeEach, expect, afterEach */
+
 /**
  * WordPress dependencies
  */

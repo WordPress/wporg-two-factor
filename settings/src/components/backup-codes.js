@@ -185,8 +185,8 @@ function Manage( { setRegenerating } ) {
 					<Icon icon={ warning } />
 					You only have <strong>{ remaining }</strong> backup codes
 					remaining. Please regenerate and save new ones before you
-					run out. If you don't, you won't be able to log into your
-					account if you lose your phone.
+					run out. If you don&apos;t, you won&apos;t be able to log
+					into your account if you lose your phone.
 				</Notice>
 			) }
 

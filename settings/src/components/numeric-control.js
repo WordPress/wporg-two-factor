@@ -13,9 +13,9 @@ import { useRef, useCallback } from '@wordpress/element';
  * using the underlying `input[type="number"]`, which has some accessibility issues.
  *
  * @param props
- * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#accessibility
- * @link https://technology.blog.gov.uk/2020/02/24/why-the-gov-uk-design-system-team-changed-the-input-type-for-numbers/
- * @link https://stackoverflow.com/a/66759105/450127
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#accessibility
+ * @see https://technology.blog.gov.uk/2020/02/24/why-the-gov-uk-design-system-team-changed-the-input-type-for-numbers/
+ * @see https://stackoverflow.com/a/66759105/450127
  */
 export default function NumericControl( props ) {
 	const { autoComplete, pattern, title, onChange, onKeyDown, index } = props;
