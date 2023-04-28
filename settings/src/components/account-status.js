@@ -3,7 +3,13 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
+import {
+	Icon,
+	cancelCircleFilled,
+	check,
+	chevronRight,
+	warning,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,11 +21,19 @@ import ScreenLink from './screen-link';
  * Render the Account Status.
  */
 export default function AccountStatus() {
-	const { userRecord }    = useContext( GlobalContext );
-	const { record }        = userRecord;
-	const emailStatus       = record.pending_email ? 'pending' : 'ok';
-	const totpStatus        = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
-	const backupCodesStatus = record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
+	const { userRecord } = useContext( GlobalContext );
+	const { record } = userRecord;
+	const emailStatus = record.pending_email ? 'pending' : 'ok';
+	const totpStatus = record[ '2fa_available_providers' ].includes(
+		'Two_Factor_Totp'
+	)
+		? 'enabled'
+		: 'disabled';
+	const backupCodesStatus = record[ '2fa_available_providers' ].includes(
+		'Two_Factor_Backup_Codes'
+	)
+		? 'enabled'
+		: 'disabled';
 
 	return (
 		<>
@@ -35,9 +49,9 @@ export default function AccountStatus() {
 				status={ emailStatus }
 				headerText="Account Email"
 				bodyText={
-					record.pending_email ?
-					`Your account email is pending a change to ${ record.pending_email }.` :
-					`Your account email address is ${ record.email }.`
+					record.pending_email
+						? `Your account email is pending a change to ${ record.pending_email }.`
+						: `Your account email address is ${ record.email }.`
 				}
 			/>
 
@@ -45,10 +59,11 @@ export default function AccountStatus() {
 				screen="totp"
 				status={ totpStatus }
 				headerText="Two-Factor Authentication"
-				bodyText={ 'enabled' === totpStatus ?
-					/* @todo update this when hardware tokens become an additional option. */
-					'You have two-factor authentication enabled using an app.' :
-					'You do not have two-factor authentication enabled.'
+				bodyText={
+					'enabled' === totpStatus
+						? /* @todo update this when hardware tokens become an additional option. */
+						  'You have two-factor authentication enabled using an app.'
+						: 'You do not have two-factor authentication enabled.'
 				}
 			/>
 
@@ -56,7 +71,9 @@ export default function AccountStatus() {
 				screen="backup-codes"
 				status={ backupCodesStatus }
 				headerText="Two-Factor Backup Codes"
-				bodyText={ `You have ${ 'enabled' === backupCodesStatus ? '' : 'not' } verified your backup codes for two-factor authentication.` }
+				bodyText={ `You have ${
+					'enabled' === backupCodesStatus ? '' : 'not'
+				} verified your backup codes for two-factor authentication.` }
 			/>
 		</>
 	);
@@ -64,10 +81,20 @@ export default function AccountStatus() {
 
 /**
  * Render a card for the status of the given setting.
+ *
+ * @param root0
+ * @param root0.screen
+ * @param root0.status
+ * @param root0.headerText
+ * @param root0.bodyText
  */
 function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 	return (
-		<Card className={ 'wporg-2fa__status-card wporg-2fa__status-card-' + screen }>
+		<Card
+			className={
+				'wporg-2fa__status-card wporg-2fa__status-card-' + screen
+			}
+		>
 			<ScreenLink
 				screen={ screen }
 				anchorText={
@@ -75,7 +102,11 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 						<StatusIcon status={ status } />
 						<h3 aria-label={"Click to enter the " + headerText + ' setting page.'}>{ headerText }</h3>
 						<p>{ bodyText }</p>
-						<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
+						<Icon
+							icon={ chevronRight }
+							size={ 26 }
+							className="wporg-2fa__status-card-open"
+						/>
 					</CardBody>
 				}
 			/>
@@ -85,6 +116,9 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 
 /**
  * Render the icon for the given status
+ *
+ * @param root0
+ * @param root0.status
  */
 function StatusIcon( { status } ) {
 	let icon;

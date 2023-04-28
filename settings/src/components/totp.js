@@ -4,20 +4,28 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, Flex } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpress/element';
+import {
+	RawHTML,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ScreenLink        from './screen-link'
-import AutoTabbingInput  from './auto-tabbing-input';
+import ScreenLink from './screen-link';
+import AutoTabbingInput from './auto-tabbing-input';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
 export default function TOTP() {
-	const { userRecord }     = useContext( GlobalContext );
+	const { userRecord } = useContext( GlobalContext );
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
-	const totpStatus         = availableProviders.includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const totpStatus = availableProviders.includes( 'Two_Factor_Totp' )
+		? 'enabled'
+		: 'disabled';
 
 	if ( 'enabled' === totpStatus ) {
 		return <Manage />;
@@ -30,23 +38,26 @@ export default function TOTP() {
  * Setup the TOTP provider.
  */
 function Setup() {
-	const { clickScreenLink, setGlobalNotice, userRecord } = useContext( GlobalContext );
-	const [ secretKey, setSecretKey ]     = useState( '' );
-	const [ qrCodeUrl, setQrCodeUrl ]     = useState( '' );
-	const [ error, setError ]             = useState( '' );
+	const { clickScreenLink, setGlobalNotice, userRecord } =
+		useContext( GlobalContext );
+	const [ secretKey, setSecretKey ] = useState( '' );
+	const [ qrCodeUrl, setQrCodeUrl ] = useState( '' );
+	const [ error, setError ] = useState( '' );
 	const [ setupMethod, setSetupMethod ] = useState( 'qr-code' );
-	const [ inputs, setInputs ]			  = useState( Array( 6 ).fill( '' ) );
+	const [ inputs, setInputs ] = useState( Array( 6 ).fill( '' ) );
 
 	// Fetch the data needed to setup TOTP.
 	useEffect( () => {
 		// useEffect callbacks can't be async directly, because that'd return the promise as a "cleanup" function.
 		const fetchSetupData = async () => {
 			const response = await apiFetch( {
-				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userRecord.record.id,
+				path:
+					'/wporg-two-factor/1.0/totp-setup?user_id=' +
+					userRecord.record.id,
 			} );
 
-			setSecretKey( response[ 'secret_key' ] );
-			setQrCodeUrl( response[ 'qr_code_url' ] );
+			setSecretKey( response.secret_key );
+			setQrCodeUrl( response.qr_code_url );
 		};
 
 		fetchSetupData();
@@ -55,7 +66,7 @@ function Setup() {
 	// Enable TOTP when button clicked.
 	const handleEnable = useCallback( async ( event ) => {
 		event.preventDefault();
-		
+
 		const code = inputs.join( '' );
 
 		try {
@@ -73,20 +84,29 @@ function Setup() {
 			refreshRecord( userRecord );
 			clickScreenLink( event, 'backup-codes' );
 			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
-
-		} catch( error ) {
+		} catch ( error ) {
 			setError( error.message );
 		}
 	} );
 
 	return (
-		<Flex expanded={false} direction='column' align="top" justify="top" gap="14px" className="wporg-2fa__totp_setup-container">
-			<p className='wporg-2fa__totp_setup-instruction'>
-				Two-Factor Authentication adds an extra layer of security to your account.			
-				Use a phone app like 
-				<a href="https://authy.com/"> Authy </a>  
+		<Flex
+			expanded={ false }
+			direction="column"
+			align="top"
+			justify="top"
+			gap="14px"
+			className="wporg-2fa__totp_setup-container"
+		>
+			<p className="wporg-2fa__totp_setup-instruction">
+				Two-Factor Authentication adds an extra layer of security to
+				your account. Use a phone app like
+				<a href="https://authy.com/"> Authy </a>
 				or
-				<a href='https://googleauthenticator.net/'> Google Authenticator </a>
+				<a href="https://googleauthenticator.net/">
+					{ ' ' }
+					Google Authenticator{ ' ' }
+				</a>
 				when logging in to WordPress.org.
 			</p>
 
@@ -101,10 +121,10 @@ function Setup() {
 				handleEnable={ handleEnable }
 				qrCodeUrl={ qrCodeUrl }
 				secretKey={ secretKey }
-				inputs={inputs}
-				setInputs={setInputs}
-				error={error}
-				setError={setError}
+				inputs={ inputs }
+				setInputs={ setInputs }
+				error={ error }
+				setError={ setError }
 			/>
 		</Flex>
 	);
@@ -112,14 +132,32 @@ function Setup() {
 
 /**
  * Render both methods for setting up TOTP in an app.
+ *
+ * @param root0
+ * @param root0.setupMethod
+ * @param root0.setSetupMethod
+ * @param root0.qrCodeUrl
+ * @param root0.secretKey
  */
 function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'qr-code' === setupMethod ) {
-		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setupMethod ] );
+		const handleClick = useCallback(
+			() => setSetupMethod( 'manual' ),
+			[ setupMethod ]
+		);
 
 		return (
-			<Flex expanded={false} direction='column' gap="16px" className="wporg-2fa__totp_setup-method-container">
-				<p><strong>Scan the QR code with your authentication app&nbsp;</strong></p>
+			<Flex
+				expanded={ false }
+				direction="column"
+				gap="16px"
+				className="wporg-2fa__totp_setup-method-container"
+			>
+				<p>
+					<strong>
+						Scan the QR code with your authentication app&nbsp;
+					</strong>
+				</p>
 
 				<Button variant="link" onClick={ handleClick }>
 					Can't scan the QR code?
@@ -134,7 +172,7 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 								{ createQrCode( qrCodeUrl ) }
 							</RawHTML>
 						</a>
-					}
+					) }
 				</div>
 			</Flex>
 		);
@@ -143,19 +181,22 @@ function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
 	if ( 'manual' === setupMethod ) {
 		const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
 
-		const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setupMethod ]);
+		const handleClick = useCallback(
+			() => setSetupMethod( 'qr-code' ),
+			[ setupMethod ]
+		);
 
 		return (
 			<div className="wporg-2fa__manual">
-				<p><strong>Enter this time code into your app&nbsp;</strong></p>
+				<p>
+					<strong>Enter this time code into your app&nbsp;</strong>
+				</p>
 
 				<Button variant="link" onClick={ handleClick }>
 					Prefer to scan a QR code?
 				</Button>
 
-				<code>
-					{ readableSecretKey }
-				</code>
+				<code>{ readableSecretKey }</code>
 			</div>
 		);
 	}
@@ -184,24 +225,57 @@ function createQrCode( data ) {
 
 /**
  * Render the form for entering the TOTP code.
+ *
+ * @param root0
+ * @param root0.handleEnable
+ * @param root0.qrCodeUrl
+ * @param root0.secretKey
+ * @param root0.inputs
+ * @param root0.setInputs
+ * @param root0.error
+ * @param root0.setError
  */
-function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
-	const [ isInputComplete, setIsInputComplete ] = useState(false);
+function SetupForm( {
+	handleEnable,
+	qrCodeUrl,
+	secretKey,
+	inputs,
+	setInputs,
+	error,
+	setError,
+} ) {
+	const [ isInputComplete, setIsInputComplete ] = useState( false );
 
 	useEffect( () => {
-		if ( error && inputs.some( input => input === '') ) {
+		if ( error && inputs.some( ( input ) => input === '' ) ) {
 			setError( '' );
 		}
 	}, [ error, inputs ] );
 
-	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [])
-	const handleClearClick = useCallback( () => setInputs( Array( 6 ).fill( '' ) ), [])
+	const handleComplete = useCallback(
+		( isComplete ) => setIsInputComplete( isComplete ),
+		[]
+	);
+	const handleClearClick = useCallback(
+		() => setInputs( Array( 6 ).fill( '' ) ),
+		[]
+	);
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
 	return (
-		<Flex expanded={false} direction='column' align='center' gap="16px" className="wporg-2fa__setup-form-container">
-			<Notice status="error" isDismissible={ false } className={ error ? "is-shown" : ""}>
+		<Flex
+			expanded={ false }
+			direction="column"
+			align="center"
+			gap="16px"
+			className="wporg-2fa__setup-form-container"
+		>
+			<Notice
+				status="error"
+				isDismissible={ false }
+				className={ error ? 'is-shown' : '' }
+			>
 				<Icon icon={ cancelCircleFilled } />
 				{ error }
 			</Notice>
@@ -209,7 +283,12 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 				<p>Enter the six digit code provided by the app:</p>
 
-				<AutoTabbingInput inputs={inputs} setInputs={setInputs} error={error} onComplete={handleComplete}/>
+				<AutoTabbingInput
+					inputs={ inputs }
+					setInputs={ setInputs }
+					error={ error }
+					onComplete={ handleComplete }
+				/>
 
 				<div className="wporg-2fa__submit-btn-container">
 					<Button variant="secondary" onClick={ handleClearClick } aria-label="Clear all inputs">
@@ -229,7 +308,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
  */
 function Manage() {
 	const { userRecord, setGlobalNotice } = useContext( GlobalContext );
-	const [ error, setError ]             = useState( '' );
+	const [ error, setError ] = useState( '' );
 
 	// Enable TOTP when button clicked.
 	const handleDisable = useCallback( async ( event ) => {
@@ -244,8 +323,7 @@ function Manage() {
 
 			refreshRecord( userRecord );
 			setGlobalNotice( 'Successfully disabled One Time Passwords.' );
-
-		} catch( error ) {
+		} catch ( error ) {
 			setError( error.message );
 		}
 	} );
@@ -253,32 +331,36 @@ function Manage() {
 	return (
 		<>
 			<p>
-				You've enabled two-factor authentication on your account — smart move!
-				When you log in to WordPress.org, you'll need to enter your username and password, and then enter a unique passcode generated by an app on your mobile device.
+				You've enabled two-factor authentication on your account — smart
+				move! When you log in to WordPress.org, you'll need to enter
+				your username and password, and then enter a unique passcode
+				generated by an app on your mobile device.
 			</p>
 
 			<p>
-				Make sure you've created { ' ' }
-				<ScreenLink screen="backup-codes" anchorText="backup codes" /> { ' ' }
-				and saved them in a safe location, in case you ever lose your device. You may also need them when transitioning to a new device.
-				Without them you may permanently lose access to your account.
+				Make sure you've created{ ' ' }
+				<ScreenLink screen="backup-codes" anchorText="backup codes" />{ ' ' }
+				and saved them in a safe location, in case you ever lose your
+				device. You may also need them when transitioning to a new
+				device. Without them you may permanently lose access to your
+				account.
 			</p>
 
 			<p>
-				<strong>Status:</strong> { ' ' }
-				Two-factor authentication is currently <span className="wporg-2fa__enabled-status">on</span>.
+				<strong>Status:</strong> Two-factor authentication is currently{ ' ' }
+				<span className="wporg-2fa__enabled-status">on</span>.
 			</p>
 
 			<Button isPrimary onClick={ handleDisable }>
 				Disable Two-Factor Authentication
 			</Button>
 
-			{ error &&
+			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					<Icon icon={ cancelCircleFilled } />
 					{ error }
 				</Notice>
-			}
+			) }
 		</>
 	);
 }

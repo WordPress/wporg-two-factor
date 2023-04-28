@@ -157,13 +157,16 @@ export default function Password() {
 				</Notice>
 			) }
 
-			{ userRecord.hasEdits && userRecord.editedRecord.password && hasAttemptedSave && ! passwordStrong && (
-				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
-					That password is too easy to compromise. Please make it
-					longer and/or add random numbers/symbols.
-				</Notice>
-			) }
+			{ userRecord.hasEdits &&
+				userRecord.editedRecord.password &&
+				hasAttemptedSave &&
+				! passwordStrong && (
+					<Notice status="error" isDismissible={ false }>
+						<Icon icon={ cancelCircleFilled } />
+						That password is too easy to compromise. Please make it
+						longer and/or add random numbers/symbols.
+					</Notice>
+				) }
 
 			<p>
 				<Button

@@ -8,10 +8,15 @@ import { useContext } from '@wordpress/element';
  */
 import { GlobalContext } from '../script';
 
-export default function ScreenLink( { screen, anchorText, buttonStyle = false, ariaLabel } ) {
+export default function ScreenLink( {
+	screen,
+	anchorText,
+	buttonStyle = false,
+	ariaLabel,
+} ) {
 	const { clickScreenLink } = useContext( GlobalContext );
 	const classes = [];
-	let screenUrl = new URL( document.location.href );
+	const screenUrl = new URL( document.location.href );
 
 	screenUrl.searchParams.set( 'screen', screen );
 
@@ -32,5 +37,5 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 		>
 			{ anchorText }
 		</a>
-	)
+	);
 }
