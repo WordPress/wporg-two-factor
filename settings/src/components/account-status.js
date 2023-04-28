@@ -19,6 +19,7 @@ export default function AccountStatus() {
 	const { record }        = userRecord;
 	const emailStatus       = record.pending_email ? 'pending' : 'ok';
 	const totpStatus        = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) ? 'enabled' : 'disabled';
+	const webAuthnStatus    = record[ '2fa_available_providers' ].includes( 'Two_Factor_WebAuthn' ) ? 'enabled' : 'disabled';
 	const backupCodesStatus = record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
 
 	return (
@@ -40,6 +41,27 @@ export default function AccountStatus() {
 					`Your account email address is ${ record.email }.`
 				}
 			/>
+
+			{/* TODO: Eventually we'll build a custom UI for WebAuthn like we have for the other providers. In
+			  * the meantime we're using the wp-admin UI.
+			  * The back-end provider isn't ready yet, though, so this shouldn't be enabled on production until it
+			  * is.
+			  *
+			  * See https://github.com/WordPress/wporg-two-factor/issues/114
+			  * See https://github.com/WordPress/wporg-two-factor/issues/87
+			  */}
+			{ 'development' === process.env.NODE_ENV &&
+				<SettingStatusCard
+					screen="webauthn"
+					status={ webAuthnStatus }
+					headerText="Two Factor Security Key"
+					bodyText={
+						'enabled' === webAuthnStatus
+						? 'You have two-factor authentication enabled using security keys.'
+						: 'You have not registered any security keys.'
+					}
+				/>
+			}
 
 			<SettingStatusCard
 				screen="totp"

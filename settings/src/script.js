@@ -14,6 +14,7 @@ import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
+import WebAuthn from './components/webauthn';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 
@@ -56,6 +57,11 @@ function Main( { userId } ) {
 		'totp':           TOTP,
 		'backup-codes':   BackupCodes,
 	};
+
+	// TODO: Keep this in sync with `AccountStatus`. See the note there for details.
+	if ( 'development' === process.env.NODE_ENV ) {
+		components.webauthn = WebAuthn;
+	}
 
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
