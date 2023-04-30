@@ -6,15 +6,12 @@ import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
  *
  * @param userId
  */
-export function getUserRecord( userId ) {
+export function useGetUserRecord( userId ) {
 	const userRecord = useEntityRecord( 'root', 'user', userId );
 
-	// Polyfill in isSaving.
-	if ( undefined === userRecord.isSaving ) {
-		userRecord.isSaving = useSelect( ( select ) =>
-			select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId )
-		);
-	}
+	userRecord.isSaving = useSelect( ( select ) =>
+		select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId )
+	);
 
 	// Initialize the password as an empty string, necessary for resetting incomplete state when leaving the password setting page.
 	if ( userRecord.record && undefined === userRecord.record.password ) {

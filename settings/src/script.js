@@ -15,7 +15,7 @@ import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getUserRecord } from './utilities';
+import { useGetUserRecord } from './utilities';
 import ScreenLink from './components/screen-link';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
@@ -53,7 +53,7 @@ function renderSettings() {
  * @param props.userId
  */
 function Main( { userId } ) {
-	const userRecord = getUserRecord( userId );
+	const userRecord = useGetUserRecord( userId );
 	const { record, edit, hasEdits, hasResolved } = userRecord;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	let currentUrl = new URL( document.location.href );

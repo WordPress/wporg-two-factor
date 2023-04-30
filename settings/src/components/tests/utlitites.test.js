@@ -9,12 +9,12 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Local dependencies
  */
-import { getUserRecord, refreshRecord } from '../../utilities';
+import { useGetUserRecord, refreshRecord } from '../../utilities';
 
 jest.mock( '@wordpress/data' );
 jest.mock( '@wordpress/core-data' );
 
-describe( 'getUserRecord', () => {
+describe( 'useGetUserRecord', () => {
 	beforeEach( () => {
 		useSelect.mockClear();
 		useEntityRecord.mockClear();
@@ -23,35 +23,25 @@ describe( 'getUserRecord', () => {
 	it( 'should call useEntityRecord with correct arguments', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		getUserRecord( 1 );
+		useGetUserRecord( 1 );
 
 		expect( useEntityRecord ).toHaveBeenCalledWith( 'root', 'user', 1 );
 	} );
 
-	it( 'should set isSaving in userRecord if not defined', () => {
+	it( 'should set isSaving in userRecord', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 		useSelect.mockReturnValue( true );
 
-		const result = getUserRecord( 1 );
+		const result = useGetUserRecord( 1 );
 
-		expect( result.isSaving ).toBeTruthy();
 		expect( useSelect ).toHaveBeenCalled();
-	} );
-
-	it( 'should not set isSaving in userRecord if already defined', () => {
-		useEntityRecord.mockReturnValue( { record: {}, isSaving: false } );
-		useSelect.mockReturnValue( true );
-
-		const result = getUserRecord( 1 );
-
-		expect( result.isSaving ).toBeFalsy();
-		expect( useSelect ).not.toHaveBeenCalled();
+		expect( result.isSaving ).toBeTruthy();
 	} );
 
 	it( 'should initialize password in userRecord.record if not defined', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		const result = getUserRecord( 1 );
+		const result = useGetUserRecord( 1 );
 
 		expect( result.record.password ).toBe( '' );
 	} );
@@ -61,7 +51,7 @@ describe( 'getUserRecord', () => {
 			record: { password: 'test-password' },
 		} );
 
-		const result = getUserRecord( 1 );
+		const result = useGetUserRecord( 1 );
 
 		expect( result.record.password ).toBe( 'test-password' );
 	} );
