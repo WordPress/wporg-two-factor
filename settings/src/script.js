@@ -72,7 +72,7 @@ function Main( { userId } ) {
 	if ( ! components[ initialScreen ] ) {
 		initialScreen = 'account-status';
 		currentUrl.searchParams.set( 'screen', initialScreen );
-		history.pushState( {}, '', currentUrl );
+		window.history.pushState( {}, '', currentUrl );
 	}
 
 	const [ screen, setScreen ] = useState( initialScreen );
@@ -114,7 +114,7 @@ function Main( { userId } ) {
 
 			currentUrl = new URL( document.location.href );
 			currentUrl.searchParams.set( 'screen', screen );
-			history.pushState( {}, '', currentUrl );
+			window.history.pushState( {}, '', currentUrl );
 
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
