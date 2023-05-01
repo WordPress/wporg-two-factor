@@ -26,7 +26,6 @@ function is_2fa_beta_tester() : bool {
 	return in_array( $user->user_login, $beta_testers, true );
 }
 
-require_once __DIR__ . '/providers/webauthn/class-two-factor-webauthn.php';
 require_once __DIR__ . '/settings/settings.php';
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
@@ -41,6 +40,8 @@ add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enab
  * Determine which providers should be available to users.
  */
 function two_factor_providers( array $providers ) : array {
+	require_once __DIR__ . '/providers/webauthn/class-two-factor-webauthn.php';
+
 	// Match the name => file path format of input var, but the path isn't needed.
 	$desired_providers = array(
 		'Two_Factor_Totp'         => '',
