@@ -40,6 +40,7 @@ function _manually_load_plugin() {
 	// Mimic w.org capes.php.
 	$GLOBALS['super_admins'] = array();
 
+	require_once dirname( __DIR__, 3 ) . '/mu-plugins/pub/mu-plugins/loader.php';
 	require dirname( __DIR__, 2 ) . '/two-factor/two-factor.php';
 	require dirname( __DIR__ ) . '/wporg-two-factor.php';
 }
