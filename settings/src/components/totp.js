@@ -96,12 +96,13 @@ function Setup() {
 				when logging in to WordPress.org.
 			</p>
 
-			<SetupMethod
-				setupMethod={ setupMethod }
-				setSetupMethod={ setSetupMethod }
-				qrCodeUrl={ qrCodeUrl }
-				secretKey={ secretKey }
-			/>
+			{ 'qr-code' === setupMethod && (
+				<SetupMethodQRCode setSetupMethod={ setSetupMethod } qrCodeUrl={ qrCodeUrl } />
+			) }
+
+			{ 'manual' === setupMethod && (
+				<SetupMethodManual setSetupMethod={ setSetupMethod } secretKey={ secretKey } />
+			) }
 
 			<SetupForm
 				handleEnable={ handleEnable }
@@ -117,67 +118,68 @@ function Setup() {
 }
 
 /**
- * Render both methods for setting up TOTP in an app.
+ * Render the QR code methods for setting up TOTP in an app.
  *
  * @param props
- * @param props.setupMethod
  * @param props.setSetupMethod
  * @param props.qrCodeUrl
+ */
+function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
+	const handleClick = useCallback( () => setSetupMethod( 'manual' ) );
+
+	return (
+		<Flex
+			expanded={ false }
+			direction="column"
+			gap="16px"
+			className="wporg-2fa__totp_setup-method-container"
+		>
+			<p>
+				<strong>Scan the QR code with your authentication app&nbsp;</strong>
+			</p>
+
+			<Button variant="link" onClick={ handleClick }>
+				Can&apos;t scan the QR code?
+			</Button>
+
+			<div className="wporg-2fa__qr-code">
+				{ ! qrCodeUrl && 'Loading...' }
+
+				{ qrCodeUrl && (
+					<a href={ qrCodeUrl } aria-label="QR code to scan">
+						<RawHTML>{ createQrCode( qrCodeUrl ) }</RawHTML>
+					</a>
+				) }
+			</div>
+		</Flex>
+	);
+}
+
+/**
+ * Render the manual method for setting up TOTP in an app.
+ *
+ * @param props
+ * @param props.setSetupMethod
  * @param props.secretKey
  */
-function SetupMethod( { setupMethod, setSetupMethod, qrCodeUrl, secretKey } ) {
-	if ( 'qr-code' === setupMethod ) {
-		const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setupMethod ] );
+function SetupMethodManual( { setSetupMethod, secretKey } ) {
+	const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
 
-		return (
-			<Flex
-				expanded={ false }
-				direction="column"
-				gap="16px"
-				className="wporg-2fa__totp_setup-method-container"
-			>
-				<p>
-					<strong>Scan the QR code with your authentication app&nbsp;</strong>
-				</p>
+	const handleClick = useCallback( () => setSetupMethod( 'qr-code' ) );
 
-				<Button variant="link" onClick={ handleClick }>
-					Can&apos;t scan the QR code?
-				</Button>
+	return (
+		<div className="wporg-2fa__manual">
+			<p>
+				<strong>Enter this time code into your app&nbsp;</strong>
+			</p>
 
-				<div className="wporg-2fa__qr-code">
-					{ ! qrCodeUrl && 'Loading...' }
+			<Button variant="link" onClick={ handleClick }>
+				Prefer to scan a QR code?
+			</Button>
 
-					{ qrCodeUrl &&
-						<a href={ qrCodeUrl } aria-label="QR code to scan">
-							<RawHTML>
-								{ createQrCode( qrCodeUrl ) }
-							</RawHTML>
-						</a>
-					) }
-				</div>
-			</Flex>
-		);
-	}
-
-	if ( 'manual' === setupMethod ) {
-		const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
-
-		const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setupMethod ] );
-
-		return (
-			<div className="wporg-2fa__manual">
-				<p>
-					<strong>Enter this time code into your app&nbsp;</strong>
-				</p>
-
-				<Button variant="link" onClick={ handleClick }>
-					Prefer to scan a QR code?
-				</Button>
-
-				<code>{ readableSecretKey }</code>
-			</div>
-		);
-	}
+			<code>{ readableSecretKey }</code>
+		</div>
+	);
 }
 
 /*
