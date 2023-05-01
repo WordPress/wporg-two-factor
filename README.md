@@ -21,7 +21,7 @@ WordPress.org-specific customizations for the Two Factor plugin
 		return in_array( $user->user_login, $GLOBALS['supes'], true );
 	}
 	```
-1. Install and build the `wporg-mu-plugins` repository.
+1. `git clone https://github.com/WordPress/wporg-mu-plugins.git --branch build wp-content/mu-plugins/pub`
 1. Add this code to your `wp-content/mu-plugins/0-sandbox.php`:
 	```php
 	require_once WPMU_PLUGIN_DIR. '/wporg-mu-plugins/mu-plugins/loader.php';
