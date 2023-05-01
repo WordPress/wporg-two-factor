@@ -84,7 +84,7 @@ kTim0qBEAjJ1pJODE9/HH/1sPjDQqC3urY2rnzvxwdkDxeSEWHMmMyYjdA==
 	/**
 	 * Verify the label value.
 	 *
-	 * @covers Two_Factor_WebAuthn::test_get_label
+	 * @covers Two_Factor_WebAuthn::get_label
 	 */
 	public function test_get_label() {
 		$this->assertStringContainsString( 'Web Authentication (FIDO2)', $this->provider->get_label() );
