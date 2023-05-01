@@ -44,7 +44,7 @@ export default function EmailAddress() {
 			await edit( { pending_email: '' } );
 			await save();
 		} catch ( error ) {
-			alert( error.message );
+			setEmailError( error.message );
 		}
 	}, [] );
 
