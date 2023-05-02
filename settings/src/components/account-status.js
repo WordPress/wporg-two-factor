@@ -88,7 +88,9 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
 				anchorText={
 					<CardBody>
 						<StatusIcon status={ status } />
-						<h3 aria-label={"Click to enter the " + headerText + ' setting page.'}>{ headerText }</h3>
+						<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
+							{ headerText }
+						</h3>
 						<p>{ bodyText }</p>
 						<Icon
 							icon={ chevronRight }

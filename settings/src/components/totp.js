@@ -253,10 +253,19 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 				/>
 
 				<div className="wporg-2fa__submit-btn-container">
-					<Button variant="secondary" onClick={ handleClearClick } aria-label="Clear all inputs">
+					<Button
+						variant="secondary"
+						onClick={ handleClearClick }
+						aria-label="Clear all inputs"
+					>
 						Clear
 					</Button>
-					<Button type="submit" variant="primary" disabled={ ! canSubmit } aria-label="Submit input digits">
+					<Button
+						type="submit"
+						variant="primary"
+						disabled={ ! canSubmit }
+						aria-label="Submit input digits"
+					>
 						Enable
 					</Button>
 				</div>
