@@ -175,6 +175,8 @@
 
 		const { action, payload, _wpnonce } = opts;
 
+		// change to madwiz. maybe they have something you can just enqueue? and remove the func below altogether?
+
 		webauthnAuthenticate( payload, ( success, info ) => {
 			if ( success ) {
 				callback( { success:true, result: info } );
@@ -309,6 +311,8 @@
 
 
 			if ( 'webauthn-test-key' === action ) {
+				// debugger;	// this causes ff to error out b/c takes too long to interact
+
 				e.preventDefault();
 				$keyEl.find( '.notice' ).remove();
 				$btn.addClass( 'busy' );

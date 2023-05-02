@@ -543,6 +543,7 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 		$keys = $this->key_store->get_keys( $user_id );
 
 		$key = $this->webauthn->authenticate( json_decode( $credential ), $keys );
+		// todo madwiz
 
 		if ( false !== $key ) {
 			// store key tested state.
@@ -610,6 +611,7 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 					array(
 						'action'   => 'webauthn-test-key',
 						'payload'  => $this->webauthn->prepareAuthenticate( array( $pub_key ) ),
+							// todo change to madwiz
 						'userId'   => $user_id,
 						'_wpnonce' => wp_create_nonce( 'webauthn-test-key' ),
 					)
