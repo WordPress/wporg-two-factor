@@ -62,10 +62,14 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 		add_action( 'login_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 
-		add_action( 'wp_ajax_webauthn-register', array( $this, 'ajax_register' ) );
+		add_action( 'wp_ajax_webauthn_preregister', [ $this, 'wp_ajax_webauthn_preregister' ] );
+		add_action( 'wp_ajax_webauthn_register', [ $this, 'wp_ajax_webauthn_register' ] );
+
+		// add_action( 'wp_ajax_webauthn-register', array( $this, 'ajax_register' ) );
 		add_action( 'wp_ajax_webauthn-edit-key', array( $this, 'ajax_edit_key' ) );
 		add_action( 'wp_ajax_webauthn-delete-key', array( $this, 'ajax_delete_key' ) );
 		add_action( 'wp_ajax_webauthn-test-key', array( $this, 'ajax_test_key' ) );
+
 
 		add_action( 'two_factor_user_options_' . __CLASS__, array( $this, 'user_options' ) );
 
@@ -73,7 +77,7 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 
 	}
 
-	public static function register_assets() {
+	public static function register_assets( $hook ) {
 		wp_register_script(
 			'webauthn-login',
 			plugins_url( 'webauthn-login.js', __FILE__ ),
@@ -82,13 +86,35 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 			true
 		);
 
+		// wp_register_script(
+		// 	'webauthn-admin',
+		// 	plugins_url( 'webauthn-admin.js', __FILE__ ),
+		// 	array( 'jquery' ),
+		// 	filemtime( __DIR__ . '/webauthn-admin.js' ),
+		// 	true
+		// );
+
 		wp_register_script(
-			'webauthn-admin',
-			plugins_url( 'webauthn-admin.js', __FILE__ ),
+			'webauthn-register-key',
+			plugins_url( 'profile.js', __FILE__ ),
 			array( 'jquery' ),
-			filemtime( __DIR__ . '/webauthn-admin.js' ),
+			filemtime( __DIR__ . '/profile.js' ),
 			true
 		);
+
+		if ( in_array( $hook, array( 'user-edit.php', 'profile.php' ), true ) ) {
+			$user = wp_get_current_user();
+
+			wp_localize_script(
+				'webauthn-register-key',
+				'tfa_webauthn',
+				array(
+					'options' => array(), // todo populate w/ getClientOptionsJson()
+					 'nonce' => wp_create_nonce( "webauthn-register_key_{$user->ID}" )
+				),
+			);
+		}
+
 
 		wp_register_style(
 			'webauthn-admin',
@@ -259,7 +285,7 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 	 */
 	public function user_options( $user ) {
 
-		wp_enqueue_script( 'webauthn-admin' );
+		wp_enqueue_script( 'webauthn-register-key' );
 		wp_enqueue_style( 'webauthn-admin' );
 
 		$challenge = $this->webauthn->prepareRegister( $user->display_name, $user->user_login );
@@ -639,6 +665,169 @@ class Two_Factor_WebAuthn extends Two_Factor_Provider {
 		$out .= '</li>';
 
 		return $out;
+	}
+
+
+
+
+
+
+
+
+
+
+	public function wp_ajax_webauthn_preregister(): void {
+		// die('x');
+		$user = wp_get_current_user();
+
+		wp_send_json_success(
+			array(
+				'options' => array( 'foo' => 'bar' ),
+				'nonce'   => wp_create_nonce( "webauthn-register_key_{$user->ID}" ),
+			)
+		);
+
+		///////////////// end stub
+
+
+		$user = wp_get_current_user();
+		$this->check_registration_nonce( $user );
+
+		try {
+			$server   = Utils::create_webauthn_server();
+			$settings = Settings::instance();
+
+			$reg_options = RegistrationOptions::createForUser( WebAuthn_User::get_for( $user ) );
+			$reg_options->setExcludeExistingCredentials( true );
+			$reg_options->setUserVerification( $settings->get_user_verification_requirement() );
+
+			if ( $settings->get_authenticator_attachment() ) {
+				$reg_options->setAuthenticatorAttachment( $settings->get_authenticator_attachment() );
+			}
+
+			if ( $settings->get_timeout() ) {
+				$reg_options->setTimeout( $settings->get_timeout() * 1000 );
+			}
+
+			$options = $server->startRegistration( $reg_options );
+
+			$context = $options->getContext();
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+			update_user_meta( $user->ID, self::REGISTRATION_CONTEXT_USER_META, base64_encode( serialize( $context ) ) );
+			wp_send_json_success(
+				array(
+					'options' => $options->getClientOptionsJson(),
+					'nonce'   => wp_create_nonce( "webauthn-register_key_{$user->ID}" ),
+				)
+			);
+		} catch ( Throwable $e ) {
+			wp_send_json_error( $e->getMessage() );
+		}
+	}
+
+	/**
+	 * @global wpdb $wpdb
+	 */
+	public function wp_ajax_webauthn_register(): void {
+		$user = wp_get_current_user();
+
+		wp_send_json_success(
+			array(
+				'row'   => '<tr> <td> hello! </td> </tr>',
+				'nonce' => wp_create_nonce( "webauthn-register_key_{$user->ID}" ),
+			)
+		);
+
+
+		///////////////// end stub
+
+		$user = wp_get_current_user();
+		$this->check_registration_nonce( $user );
+
+		try {
+			$server  = Utils::create_webauthn_server();
+			$context = (string) get_user_meta( $user->ID, self::REGISTRATION_CONTEXT_USER_META, true );
+			/** @var mixed */
+			$context = unserialize( base64_decode( $context ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			if ( ! ( $context instanceof RegistrationContext ) ) {
+				throw new UnexpectedValueException( __( 'Unable to retrieve the registration context.', 'two-factor-provider-webauthn' ) );
+			}
+
+			// We cannot use WordPress sanitization functions here: the credential must not be altered.
+			// We validate that `credential` is a string, valid JSON, and decodes to an object (associative array in terms of PHP).
+			// If any of the conditions does not hold, we fail the request.
+			// The webauthn-server library performs further validation in accordance with the specification.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$credential = $_POST['credential'] ?? null; // Dangerous to sanitize; the code will validate the value
+			if ( ! is_string( $credential ) ) {
+				throw new InvalidArgumentException( __( 'Bad request.', 'two-factor-provider-webauthn' ) );
+			}
+
+			/** @var mixed */
+			$credential = json_decode( wp_unslash( $credential ), true, 512, JSON_THROW_ON_ERROR );
+			if ( is_array( $credential ) ) {
+				$result = $server->finishRegistration(
+					JsonConverter::decodeCredential( $credential, 'attestation' ),
+					$context
+				);
+
+				$name  = Utils::get_post_field_as_string( 'name' );
+				$store = new WebAuthn_Credential_Store();
+				$key   = $store->save_user_key( $name, $result );
+				if ( null === $key ) {
+					if ( defined( 'DEBUG_TFPWA' ) && true === constant( 'DEBUG_TFPWA' ) ) {
+						/** @var wpdb $wpdb */
+						/** @psalm-suppress InvalidGlobal */
+						global $wpdb;
+						$last_query = $wpdb->last_query;
+						$last_error = $wpdb->last_error;
+
+						/** @var string */
+						$credential = wp_json_encode(
+							array(
+								'user_handle'   => $result->getUserHandle()->toString(),
+								'credential_id' => $result->getCredentialId()->toString(),
+								'public_key'    => $result->getPublicKey()->toString(),
+								'counter'       => $result->getSignatureCounter(),
+								'name'          => $name ?: __( 'New Key', 'two-factor-provider-webauthn' ),
+								'added'         => time(),
+								'last_used'     => time(),
+								'u2f'           => 0,
+							)
+						);
+
+						// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						error_log( sprintf( 'Unable to save the key to the database. Last query: %s, last error: %s, credential: %s', $last_query, $last_error, $credential ) );
+						throw new UnexpectedValueException(
+							"Unable to save the key to the database.\n"
+							. "Last query: {$last_query}\n"
+							. "Last error: {$last_error}\n"
+							. "Credential: {$credential}"
+						);
+					}
+
+					throw new UnexpectedValueException( __( 'Unable to save the key to the database.', 'two-factor-provider-webauthn' ) );
+				}
+
+				$table = new Key_Table( $user );
+				ob_start();
+				$table->single_row( (object) $key );
+				$row = ob_get_clean();
+
+				wp_send_json_success(
+					array(
+						'row'   => $row,
+						'nonce' => wp_create_nonce( "webauthn-register_key_{$user->ID}" ),
+					)
+				);
+			} else {
+				throw new InvalidArgumentException( __( 'Bad request.', 'two-factor-provider-webauthn' ) );
+			}
+		} catch ( Throwable $e ) {
+			wp_send_json_error( $e->getMessage(), 400 );
+		} finally {
+			delete_user_meta( $user->ID, self::REGISTRATION_CONTEXT_USER_META );
+		}
 	}
 
 }
