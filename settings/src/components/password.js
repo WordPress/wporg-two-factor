@@ -128,7 +128,7 @@ export default function Password() {
 					label="New Password"
 					size="62"
 					value={ userRecord.editedRecord.password ?? '' }
-					placeholder="Q1jtBPRmROv51KOtbZ5aIKrc"
+					placeholder="Enter New Password..."
 					onChange={ handlePasswordChange }
 				/>
 				<Button

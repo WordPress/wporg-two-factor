@@ -91,7 +91,7 @@ export default function EmailAddress() {
 				help="We will send you a verification email before updating your email address."
 				label="Your email address"
 				size="62"
-				placeholder="my-email-address@example.org"
+				placeholder="Enter email address..."
 				value={ editedRecord.email ?? record.email }
 				onChange={ (email) => edit( { email } ) }
 			/>

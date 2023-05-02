@@ -5,6 +5,15 @@
 	margin-bottom: 2rem;
 }
 
+#bbp-your-profile {
+	.components-notice,
+	.notice {
+		a {
+			text-decoration: underline;
+		}
+	}
+}
+
 .wp-block-wporg-two-factor-settings {
 	position: relative;
 
