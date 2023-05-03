@@ -25,10 +25,14 @@ function register_block() {
  * @codeCoverageIgnore
  */
 function replace_core_ui_with_custom() : void {
+	/*
+	@todo Temporarily commented so that WebAuthn can be managed via wp-admin. Restore this when our custom WebAuthn UI is ready.
+	See https://github.com/WordPress/wporg-two-factor/issues/114, https://github.com/WordPress/wporg-two-factor/issues/87.
 	remove_action( 'show_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 	remove_action( 'edit_user_profile', array( 'Two_Factor_Core', 'user_two_factor_options' ) );
 	remove_action( 'personal_options_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
 	remove_action( 'edit_user_profile_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
+	*/
 
 	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
 
