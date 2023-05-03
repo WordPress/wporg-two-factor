@@ -3,6 +3,7 @@
 		".",
 		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
 		"https://downloads.wordpress.org/plugin/bbpress.latest-stable.zip",
+		"https://downloads.wordpress.org/plugin/two-factor-provider-webauthn.latest-stable.zip",
 		"WordPress/two-factor"
 	],
 	"mappings": {

@@ -42,12 +42,14 @@ add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enab
 function two_factor_providers( array $providers ) : array {
 	// Match the name => file path format of input var, but the path isn't needed.
 	$desired_providers = array(
-		'Two_Factor_WebAuthn'     => '',
+		'TwoFactor_Provider_WebAuthn' => '',
 		'Two_Factor_Totp'         => '',
 		'Two_Factor_Backup_Codes' => '',
 	);
 
-	return array_intersect_key( $providers, $desired_providers );
+	$providers = array_intersect_key( $providers, $desired_providers );
+
+	return $providers;
 }
 
 /**
@@ -57,8 +59,8 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 	$user                = get_user_by( 'id', $user_id );
 	$available_providers = Two_Factor_Core::get_available_providers_for_user( $user );
 
-	if ( isset( $available_providers['Two_Factor_WebAuthn'] ) ) {
-		$provider = 'Two_Factor_WebAuthn';
+	if ( isset( $available_providers['TwoFactor_Provider_WebAuthn'] ) ) {
+		$provider = 'TwoFactor_Provider_WebAuthn';
 	} elseif ( isset( $available_providers['Two_Factor_Totp'] ) ) {
 		$provider = 'Two_Factor_Totp';
 	} elseif ( 'Two_Factor_Backup_Codes' === $provider && 1 === count( $available_providers ) ) {
