@@ -11,13 +11,13 @@ export default function RevalidateModal() {
 	const goBack = ( event ) => clickScreenLink( event, 'account-status' ); 
 	const goRevalidate = () => {
 		var url = new URL( userRecord.record[ '2fa_revalidation' ].revalidate_url );
-		url.searchParams.set( 'redirect_to', encodeURIComponent( window.location.href ) );
+		url.searchParams.set( 'redirect_to', encodeURI( window.location.href ) );
 
 		window.location = url.href;
 	};
 
 	return (
-		<Modal title="Confirm your Two Factor" onRequestClose={ goBack } isDismissible="true">
+		<Modal title="Confirm your Two Factor" onRequestClose={ goBack }>
 			<p>
 				Before you can update your Two Factor details, you first need to reconfirm your existing login.
 			</p>
