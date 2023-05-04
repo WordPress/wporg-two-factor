@@ -16,6 +16,7 @@ import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
+import RevalidateModal from './components/revalidate-modal';
 
 export const GlobalContext = createContext( null );
 
@@ -57,6 +58,12 @@ function Main( { userId } ) {
 		'totp':           TOTP,
 		'backup-codes':   BackupCodes,
 	};
+
+	// The screens where a recent two factor challenge is required.
+	const twoFactorRequiredScreens = [
+		'totp',
+		'backup-codes',
+	];
 
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
@@ -124,6 +131,15 @@ function Main( { userId } ) {
 			</div>
 		);
 
+	} else if (
+		twoFactorRequiredScreens.includes( screen ) &&
+		userRecord.record[ '2fa_available_providers' ] &&
+		userRecord.record[ '2fa_revalidation' ] &&
+		! userRecord.record[ '2fa_revalidation' ].can_edit
+	) {
+		screenContent = (
+			<RevalidateModal />
+		);
 	} else {
 		screenContent = (
 			<Card>

@@ -175,6 +175,26 @@ function register_user_fields(): void {
 			],
 		]
 	);
+
+	register_rest_field(
+		'user',
+		'2fa_revalidation',
+		[
+			'get_callback' => function( $user ) {
+				$revalidate_url  = '';
+				$can_edit       = Two_Factor_Core::current_user_can_update_two_factor_options();
+				if ( ! $can_edit ) {
+					$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url();
+				}
+
+				return compact( 'can_edit', 'revalidate_url' );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
 }
 
 /**
