@@ -89,10 +89,10 @@ function Setup() {
 		>
 			<p className="wporg-2fa__totp_setup-instruction">
 				Two-Factor Authentication adds an extra layer of security to your account. Use a
-				phone app like
-				<a href="https://authy.com/"> Authy </a>
-				or
-				<a href="https://googleauthenticator.net/"> Google Authenticator </a>
+				phone app like <a href="https://authy.com/">Authy</a> or{ ' ' }
+				<a href="https://support.google.com/accounts/answer/1066447">
+					Google Authenticator
+				</a>{ ' ' }
 				when logging in to WordPress.org.
 			</p>
 
