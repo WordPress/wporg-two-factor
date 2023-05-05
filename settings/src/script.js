@@ -113,7 +113,7 @@ function Main( { userId } ) {
 			}
 
 			currentUrl = new URL( document.location.href );
-			currentUrl.searchParams.set( 'screen', screen );
+			currentUrl.searchParams.set( 'screen', nextScreen );
 			window.history.pushState( {}, '', currentUrl );
 
 			setGlobalNotice( '' );
