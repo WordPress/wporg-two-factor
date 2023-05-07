@@ -3,7 +3,7 @@ name: Static Analysis (Linting)
 # This workflow is triggered on pushes to trunk, and any PRs.
 on:
   push:
-    branches: [fix/137-eslint]
+    branches: [trunk]
   pull_request:
 
 jobs:
@@ -20,10 +20,9 @@ jobs:
       with:
         cache: 'yarn'
 
-    - name: yarn install and build
+    - name: Install NPM dependencies
       run: |
         yarn
-        yarn workspaces run build
 
     - name: Lint JavaScript
       run: |
