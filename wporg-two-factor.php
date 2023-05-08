@@ -34,7 +34,7 @@ add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
-
+add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
 
 /**
  * Determine which providers should be available to users.
@@ -226,6 +226,22 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 	);
 
 	return $two_factor_notice . $existing_notices;
+}
+
+/*
+ * Remove the 2FA settings page from the admin menu.
+ *
+ * We don't want site admins making changes, etc.
+ */
+function block_webauthn_settings_page( ) {
+	$screen = get_current_screen();
+
+	// Prevent direct access.
+	if ( $screen->id === 'settings_page_2fa-webauthn' ) {
+		wp_die( 'Access Denied.' );
+	}
+
+	remove_submenu_page( 'options-general.php', '2fa-webauthn' );
 }
 
 /**
