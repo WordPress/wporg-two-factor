@@ -231,7 +231,10 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 	}, [ error, inputs ] );
 
 	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [] );
-	const handleClearClick = useCallback( () => setInputs( Array( 6 ).fill( '' ) ), [] );
+	const handleClearClick = useCallback( () => {
+		setInputs( Array( 6 ).fill( '' ) );
+		setIsInputComplete( false );
+	}, [] );
 
 	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
 
