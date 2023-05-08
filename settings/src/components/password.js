@@ -12,19 +12,8 @@ import { generatePassword } from '@automattic/generate-password';
  * WordPress dependencies
  */
 import { Button, Flex, Notice, TextControl } from '@wordpress/components';
-import {
-	useCallback,
-	useContext,
-	useEffect,
-	useState,
-} from '@wordpress/element';
-import {
-	Icon,
-	cancelCircleFilled,
-	check,
-	seen,
-	unseen,
-} from '@wordpress/icons';
+import { useCallback, useContext, useEffect, useState } from '@wordpress/element';
+import { Icon, cancelCircleFilled, check, seen, unseen } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -42,10 +31,7 @@ export default function Password() {
 	let passwordStrong = true; // Saved passwords have already passed the test.
 
 	if ( userRecord.hasEdits ) {
-		passwordStrong = isPasswordStrong(
-			userRecord.editedRecord.password,
-			userRecord.record
-		);
+		passwordStrong = isPasswordStrong( userRecord.editedRecord.password, userRecord.record );
 	}
 
 	// Clear the "saved password" notice when password is being changed.
@@ -91,10 +77,7 @@ export default function Password() {
 		[ passwordStrong, userRecord.isSaving ]
 	);
 
-	const handlePasswordChange = useCallback(
-		( password ) => userRecord.edit( { password } ),
-		[]
-	);
+	const handlePasswordChange = useCallback( ( password ) => userRecord.edit( { password } ), [] );
 
 	const handlePasswordToggle = useCallback(
 		() => setInputType( inputType === 'password' ? 'text' : 'password' ),
@@ -104,14 +87,13 @@ export default function Password() {
 	return (
 		<form onSubmit={ handleFormSubmit }>
 			<p>
-				To update your password enter a new one below. Strong passwords
-				are random, at least twenty characters long, and include
-				uppercase letters and symbols.
+				To update your password enter a new one below. Strong passwords are random, at least
+				twenty characters long, and include uppercase letters and symbols.
 			</p>
 
 			<p>
-				For convenience, use a password manager to store and
-				automatically enter passwords. For more information, read about{ ' ' }
+				For convenience, use a password manager to store and automatically enter passwords.
+				For more information, read about{ ' ' }
 				<a href="https://wordpress.org/documentation/article/password-best-practices/">
 					password best practices
 				</a>
@@ -135,16 +117,8 @@ export default function Password() {
 					className="wporg-2fa__show-password"
 					size={ 24 }
 					onClick={ handlePasswordToggle }
-					aria-label={
-						inputType === 'password'
-							? 'Show Password'
-							: 'Hide Password'
-					}
-					title={
-						inputType === 'password'
-							? 'Show Password'
-							: 'Hide Password'
-					}
+					aria-label={ inputType === 'password' ? 'Show Password' : 'Hide Password' }
+					title={ inputType === 'password' ? 'Show Password' : 'Hide Password' }
 				>
 					<Icon icon={ inputType === 'password' ? seen : unseen } />
 				</Button>
@@ -157,20 +131,19 @@ export default function Password() {
 				</Notice>
 			) }
 
-			{ userRecord.hasEdits && userRecord.editedRecord.password && hasAttemptedSave && ! passwordStrong && (
-				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
-					That password is too easy to compromise. Please make it
-					longer and/or add random numbers/symbols.
-				</Notice>
-			) }
+			{ userRecord.hasEdits &&
+				userRecord.editedRecord.password &&
+				hasAttemptedSave &&
+				! passwordStrong && (
+					<Notice status="error" isDismissible={ false }>
+						<Icon icon={ cancelCircleFilled } />
+						That password is too easy to compromise. Please make it longer and/or add
+						random numbers/symbols.
+					</Notice>
+				) }
 
 			<p>
-				<Button
-					isPrimary
-					disabled={ ! userRecord.editedRecord.password }
-					type="submit"
-				>
+				<Button isPrimary disabled={ ! userRecord.editedRecord.password } type="submit">
 					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 

@@ -1,3 +1,5 @@
+/* global jest, it, describe, beforeEach, expect, afterEach */
+
 /**
  * WordPress dependencies
  */
@@ -7,82 +9,75 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Local dependencies
  */
-import { getUserRecord, refreshRecord } from '../../utilities';
+import { useGetUserRecord, refreshRecord } from '../../utilities';
 
-jest.mock('@wordpress/data');
-jest.mock('@wordpress/core-data');
+jest.mock( '@wordpress/data' );
+jest.mock( '@wordpress/core-data' );
 
-describe('getUserRecord', () => {
-    beforeEach(() => {
-        useSelect.mockClear();
-        useEntityRecord.mockClear();
-    });
+describe( 'useGetUserRecord', () => {
+	beforeEach( () => {
+		useSelect.mockClear();
+		useEntityRecord.mockClear();
+	} );
 
-    it('should call useEntityRecord with correct arguments', () => {
-        useEntityRecord.mockReturnValue({ record: {} });
+	it( 'should call useEntityRecord with correct arguments', () => {
+		useEntityRecord.mockReturnValue( { record: {} } );
 
-        getUserRecord(1);
+		useGetUserRecord( 1 );
 
-        expect(useEntityRecord).toHaveBeenCalledWith('root', 'user', 1);
-    });
+		expect( useEntityRecord ).toHaveBeenCalledWith( 'root', 'user', 1 );
+	} );
 
-    it('should set isSaving in userRecord if not defined', () => {
-        useEntityRecord.mockReturnValue({ record: {} });
-        useSelect.mockReturnValue(true);
+	it( 'should set isSaving in userRecord', () => {
+		useEntityRecord.mockReturnValue( { record: {} } );
+		useSelect.mockReturnValue( true );
 
-        const result = getUserRecord(1);
+		const result = useGetUserRecord( 1 );
 
-        expect(result.isSaving).toBeTruthy();
-        expect(useSelect).toHaveBeenCalled();
-    });
+		expect( useSelect ).toHaveBeenCalled();
+		expect( result.isSaving ).toBeTruthy();
+	} );
 
-    it('should not set isSaving in userRecord if already defined', () => {
-        useEntityRecord.mockReturnValue({ record: {}, isSaving: false });
-        useSelect.mockReturnValue(true);
+	it( 'should initialize password in userRecord.record if not defined', () => {
+		useEntityRecord.mockReturnValue( { record: {} } );
 
-        const result = getUserRecord(1);
+		const result = useGetUserRecord( 1 );
 
-        expect(result.isSaving).toBeFalsy();
-        expect(useSelect).not.toHaveBeenCalled();
-    });
+		expect( result.record.password ).toBe( '' );
+	} );
 
-    it('should initialize password in userRecord.record if not defined', () => {
-        useEntityRecord.mockReturnValue({ record: {} });
+	it( 'should not overwrite password in userRecord.record if already defined', () => {
+		useEntityRecord.mockReturnValue( {
+			record: { password: 'test-password' },
+		} );
 
-        const result = getUserRecord(1);
+		const result = useGetUserRecord( 1 );
 
-        expect(result.record.password).toBe('');
-    });
+		expect( result.record.password ).toBe( 'test-password' );
+	} );
+} );
 
-    it('should not overwrite password in userRecord.record if already defined', () => {
-        useEntityRecord.mockReturnValue({ record: { password: 'test-password' } });
+describe( 'refreshRecord', () => {
+	let mockRecord;
 
-        const result = getUserRecord(1);
+	beforeEach( () => {
+		mockRecord = {
+			edit: jest.fn(),
+			save: jest.fn(),
+		};
+	} );
 
-        expect(result.record.password).toBe('test-password');
-    });
-});
+	afterEach( () => {
+		mockRecord.edit.mockReset();
+		mockRecord.save.mockReset();
+	} );
 
-describe('refreshRecord', () => {
-  let mockRecord;
+	it( 'should call edit and save methods on the record object', () => {
+		refreshRecord( mockRecord );
 
-  beforeEach(() => {
-    mockRecord = {
-      edit: jest.fn(),
-      save: jest.fn(),
-    };
-  });
-
-  afterEach(() => {
-    mockRecord.edit.mockReset();
-    mockRecord.save.mockReset();
-  });
-
-  it('should call edit and save methods on the record object', () => {
-    refreshRecord(mockRecord);
-
-    expect(mockRecord.edit).toHaveBeenCalledWith({ refreshRecordFakeKey: '' });
-    expect(mockRecord.save).toHaveBeenCalled();
-  });
-});
-
+		expect( mockRecord.edit ).toHaveBeenCalledWith( {
+			refreshRecordFakeKey: '',
+		} );
+		expect( mockRecord.save ).toHaveBeenCalled();
+	} );
+} );

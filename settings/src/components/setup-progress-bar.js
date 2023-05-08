@@ -23,10 +23,12 @@ export default function SetupProgressBar( { step } ) {
 			<ul className="wporg-2fa__setup-step-separators">
 				<li className="wporg-2fa__step-separator is-enabled" />
 
-				<li className={
-					'wporg-2fa__step-separator ' +
-					( 'backup-codes' === step ? 'is-enabled' : 'is-disabled' )
-				} />
+				<li
+					className={
+						'wporg-2fa__step-separator ' +
+						( 'backup-codes' === step ? 'is-enabled' : 'is-disabled' )
+					}
+				/>
 
 				<li className="wporg-2fa__step-separator is-disabled" />
 			</ul>
