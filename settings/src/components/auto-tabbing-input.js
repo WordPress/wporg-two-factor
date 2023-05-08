@@ -46,17 +46,20 @@ const AutoTabbingInput = ( props ) => {
 	}, [] );
 
 	const handlePaste = useCallback( ( event ) => {
-		const paste = event.clipboardData.getData('Text').replace( /[^0-9]/g, '' )
+		const paste = event.clipboardData.getData( 'Text' ).replace( /[^0-9]/g, '' );
 
-		if ( inputs.length == paste.length ) {
+		if ( inputs.length === paste.length ) {
 			event.preventDefault();
-			setInputs( paste.split('') );
+			setInputs( paste.split( '' ) );
 			onComplete( true );
 		}
 	}, [] );
 
 	return (
-		<div className={ 'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' ) } onPaste={ handlePaste }>
+		<div
+			className={ 'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' ) }
+			onPaste={ handlePaste }
+		>
 			{ inputs.map( ( value, index ) => (
 				<NumericControl
 					{ ...props }
