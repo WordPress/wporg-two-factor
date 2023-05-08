@@ -181,13 +181,11 @@ function register_user_fields(): void {
 		'2fa_revalidation',
 		[
 			'get_callback' => function( $user ) {
-				$revalidate_url  = '';
-				$can_edit       = Two_Factor_Core::current_user_can_update_two_factor_options();
-				if ( ! $can_edit ) {
-					$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url();
-				}
+				$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url( true );
+				$expiry         = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, $user->ID, '' );
+				$expires_at     = Two_Factor_Core::is_current_user_session_two_factor() + $expiry;
 
-				return compact( 'can_edit', 'revalidate_url' );
+				return compact( 'revalidate_url', 'expires_at' );
 			},
 			'schema' => [
 				'type'    => 'array',

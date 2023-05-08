@@ -31,6 +31,9 @@ function replace_core_ui_with_custom() : void {
 	remove_action( 'edit_user_profile_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
 
 	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
+
+	// Add some customizations to the revalidate_2fa page for when it's displayed in an iframe.
+	add_action( 'login_footer', __NAMESPACE__ . '\login_footer_revalidate_customizations' );
 }
 
 /**
@@ -63,3 +66,37 @@ function render_custom_ui() : void {
 
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }
+
+function login_footer_revalidate_customizations() {
+	// When the revalidate_2fa page is displayed in an interim login on not-login, add some style and JS handlers.
+	if (
+		'login.wordpress.org' === $_SERVER['HTTP_HOST'] ||
+		empty( $_REQUEST['interim-login'] ) ||
+		'revalidate_2fa' !== ( $_REQUEST['action'] ?? '' )
+	) {
+		return;
+	}
+
+	?>
+	<style>
+		body.login-action-revalidate_2fa #login h1,
+		body.login-action-revalidate_2fa #backtoblog {
+			display: none;
+		}
+	</style>
+	<script>
+		(function() {
+			const loginFormExists  = !! document.querySelector( '#loginform' );
+			const loginFormMessage = document.querySelector( '#login .message' )?.textContent || '';
+
+			// If the login no longer exists, let the parent know.
+			if ( ! loginFormExists ) {
+				window.parent.postMessage( { type: 'reValidationComplete', message: loginFormMessage }, '*' );
+			}
+		})();
+	</script>
+	<?php
+}
+
+// To test, revalidate every 30seconds.
+// add_filter( 'two_factor_revalidate_time', function() { return 30; } );

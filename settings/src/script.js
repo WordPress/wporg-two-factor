@@ -135,7 +135,7 @@ function Main( { userId } ) {
 		twoFactorRequiredScreens.includes( screen ) &&
 		userRecord.record[ '2fa_available_providers' ] &&
 		userRecord.record[ '2fa_revalidation' ] &&
-		! userRecord.record[ '2fa_revalidation' ].can_edit
+		userRecord.record[ '2fa_revalidation' ].expires_at <= ( (new Date()).getTime()/1000 )
 	) {
 		screenContent = (
 			<RevalidateModal />
