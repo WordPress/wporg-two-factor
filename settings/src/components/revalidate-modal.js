@@ -44,7 +44,7 @@ function RevalidateIframe( { screen } ) {
 	const ref = useRef();
 
 	useEffect( () => {
-		function maybeRefreshUser( { event, data: { type, message } = {} } ) {
+		function maybeRefreshUser( { data: { type, message } = {} } ) {
 			if ( type != 'reValidationComplete' ) {
 				return;
 			}
