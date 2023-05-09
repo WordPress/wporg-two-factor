@@ -130,11 +130,34 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
-	let screenContent;
+	let screenContent = (
+		<Card>
+			<CardHeader className="wporg-2fa__navigation" size="xSmall">
+				<ScreenLink
+					screen="account-status"
+					ariaLabel="Back to the account status page"
+					anchorText={
+						<>
+							<Icon icon={ chevronLeft } />
+							Back
+						</>
+					}
+				/>
+
+				<h3>
+					{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }
+				</h3>
+			</CardHeader>
+
+			<CardBody className={ 'wporg-2fa__' + screen }>
+				<CurrentScreen />
+			</CardBody>
+		</Card>
+	);
 
 	if ( 'account-status' === screen ) {
 		screenContent = (
-			<div className={ 'wporg-2fa__' + screen }>
+			<div className={ 'wporg-2fa__account-status' }>
 				<AccountStatus />
 			</div>
 		);
@@ -144,33 +167,13 @@ function Main( { userId } ) {
 		userRecord.record[ '2fa_revalidation' ] &&
 		userRecord.record[ '2fa_revalidation' ].expires_at <= new Date().getTime() / 1000
 	) {
-		screenContent = <RevalidateModal />;
-	} else {
 		screenContent = (
-			<Card>
-				<CardHeader className="wporg-2fa__navigation" size="xSmall">
-					<ScreenLink
-						screen="account-status"
-						ariaLabel="Back to the account status page"
-						anchorText={
-							<>
-								<Icon icon={ chevronLeft } />
-								Back
-							</>
-						}
-					/>
-
-					<h3>
-						{ screen
-							.replace( '-', ' ' )
-							.replace( 'totp', 'Two-Factor Authentication' ) }
-					</h3>
-				</CardHeader>
-
-				<CardBody className={ 'wporg-2fa__' + screen }>
-					<CurrentScreen />
-				</CardBody>
-			</Card>
+			<>
+				<div className={ 'wporg-2fa__account-status' }>
+					<AccountStatus />
+				</div>
+				<RevalidateModal />
+			</>
 		);
 	}
 
