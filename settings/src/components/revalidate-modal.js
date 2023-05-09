@@ -3,7 +3,7 @@
  */
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { GlobalContext } from '../script';
-import { Button, Modal, __experimentalHStack as HStack } from '@wordpress/components';
+import { Button, Modal, Flex } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities';
 
@@ -28,14 +28,14 @@ export default function RevalidateModal() {
 				Before you can update your Two Factor details, you first need to reconfirm your
 				existing login.
 			</p>
-			<HStack justify="right">
+			<Flex justify="right">
 				<Button variant="secondary" onClick={ goBack }>
 					Cancel
 				</Button>
 				<Button variant="primary" onClick={ showRevalidate }>
 					Continue
 				</Button>
-			</HStack>
+			</Flex>
 		</Modal>
 	);
 }
