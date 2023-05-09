@@ -49,9 +49,14 @@ function RevalidateIframe( { screen } ) {
 				return;
 			}
 
-			refreshRecord( userRecord );
 			setGlobalNotice( message || 'Two Factor confirmed' );
-			setScreen( screen );
+
+			// Pretend that the expires_at is in the future (+1hr), this provides a 'faster' UI.
+			// This intentionally doesn't use `edit()` to prevent it attempting to update it on the server.
+			userRecord.record[ '2fa_revalidation' ].expires_at = ((new Date()).getTime()/1000) + 3600;
+
+			// Refresh the user record, to fetch the correct 2fa_revalidation data.
+			refreshRecord( userRecord );
 		}
 
 		window.addEventListener( 'message', maybeRefreshUser );
