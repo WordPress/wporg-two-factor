@@ -1,41 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 import { GlobalContext } from '../script';
-import { Button, Modal, Flex } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities';
 
 export default function RevalidateModal() {
 	const { clickScreenLink } = useContext( GlobalContext );
-	const [ showIframe, setIframe ] = useState( false );
 
 	const goBack = ( event ) => clickScreenLink( event, 'account-status' );
-	const showRevalidate = () => setIframe( true );
 
-	if ( showIframe ) {
 		return (
-			<Modal title="Confirm your Two Factor" onRequestClose={ goBack }>
-				<RevalidateIframe />
-			</Modal>
-		);
-	}
+		<Modal
+			title="Two-Factor Authentication"
+			onRequestClose={ goBack }
+			className="wporg-2fa__revalidate-modal"
+		>
+			<p>To update your two-factor options, you must first revalidate your session.</p>
 
-	return (
-		<Modal title="Confirm your Two Factor" onRequestClose={ goBack }>
-			<p>
-				Before you can update your Two Factor details, you first need to reconfirm your
-				existing login.
-			</p>
-			<Flex justify="right">
-				<Button variant="secondary" onClick={ goBack }>
-					Cancel
-				</Button>
-				<Button variant="primary" onClick={ showRevalidate }>
-					Continue
-				</Button>
-			</Flex>
+			<RevalidateIframe />
 		</Modal>
 	);
 }
