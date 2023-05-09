@@ -69,10 +69,7 @@ function Main( { userId } ) {
 	};
 
 	// The screens where a recent two factor challenge is required.
-	const twoFactorRequiredScreens = [
-		'totp',
-		'backup-codes',
-	];
+	const twoFactorRequiredScreens = [ 'totp', 'backup-codes' ];
 
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
@@ -145,11 +142,9 @@ function Main( { userId } ) {
 		twoFactorRequiredScreens.includes( screen ) &&
 		userRecord.record[ '2fa_available_providers' ] &&
 		userRecord.record[ '2fa_revalidation' ] &&
-		userRecord.record[ '2fa_revalidation' ].expires_at <= ( (new Date()).getTime()/1000 )
+		userRecord.record[ '2fa_revalidation' ].expires_at <= new Date().getTime() / 1000
 	) {
-		screenContent = (
-			<RevalidateModal />
-		);
+		screenContent = <RevalidateModal />;
 	} else {
 		screenContent = (
 			<Card>
