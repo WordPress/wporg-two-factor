@@ -79,9 +79,46 @@ function login_footer_revalidate_customizations() {
 
 	?>
 	<style>
-		body.login-action-revalidate_2fa #login h1,
-		body.login-action-revalidate_2fa #backtoblog {
+		.login-action-revalidate_2fa {
+			background: white;
+			padding: 0 32px;
+		}
+
+		.login-action-revalidate_2fa #login {
+			padding: unset;
+			width: auto;
+		}
+
+		.login-action-revalidate_2fa #login h1,
+		.login-action-revalidate_2fa #backtoblog,
+		.login-action-revalidate_2fa .two-factor-prompt + br {
 			display: none;
+		}
+
+		.login-action-revalidate_2fa #login_error {
+			box-shadow: none;
+			background-color: #f4a2a2;
+		}
+
+		.login-action-revalidate_2fa #loginform {
+			border: none;
+			padding: 0;
+			box-shadow: none;
+			margin-top: 0;
+			overflow: visible;
+		}
+
+		.login-action-revalidate_2fa #loginform .button-primary {
+			width: 100%;
+			float: unset;
+		}
+
+		.login-action-revalidate_2fa #login p {
+			font-size: 14px;
+		}
+
+		.login-action-revalidate_2fa .backup-methods-wrap {
+			padding: 0;
 		}
 	</style>
 	<script>

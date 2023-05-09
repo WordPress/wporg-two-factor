@@ -12,7 +12,7 @@ export default function RevalidateModal() {
 
 	const goBack = ( event ) => clickScreenLink( event, 'account-status' );
 
-		return (
+	return (
 		<Modal
 			title="Two-Factor Authentication"
 			onRequestClose={ goBack }
@@ -46,20 +46,17 @@ function RevalidateIframe() {
 		}
 
 		window.addEventListener( 'message', maybeRefreshUser );
+
 		return () => {
 			window.removeEventListener( 'message', maybeRefreshUser );
 		};
 	}, [] );
 
 	return (
-		<>
-			<iframe
-				title="Two Factor Revalidation"
-				ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
-				src={ userRecord.record[ '2fa_revalidation' ].revalidate_url }
-				width="400px"
-				height="400px"
-			/>
-		</>
+		<iframe
+			title="Two Factor Revalidation"
+			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+			src={ userRecord.record[ '2fa_revalidation' ].revalidate_url }
+		/>
 	);
 }
