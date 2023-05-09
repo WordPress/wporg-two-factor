@@ -35,7 +35,7 @@ function RevalidateIframe() {
 				return;
 			}
 
-			setGlobalNotice( message || 'Two Factor confirmed' );
+			setGlobalNotice( message || 'Two-Factor confirmed' );
 
 			// Pretend that the expires_at is in the future (+1hr), this provides a 'faster' UI.
 			// This intentionally doesn't use `edit()` to prevent it attempting to update it on the server.
@@ -54,7 +54,7 @@ function RevalidateIframe() {
 
 	return (
 		<iframe
-			title="Two Factor Revalidation"
+			title="Two-Factor Revalidation"
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			src={ userRecord.record[ '2fa_revalidation' ].revalidate_url }
 		/>
