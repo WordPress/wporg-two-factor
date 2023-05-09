@@ -1,3 +1,5 @@
+/* global jest, describe, beforeAll, afterEach, it, expect */
+
 /**
  * External dependencies
  */
@@ -62,8 +64,7 @@ describe( 'Password', () => {
 
 	describe( 'Messaging', () => {
 		const weakPasswordRegex = /That password is too easy to compromise/i;
-		const strongPasswordRegex =
-			/Your password is strong enough to be saved./i;
+		const strongPasswordRegex = /Your password is strong enough to be saved./i;
 
 		it( 'should not display any notice on load', () => {
 			useContext.mockReturnValue( mockContext );
@@ -80,7 +81,7 @@ describe( 'Password', () => {
 			expect( queryAllByText( strongPasswordRegex ) ).toHaveLength( 0 );
 		} );
 
-		it( 'should display the weak password notice', () => {
+		it( 'should display the weak password notice after submitting', () => {
 			// State: the user has updated their password to something weak
 			// although the strength is not tested here.
 			mockContext.userRecord.editedRecord.password = 'weak';
@@ -91,7 +92,7 @@ describe( 'Password', () => {
 			// We'll mock the password estimator to return a score of 1.
 			mockPasswordEstimator( 1 );
 
-			const { queryAllByText } = render( <Password />, {
+			const { queryAllByText, getAllByRole } = render( <Password />, {
 				wrapper: ( { children } ) => (
 					<GlobalContext.Provider value={ mockContext }>
 						{ children }
@@ -99,10 +100,13 @@ describe( 'Password', () => {
 				),
 			} );
 
+			// Find the submit button and click it.
+			const buttons = getAllByRole( 'button' );
+			const saveButton = buttons.filter( ( button ) => button.type === 'submit' )[ 0 ];
+			fireEvent.click( saveButton );
+
 			// We may have this message multiple times, because of 'speak'.
-			expect(
-				queryAllByText( weakPasswordRegex ).length
-			).toBeGreaterThanOrEqual( 1 );
+			expect( queryAllByText( weakPasswordRegex ).length ).toBeGreaterThanOrEqual( 1 );
 		} );
 
 		it( 'should display the strong password notice', () => {
@@ -125,9 +129,7 @@ describe( 'Password', () => {
 			} );
 
 			// We may have this message multiple times, because of 'speak'.
-			expect(
-				queryAllByText( strongPasswordRegex ).length
-			).toBeGreaterThanOrEqual( 1 );
+			expect( queryAllByText( strongPasswordRegex ).length ).toBeGreaterThanOrEqual( 1 );
 		} );
 	} );
 
@@ -136,9 +138,7 @@ describe( 'Password', () => {
 
 		const { getByLabelText } = render( <Password />, {
 			wrapper: ( { children } ) => (
-				<GlobalContext.Provider value={ mockContext }>
-					{ children }
-				</GlobalContext.Provider>
+				<GlobalContext.Provider value={ mockContext }>{ children }</GlobalContext.Provider>
 			),
 		} );
 
@@ -163,16 +163,12 @@ describe( 'Password', () => {
 
 		const { getAllByRole } = render( <Password />, {
 			wrapper: ( { children } ) => (
-				<GlobalContext.Provider value={ mockContext }>
-					{ children }
-				</GlobalContext.Provider>
+				<GlobalContext.Provider value={ mockContext }>{ children }</GlobalContext.Provider>
 			),
 		} );
 
 		const buttons = getAllByRole( 'button' );
-		const saveButton = buttons.filter(
-			( button ) => button.type === 'submit'
-		)[ 0 ];
+		const saveButton = buttons.filter( ( button ) => button.type === 'submit' )[ 0 ];
 		fireEvent.click( saveButton );
 
 		expect( mockContext.userRecord.save ).toHaveBeenCalled();
@@ -183,9 +179,7 @@ describe( 'Password', () => {
 
 		const { getByLabelText } = render( <Password />, {
 			wrapper: ( { children } ) => (
-				<GlobalContext.Provider value={ mockContext }>
-					{ children }
-				</GlobalContext.Provider>
+				<GlobalContext.Provider value={ mockContext }>{ children }</GlobalContext.Provider>
 			),
 		} );
 

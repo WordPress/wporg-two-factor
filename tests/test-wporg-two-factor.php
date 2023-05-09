@@ -1,6 +1,7 @@
 <?php
 
 use function WordPressdotorg\Two_Factor\{ user_requires_2fa };
+use function WordPressdotorg\MU_Plugins\Encryption\{ generate_encryption_key };
 
 defined( 'WPINC' ) || die();
 
@@ -19,6 +20,17 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 			'user_login' => 'regular_user',
 			'role'       => 'contributor',
 		) );
+
+		// Generate an encryption key for testing with.
+		if ( ! function_exists( 'wporg_encryption_keys' ) ) {
+			function wporg_encryption_keys() {
+				static $keys = null;
+
+				return $keys ?? $keys = [
+					'two-factor' => generate_encryption_key(),
+				];
+			}
+		}
 	}
 
 	/**
@@ -53,7 +65,9 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		// This should start counting at one instead of zero, to match `Two_Factor_Core`.
 		update_user_meta( $user_id, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, array( 1 => 'Two_Factor_Totp' ) );
 		update_user_meta( $user_id, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Totp' );
-		update_user_meta( $user_id, Two_Factor_Totp::SECRET_META_KEY, 'foo bar bax quiz' );
+
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_provider->set_user_totp_key( $user_id, $totp_provider->generate_key() );
 
 		$this->assertTrue( Two_Factor_Core::is_user_using_two_factor( $user_id ) );
 	}
@@ -225,19 +239,56 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 
 		// Enable TOTP (as secondary).
-		$totp_provider = Two_Factor_Totp::get_instance();
-		$totp_provider->set_user_totp_key( self::$regular_user->ID, Two_Factor_Totp::generate_key() );
-		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
-
-		$expected = 'Two_Factor_Totp';
-		$actual   = get_class( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_provider->set_user_totp_key( self::$regular_user->ID, $totp_provider->generate_key() );
+		$enabled       = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
 		$this->assertTrue( $enabled );
-		$this->assertSame( $expected, $actual );
+
+		// Validate that the TOTP key was stored in an encrypted form.
+		$totp_key       = $totp_provider->get_user_totp_key( self::$regular_user->ID );
+		$totp_user_meta = get_user_meta( self::$regular_user->ID, $totp_provider::SECRET_META_KEY, true );
+		$this->assertNotSame( $totp_key, $totp_user_meta );
+
+		// Validate that TOTP is now the primary provider.
+		$provider       = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+		$expected_class = 'WordPressdotorg\Two_Factor\Encrypted_Totp_Provider';
+		$actual_class   = get_class( $provider );
+		$this->assertSame( $expected_class, $actual_class );
+
+		$expected_key = 'Two_Factor_Totp';
+		$actual_key   = $provider->get_key();
+		$this->assertSame( $expected_key, $provider->get_key() );
 
 		// Validate that Backup Codes are now available as secondary.
 		$expected = [ 'Two_Factor_Backup_Codes', 'Two_Factor_Totp' ];
 		$actual   = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Verify that the TOTP key is encrypted if a non-encrypted key is encounted.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\Encrypted_Totp_Provider::get_user_totp_key
+	 * @covers WordPressdotorg\Two_Factor\Encrypted_Totp_Provider::set_user_totp_key
+	 */
+	public function test_totp_key_upgraded_to_encrypted() {
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_key      = $totp_provider->generate_key();
+
+		// Set the user meta with the unencrypted key
+		update_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, $totp_key );
+		$meta_value = get_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, true );
+		$this->assertSame( $totp_key, $meta_value );
+
+		// Fetch the key, triggering the encryption upgrade.
+		$returned_key = $totp_provider->get_user_totp_key( self::$regular_user->ID );
+		$this->assertSame( $totp_key, $returned_key );
+
+		// Check the user meta has been encrypted.
+		$meta_value = get_user_meta( self::$regular_user->ID, Two_Factor_Totp::SECRET_META_KEY, true );
+		$this->assertNotSame( $totp_key, $meta_value );
+		$this->assertTrue( wporg_is_encrypted( $meta_value ) );
+
 	}
 }

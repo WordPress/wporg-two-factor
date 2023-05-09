@@ -1,41 +1,46 @@
 /**
  * WordPress dependencies
  */
-import apiFetch                                         from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
-import { Button, CheckboxControl, Notice, Spinner }     from '@wordpress/components';
-import { Icon, warning }                                from '@wordpress/icons';
+import { Button, CheckboxControl, Notice, Spinner } from '@wordpress/components';
+import { Icon, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities';
-import SetupProgressBar  from './setup-progress-bar';
 
 /**
  * Setup and manage backup codes.
  */
 export default function BackupCodes() {
-	const { userRecord }                    = useContext( GlobalContext );
+	const { userRecord } = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
-	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ) ? 'enabled' : 'disabled';
+	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes(
+		'Two_Factor_Backup_Codes'
+	)
+		? 'enabled'
+		: 'disabled';
 
 	if ( 'enabled' === backupCodesStatus && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
-	} else {
-		return <Setup setRegenerating={ setRegenerating } />;
 	}
+	return <Setup setRegenerating={ setRegenerating } />;
 }
 
 /**
  * Setup the Backup Codes provider.
+ *
+ * @param props
+ * @param props.setRegenerating
  */
 function Setup( { setRegenerating } ) {
 	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
-	const [ hasPrinted, setHasPrinted ]   = useState( false );
+	const [ hasPrinted, setHasPrinted ] = useState( false );
 
 	// Generate new backup codes and save them in usermeta.
 	useEffect( () => {
@@ -51,7 +56,7 @@ function Setup( { setRegenerating } ) {
 				data: {
 					user_id: userRecord.record.id,
 					enable_provider: true,
-				}
+				},
 			} );
 
 			setBackupCodes( response.codes );
@@ -70,11 +75,10 @@ function Setup( { setRegenerating } ) {
 
 	return (
 		<>
-			<SetupProgressBar step="backup-codes" />
-
 			<p>
-				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
-				Each code can only be used once.
+				Backup codes let you access your account if your primary two-factor authentication
+				method is unavailable, like if your phone is lost or stolen. Each code can only be
+				used once.
 			</p>
 
 			<p>Please print the codes and keep them in a safe place.</p>
@@ -83,8 +87,9 @@ function Setup( { setRegenerating } ) {
 
 			<Notice status="warning" isDismissible={ false }>
 				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-				Without access to the one-time password app or a backup code, you will lose access to your account.
-				Once you navigate away from this page, you will not be able to view these codes again.
+				Without access to the one-time password app or a backup code, you will lose access
+				to your account. Once you navigate away from this page, you will not be able to view
+				these codes again.
 			</Notice>
 
 			<CheckboxControl
@@ -94,11 +99,7 @@ function Setup( { setRegenerating } ) {
 			/>
 
 			<p>
-				<Button
-					isPrimary
-					disabled={ ! hasPrinted }
-					onClick={ handleFinished }
-				>
+				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
 					All Finished
 				</Button>
 			</p>
@@ -108,60 +109,74 @@ function Setup( { setRegenerating } ) {
 
 /**
  * Display a list of backup codes
+ *
+ * @param props
+ * @param props.codes
  */
 function CodeList( { codes } ) {
 	return (
 		<div className="wporg-2fa__backup-codes-list">
-			{ ! codes.length &&
+			{ ! codes.length && (
 				<p>
 					Generating backup codes...
 					<Spinner />
 				</p>
-			}
+			) }
 
-			{ codes.length > 0 &&
+			{ codes.length > 0 && (
 				<ol>
 					{ codes.map( ( code ) => {
 						return (
-							 <li key={ code } className="wporg-2fa__token">
-								 { code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
-							 </li>
-						)
+							<li key={ code } className="wporg-2fa__token">
+								{ code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
+							</li>
+						);
 					} ) }
 				</ol>
-			}
+			) }
 		</div>
 	);
 }
 
 /**
  * Render the screen where users can manage Backup Codes.
+ *
+ * @param props
+ * @param props.setRegenerating
  */
 function Manage( { setRegenerating } ) {
 	const { userRecord } = useContext( GlobalContext );
-	const remaining      = userRecord.record[ '2fa_backup_codes_remaining' ];
+	const remaining = userRecord.record[ '2fa_backup_codes_remaining' ];
 
 	return (
 		<>
 			<p>
-				Backup codes let you access your account if your primary two-factor authentication method is unavailable, like if your phone is lost or stolen.
-				Each code can only be used once.
+				Backup codes let you access your account if your primary two-factor authentication
+				method is unavailable, like if your phone is lost or stolen. Each code can only be
+				used once.
 			</p>
 
-			{ remaining > 5 &&
-				<p>You have <strong>{ remaining }</strong> backup codes remaining.</p>
-			}
+			{ remaining > 5 && (
+				<p>
+					You have <strong>{ remaining }</strong> backup codes remaining.
+				</p>
+			) }
 
-			{ remaining <= 5 &&
+			{ remaining <= 5 && (
 				<Notice status="warning" isDismissible={ false }>
 					<Icon icon={ warning } />
-					You only have <strong>{ remaining }</strong> backup codes remaining.
-					Please regenerate and save new ones before you run out.
-					If you don't, you won't be able to log into your account if you lose your phone.
+					You only have <strong>{ remaining }</strong> backup codes remaining. Please
+					regenerate and save new ones before you run out. If you don&apos;t, you
+					won&apos;t be able to log into your account if you lose your phone.
 				</Notice>
-			}
+			) }
 
-			<Button isSecondary onClick={ () => { setRegenerating( true ) } }>
+			<Button
+				isSecondary
+				onClick={ () => {
+					setRegenerating( true );
+				} }
+			>
 				Generate new backup codes
 			</Button>
 		</>

@@ -1,9 +1,9 @@
-
 /**
  * WordPress dependencies
  */
 import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
+import { Icon, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,19 +14,19 @@ import { GlobalContext } from '../script';
  * Render the Email setting.
  */
 export default function EmailAddress() {
-	const { userRecord }                                           = useContext( GlobalContext );
+	const { userRecord } = useContext( GlobalContext );
 	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord;
-	const [ emailError, setEmailError ]                            = useState( '' );
-	const [ justChangedEmail, setJustChangedEmail ]                = useState( false );
+	const [ emailError, setEmailError ] = useState( '' );
+	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
 
 	const handleSave = useCallback( async () => {
 		try {
-			setEmailError('');
+			setEmailError( '' );
 
 			await save();
 
 			setJustChangedEmail( true );
-		} catch( error ) {
+		} catch ( error ) {
 			let message = error.message;
 
 			if ( 'rest_user_invalid_email' === error.code ) {
@@ -43,56 +43,60 @@ export default function EmailAddress() {
 		try {
 			await edit( { pending_email: '' } );
 			await save();
-		} catch( error ) {
-			alert( error.message );
+		} catch ( error ) {
+			setEmailError( error.message );
 		}
 	}, [] );
 
 	return (
 		<>
-			{ record.pending_email && ! justChangedEmail &&
+			{ record.pending_email && ! justChangedEmail && (
 				<Notice
 					status="warning"
 					className="actions-on-right"
 					isDismissible={ false }
-					actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }
+					actions={ [ { label: 'Cancel change', onClick: handleDiscard } ] }
 				>
 					<p>
 						There is a pending email change to { record.pending_email }.<br />
 						Please check your email for a confirmation link.
 					</p>
 				</Notice>
-			}
+			) }
 
-			{ record.pending_email && justChangedEmail &&
+			{ record.pending_email && justChangedEmail && (
 				<Notice
 					status="success"
 					className="actions-on-right"
 					isDismissible={ false }
-					actions={ [ { label: "Cancel change", onClick: handleDiscard } ] }
+					actions={ [ { label: 'Cancel change', onClick: handleDiscard } ] }
 				>
 					<p>
-						Please check your email for a confirmation email.<br />
+						Please check your email for a confirmation email.
+						<br />
 						If { record.pending_email } is incorrect, simply enter a new email below.
 					</p>
 				</Notice>
-			}
+			) }
 
-			<p>
-				To change your email address enter a new one below.
-			</p>
+			<p>To change your email address enter a new one below.</p>
 
 			<TextControl
 				type="email"
 				help="We will send you a verification email before updating your email address."
 				label="Your email address"
 				size="62"
-				placeholder="my-email-address@example.org"
+				placeholder="Enter email address..."
 				value={ editedRecord.email ?? record.email }
-				onChange={ (email) => edit( { email } ) }
+				onChange={ ( email ) => edit( { email } ) }
 			/>
 
-			{ emailError && <p className="email-error">{ emailError }</p> }
+			{ emailError && (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ emailError }
+				</Notice>
+			) }
 
 			<p>
 				<Button
@@ -102,10 +106,12 @@ export default function EmailAddress() {
 				>
 					{ isSaving ? (
 						<>
-							<Spinner/>
+							<Spinner />
 							Updating
 						</>
-					) : 'Update Email Address' }
+					) : (
+						'Update Email Address'
+					) }
 				</Button>
 			</p>
 		</>

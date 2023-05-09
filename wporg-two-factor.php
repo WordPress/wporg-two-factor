@@ -244,6 +244,15 @@ function get_edit_account_url() : string {
 	return $url;
 }
 
+/*
+ * Switch out the TOTP provider for one that encrypts the TOTP key.
+ */
+add_filter( 'two_factor_provider_classname_Two_Factor_Totp', function( string $provider ) : string {
+	require_once __DIR__ . '/class-encrypted-totp-provider.php';
+
+	return __NAMESPACE__ . '\Encrypted_Totp_Provider';
+} );
+
 // Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
 // Hotfix for https://github.com/WordPress/gutenberg/pull/48268
 add_filter( 'block_type_metadata', function( $metadata ) {

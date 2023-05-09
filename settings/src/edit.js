@@ -10,11 +10,11 @@ import { Placeholder } from '@wordpress/components';
  */
 export default function Edit() {
 	return (
-		<div { ...useBlockProps() } >
+		<div { ...useBlockProps() }>
 			<Placeholder
 				instructions={ __( 'Not rendered in editor.', 'wporg' ) }
 				label={ __( 'Two-Factor Authentication', 'wporg' ) }
-			> </Placeholder>
+			/>
 		</div>
 	);
 }
