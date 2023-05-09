@@ -8,7 +8,7 @@ import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities'
 
 export default function RevalidateModal( { screen } ) {
-	const { userRecord, clickScreenLink } = useContext( GlobalContext );
+	const { clickScreenLink } = useContext( GlobalContext );
 	const [ showIframe, setIframe ] = useState( false );
 
 	const goBack = ( event ) => clickScreenLink( event, 'account-status' ); 
@@ -40,7 +40,7 @@ export default function RevalidateModal( { screen } ) {
 }
 
 function RevalidateIframe( { screen } ) {
-	const { setGlobalNotice, setScreen, userRecord } = useContext( GlobalContext );
+	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
 	const ref = useRef();
 
 	useEffect( () => {
