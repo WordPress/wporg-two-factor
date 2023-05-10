@@ -57,9 +57,7 @@ function two_factor_providers( array $providers ) : array {
 		'Two_Factor_Backup_Codes' => '',
 	);
 
-	$providers = array_intersect_key( $providers, $desired_providers );
-
-	return $providers;
+	return array_intersect_key( $providers, $desired_providers );
 }
 
 /**
