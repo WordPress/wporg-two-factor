@@ -11,6 +11,7 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
+use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
 use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
@@ -27,6 +28,15 @@ function is_2fa_beta_tester() : bool {
 }
 
 require_once __DIR__ . '/settings/settings.php';
+
+/*
+ * Make sure the WebAuthn plugin loads early, because all of our functions that call
+ * `Two_Factor_Core::is_user_using_two_factor()` etc assume that all providers are loaded. If WebAuthn is loaded
+ * too late, then `remove_capabilities_until_2fa_enabled()` would cause `get_enable_2fa_notice()` to be shown on
+ * the front end if WebAuthn is enabled and TOTP isn't.
+ */
+$webauthn = WebAuthn_Plugin::instance();
+$webauthn->init();
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
