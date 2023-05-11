@@ -1,0 +1,34 @@
+.wporg-2fa__revalidate-modal {
+	$header-height: 100px;
+
+	&.components-modal__frame {
+		border-radius: 8px;
+	}
+
+	.components-modal__header {
+		height: $header-height;
+
+		h1 {
+			margin: unset;
+		}
+	}
+	
+	.components-modal__content {
+		margin-top: $header-height;
+		padding: 0;
+	}
+
+	p {
+		margin: 0 32px 1rem;
+		// Match style of login page text in iframe
+		font-size: 14px;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	}
+
+	iframe {
+		border: none;
+		width: 100%;
+		// Allow for error messages above form
+		height: 330px;
+	}
+}

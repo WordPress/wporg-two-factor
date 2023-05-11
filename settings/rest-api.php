@@ -175,6 +175,24 @@ function register_user_fields(): void {
 			],
 		]
 	);
+
+	register_rest_field(
+		'user',
+		'2fa_revalidation',
+		[
+			'get_callback' => function( $user ) {
+				$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url( true );
+				$expiry         = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, $user['id'], '' );
+				$expires_at     = Two_Factor_Core::is_current_user_session_two_factor() + $expiry;
+
+				return compact( 'revalidate_url', 'expires_at' );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
 }
 
 /**

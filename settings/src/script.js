@@ -23,6 +23,7 @@ import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
+import RevalidateModal from './components/revalidate-modal';
 
 export const GlobalContext = createContext( null );
 
@@ -66,6 +67,9 @@ function Main( { userId } ) {
 		totp: TOTP,
 		'backup-codes': BackupCodes,
 	};
+
+	// The screens where a recent two factor challenge is required.
+	const twoFactorRequiredScreens = [ 'totp', 'backup-codes' ];
 
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 
@@ -126,40 +130,50 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
-	let screenContent;
+	let screenContent = (
+		<Card>
+			<CardHeader className="wporg-2fa__navigation" size="xSmall">
+				<ScreenLink
+					screen="account-status"
+					ariaLabel="Back to the account status page"
+					anchorText={
+						<>
+							<Icon icon={ chevronLeft } />
+							Back
+						</>
+					}
+				/>
+
+				<h3>
+					{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }
+				</h3>
+			</CardHeader>
+
+			<CardBody className={ 'wporg-2fa__' + screen }>
+				<CurrentScreen />
+			</CardBody>
+		</Card>
+	);
 
 	if ( 'account-status' === screen ) {
 		screenContent = (
-			<div className={ 'wporg-2fa__' + screen }>
+			<div className={ 'wporg-2fa__account-status' }>
 				<AccountStatus />
 			</div>
 		);
-	} else {
+	} else if (
+		twoFactorRequiredScreens.includes( screen ) &&
+		userRecord.record[ '2fa_available_providers' ] &&
+		userRecord.record[ '2fa_revalidation' ] &&
+		userRecord.record[ '2fa_revalidation' ].expires_at <= new Date().getTime() / 1000
+	) {
 		screenContent = (
-			<Card>
-				<CardHeader className="wporg-2fa__navigation" size="xSmall">
-					<ScreenLink
-						screen="account-status"
-						ariaLabel="Back to the account status page"
-						anchorText={
-							<>
-								<Icon icon={ chevronLeft } />
-								Back
-							</>
-						}
-					/>
-
-					<h3>
-						{ screen
-							.replace( '-', ' ' )
-							.replace( 'totp', 'Two-Factor Authentication' ) }
-					</h3>
-				</CardHeader>
-
-				<CardBody className={ 'wporg-2fa__' + screen }>
-					<CurrentScreen />
-				</CardBody>
-			</Card>
+			<>
+				<div className={ 'wporg-2fa__account-status' }>
+					<AccountStatus />
+				</div>
+				<RevalidateModal />
+			</>
 		);
 	}
 

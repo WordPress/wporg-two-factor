@@ -31,6 +31,9 @@ function replace_core_ui_with_custom() : void {
 	remove_action( 'edit_user_profile_update', array( 'Two_Factor_Core', 'user_two_factor_options_update' ) );
 
 	add_action( 'bbp_user_edit_account', __NAMESPACE__ . '\render_custom_ui' );
+
+	// Add some customizations to the revalidate_2fa page for when it's displayed in an iframe.
+	add_action( 'login_footer', __NAMESPACE__ . '\login_footer_revalidate_customizations' );
 }
 
 /**
@@ -63,3 +66,74 @@ function render_custom_ui() : void {
 
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }
+
+function login_footer_revalidate_customizations() {
+	// When the revalidate_2fa page is displayed in an interim login on not-login, add some style and JS handlers.
+	if (
+		'login.wordpress.org' === $_SERVER['HTTP_HOST'] ||
+		empty( $_REQUEST['interim-login'] ) ||
+		'revalidate_2fa' !== ( $_REQUEST['action'] ?? '' )
+	) {
+		return;
+	}
+
+	?>
+	<style>
+		.login-action-revalidate_2fa {
+			background: white;
+			padding: 0 32px;
+		}
+
+		.login-action-revalidate_2fa #login {
+			padding: unset;
+			width: auto;
+		}
+
+		.login-action-revalidate_2fa #login h1,
+		.login-action-revalidate_2fa #backtoblog,
+		.login-action-revalidate_2fa .two-factor-prompt + br {
+			display: none;
+		}
+
+		.login-action-revalidate_2fa #login_error {
+			box-shadow: none;
+			background-color: #f4a2a2;
+		}
+
+		.login-action-revalidate_2fa #loginform {
+			border: none;
+			padding: 0;
+			box-shadow: none;
+			margin-top: 0;
+			overflow: visible;
+		}
+
+		.login-action-revalidate_2fa #loginform .button-primary {
+			width: 100%;
+			float: unset;
+		}
+
+		.login-action-revalidate_2fa #login p {
+			font-size: 14px;
+		}
+
+		.login-action-revalidate_2fa .backup-methods-wrap {
+			padding: 0;
+		}
+	</style>
+	<script>
+		(function() {
+			const loginFormExists  = !! document.querySelector( '#loginform' );
+			const loginFormMessage = document.querySelector( '#login .message' )?.textContent || '';
+
+			// If the login no longer exists, let the parent know.
+			if ( ! loginFormExists ) {
+				window.parent.postMessage( { type: 'reValidationComplete', message: loginFormMessage }, '*' );
+			}
+		})();
+	</script>
+	<?php
+}
+
+// To test, revalidate every 30seconds.
+// add_filter( 'two_factor_revalidate_time', function() { return 30; } );
