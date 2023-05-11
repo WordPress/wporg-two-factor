@@ -134,6 +134,3 @@ function login_footer_revalidate_customizations() {
 	</script>
 	<?php
 }
-
-// To test, revalidate every 30seconds.
-// add_filter( 'two_factor_revalidate_time', function() { return 30; } );
