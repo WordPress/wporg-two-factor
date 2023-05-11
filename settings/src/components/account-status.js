@@ -18,14 +18,20 @@ export default function AccountStatus() {
 	const { userRecord } = useContext( GlobalContext );
 	const { record } = userRecord;
 	const emailStatus = record.pending_email ? 'pending' : 'ok';
-	const totpStatus = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' )
-		? 'enabled'
-		: 'disabled';
-	const backupCodesStatus = record[ '2fa_available_providers' ].includes(
-		'Two_Factor_Backup_Codes'
-	)
-		? 'enabled'
-		: 'disabled';
+	const totpEnabled = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' );
+	const webAuthnEnabled = record[ '2fa_available_providers' ].includes(
+		'TwoFactor_Provider_WebAuthn'
+	);
+	const primaryProviderEnabled = totpEnabled || webAuthnEnabled;
+	const backupCodesEnabled =
+		record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
+
+	const backupBodyText =
+		! backupCodesEnabled && ! primaryProviderEnabled
+			? 'Please enable Two-Factor Authentication before enabling backup codes.'
+			: `You have
+				${ backupCodesEnabled ? '' : 'not' }
+				verified your backup codes for two-factor authentication.`;
 
 	return (
 		<>
@@ -49,10 +55,10 @@ export default function AccountStatus() {
 
 			<SettingStatusCard
 				screen="totp"
-				status={ totpStatus }
+				status={ totpEnabled }
 				headerText="Two-Factor Authentication"
 				bodyText={
-					'enabled' === totpStatus
+					totpEnabled
 						? /* @todo update this when hardware tokens become an additional option. */
 						  'You have two-factor authentication enabled using an app.'
 						: 'You do not have two-factor authentication enabled.'
@@ -61,11 +67,10 @@ export default function AccountStatus() {
 
 			<SettingStatusCard
 				screen="backup-codes"
-				status={ backupCodesStatus }
+				status={ backupCodesEnabled }
 				headerText="Two-Factor Backup Codes"
-				bodyText={ `You have ${
-					'enabled' === backupCodesStatus ? '' : 'not'
-				} verified your backup codes for two-factor authentication.` }
+				bodyText={ backupBodyText }
+				disabled={ ! backupCodesEnabled }
 			/>
 		</>
 	);
@@ -79,27 +84,29 @@ export default function AccountStatus() {
  * @param props.status
  * @param props.headerText
  * @param props.bodyText
+ * @param props.disabled
  */
-function SettingStatusCard( { screen, status, headerText, bodyText } ) {
+function SettingStatusCard( { screen, status, headerText, bodyText, disabled = false } ) {
+	const cardContent = (
+		<CardBody>
+			<StatusIcon status={ status } />
+			<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
+				{ headerText }
+			</h3>
+			<p>{ bodyText }</p>
+			<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
+		</CardBody>
+	);
+
+	let classes = 'wporg-2fa__status-card wporg-2fa__status-card-' + screen;
+
+	if ( disabled ) {
+		classes += ' is-disabled';
+	}
+
 	return (
-		<Card className={ 'wporg-2fa__status-card wporg-2fa__status-card-' + screen }>
-			<ScreenLink
-				screen={ screen }
-				anchorText={
-					<CardBody>
-						<StatusIcon status={ status } />
-						<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
-							{ headerText }
-						</h3>
-						<p>{ bodyText }</p>
-						<Icon
-							icon={ chevronRight }
-							size={ 26 }
-							className="wporg-2fa__status-card-open"
-						/>
-					</CardBody>
-				}
-			/>
+		<Card className={ classes }>
+			{ disabled ? cardContent : <ScreenLink screen={ screen } anchorText={ cardContent } /> }
 		</Card>
 	);
 }
@@ -112,6 +119,10 @@ function SettingStatusCard( { screen, status, headerText, bodyText } ) {
  */
 function StatusIcon( { status } ) {
 	let icon;
+
+	if ( 'boolean' === typeof status ) {
+		status = status ? 'enabled' : 'disabled';
+	}
 
 	switch ( status ) {
 		case 'ok':

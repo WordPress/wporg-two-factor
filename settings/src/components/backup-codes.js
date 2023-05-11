@@ -19,13 +19,10 @@ export default function BackupCodes() {
 	const { userRecord } = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
-	const backupCodesStatus = userRecord.record[ '2fa_available_providers' ].includes(
-		'Two_Factor_Backup_Codes'
-	)
-		? 'enabled'
-		: 'disabled';
+	const backupCodesEnabled =
+		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 
-	if ( 'enabled' === backupCodesStatus && ! regenerating ) {
+	if ( backupCodesEnabled && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
 	}
 	return <Setup setRegenerating={ setRegenerating } />;
