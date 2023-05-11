@@ -55,7 +55,7 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 	 * Test whether encryption is available.
 	 */
 	private static function encryption_enabled() {
-		if ( ! function_exists( 'wporg_is_encrypted' ) )
+		if ( ! function_exists( 'wporg_is_encrypted' ) ) {
 			return false;
 		}
 
