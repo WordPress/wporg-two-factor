@@ -18,7 +18,8 @@ import { useRef, useCallback } from '@wordpress/element';
  * @see https://stackoverflow.com/a/66759105/450127
  */
 export default function NumericControl( props ) {
-	const { autoComplete, pattern, title, onChange, onKeyDown, index } = props;
+	const { autoComplete, pattern, title, onChange, onKeyDown, index, value, maxLength, required } =
+		props;
 
 	const inputRef = useRef( null );
 
@@ -36,7 +37,6 @@ export default function NumericControl( props ) {
 
 	return (
 		<input
-			{ ...props }
 			type="text"
 			inputMode="numeric"
 			ref={ inputRef }
@@ -46,6 +46,9 @@ export default function NumericControl( props ) {
 			onChange={ handleChange }
 			onKeyDown={ handleKeyDown }
 			data-1p-ignore // Prevent 1Password from showing up
+			value={ value }
+			maxLength={ maxLength }
+			required={ required }
 		/>
 	);
 }
