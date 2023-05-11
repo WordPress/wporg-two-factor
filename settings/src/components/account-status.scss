@@ -5,6 +5,12 @@
 			z-index: 1;
 		}
 
+		&.is-disabled,
+		&.is-disabled .wporg-2fa__status-card-open {
+			opacity: .6;
+			cursor: not-allowed;
+		}
+
 		a {
 			display: block;
 			text-decoration: none;
