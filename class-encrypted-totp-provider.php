@@ -21,7 +21,7 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 	 * @return bool True if the key was saved, false otherwise.
 	 */
 	public function set_user_totp_key( $user_id, $key ) {
-		if ( function_exists( 'wporg_encrypt' ) ) {
+		if ( self::encryption_enabled() ) {
 			$key = wporg_encrypt( $key, (string) $user_id, 'two-factor' );
 		}
 
@@ -39,7 +39,7 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 	public function get_user_totp_key( $user_id ) {
 		$key = parent::get_user_totp_key( $user_id );
 
-		if ( $key && function_exists( 'wporg_is_encrypted' ) ) {
+		if ( $key && self::encryption_enabled() ) {
 			if ( wporg_is_encrypted( $key ) ) {
 				$key = (string) wporg_decrypt( $key, (string) $user_id, 'two-factor' );
 			} else {
@@ -49,5 +49,22 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 		}
 
 		return $key;
+	}
+
+	/**
+	 * Test whether encryption is available.
+	 */
+	private static function encryption_enabled() {
+		if ( ! function_exists( 'wporg_is_encrypted' ) )
+			return false;
+		}
+
+		// On local systems, encryption is not enabled if the constant is missing.
+		if ( 'local' == wp_get_environment_type() && ! defined( 'WPORG_TWO_FACTOR_ENCRYPTION_KEY' ) ) {
+			return false;
+		}
+
+		// Else, encryption functions are available, it's not local, or keys are defined.
+		return true;
 	}
 }
