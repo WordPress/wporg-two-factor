@@ -163,9 +163,8 @@ function Main( { userId } ) {
 		);
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
-		userRecord.record[ '2fa_available_providers' ] &&
-		userRecord.record[ '2fa_revalidation' ] &&
-		userRecord.record[ '2fa_revalidation' ].expires_at <= new Date().getTime() / 1000
+		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) &&
+		userRecord.record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
 	) {
 		screenContent = (
 			<>
