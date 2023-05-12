@@ -34,7 +34,7 @@ export default function AccountStatus() {
 				verified your backup codes for two-factor authentication.`;
 
 	return (
-		<>
+		<div className={ 'wporg-2fa__account-status' }>
 			<SettingStatusCard
 				screen="password"
 				status="enabled"
@@ -72,7 +72,7 @@ export default function AccountStatus() {
 				bodyText={ backupBodyText }
 				disabled={ ! backupCodesEnabled }
 			/>
-		</>
+		</div>
 	);
 }
 

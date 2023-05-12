@@ -156,21 +156,15 @@ function Main( { userId } ) {
 	);
 
 	if ( 'account-status' === screen ) {
-		screenContent = (
-			<div className={ 'wporg-2fa__account-status' }>
-				<AccountStatus />
-			</div>
-		);
+		screenContent = <AccountStatus />;
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) &&
-		userRecord.record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
+		record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) &&
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
 	) {
 		screenContent = (
 			<>
-				<div className={ 'wporg-2fa__account-status' }>
-					<AccountStatus />
-				</div>
+				<AccountStatus />
 				<RevalidateModal />
 			</>
 		);
