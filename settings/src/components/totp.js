@@ -222,21 +222,17 @@ function createQrCode( data ) {
  * @param props.setError
  */
 function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
-	const [ isInputComplete, setIsInputComplete ] = useState( false );
-
 	useEffect( () => {
 		if ( error && inputs.some( ( input ) => input === '' ) ) {
 			setError( '' );
 		}
 	}, [ error, inputs ] );
 
-	const handleComplete = useCallback( ( isComplete ) => setIsInputComplete( isComplete ), [] );
 	const handleClearClick = useCallback( () => {
 		setInputs( Array( 6 ).fill( '' ) );
-		setIsInputComplete( false );
 	}, [] );
 
-	const canSubmit = qrCodeUrl && secretKey && isInputComplete;
+	const canSubmit = qrCodeUrl && secretKey && inputs.every( ( input ) => !! input );
 
 	return (
 		<Flex
@@ -254,12 +250,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 				<p>Enter the six digit code provided by the app:</p>
 
-				<AutoTabbingInput
-					inputs={ inputs }
-					setInputs={ setInputs }
-					error={ error }
-					onComplete={ handleComplete }
-				/>
+				<AutoTabbingInput inputs={ inputs } setInputs={ setInputs } error={ error } />
 
 				<div className="wporg-2fa__submit-btn-container">
 					<Button

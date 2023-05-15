@@ -9,27 +9,13 @@ import { useCallback } from '@wordpress/element';
 import NumericControl from './numeric-control';
 
 const AutoTabbingInput = ( props ) => {
-	const { inputs, setInputs, onComplete, error } = props;
+	const { inputs, setInputs, error } = props;
 
 	const handleChange = useCallback( ( value, event, index, inputRef ) => {
 		setInputs( ( prevInputs ) => {
 			const newInputs = [ ...prevInputs ];
 
-			// Clean input
-			if ( value.trim() === '' ) {
-				event.target.value = '';
-				value = '';
-			}
-
-			newInputs[ index ] = value;
-
-			// Check if all inputs are filled
-			const allFilled = newInputs.every( ( input ) => '' !== input );
-			if ( allFilled && onComplete ) {
-				onComplete( true );
-			} else {
-				onComplete( false );
-			}
+			newInputs[ index ] = value.trim() === '' ? '' : value;
 
 			return newInputs;
 		} );
@@ -51,7 +37,6 @@ const AutoTabbingInput = ( props ) => {
 		if ( inputs.length === paste.length ) {
 			event.preventDefault();
 			setInputs( paste.split( '' ) );
-			onComplete( true );
 		}
 	}, [] );
 
