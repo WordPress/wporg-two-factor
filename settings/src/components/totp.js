@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, Flex } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { RawHTML, useCallback, useContext, useEffect, useState } from '@wordpress/element';
+import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -222,11 +222,17 @@ function createQrCode( data ) {
  * @param props.setError
  */
 function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
+	const inputsRef = useRef( inputs );
+
 	useEffect( () => {
-		if ( error && inputs.some( ( input ) => input === '' ) ) {
+		const prevInputs = inputsRef.current;
+		inputsRef.current = inputs;
+
+		// Clear the error if any of the inputs have changed
+		if ( error && inputs.some( ( input, index ) => input !== prevInputs[ index ] ) ) {
 			setError( '' );
 		}
-	}, [ error, inputs ] );
+	}, [ error, inputs, inputsRef ] );
 
 	const handleClearClick = useCallback( () => {
 		setInputs( Array( 6 ).fill( '' ) );
