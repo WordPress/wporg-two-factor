@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
 import NumericControl from './numeric-control';
 
 const AutoTabbingInput = ( props ) => {
-	const { inputs, setInputs, error } = props;
+	const { inputs, setInputs, error, setError } = props;
 
 	const handleChange = useCallback( ( value, event, index, inputRef ) => {
 		setInputs( ( prevInputs ) => {
@@ -32,11 +32,17 @@ const AutoTabbingInput = ( props ) => {
 	}, [] );
 
 	const handlePaste = useCallback( ( event ) => {
-		const paste = event.clipboardData.getData( 'Text' ).replace( /[^0-9]/g, '' );
+		event.preventDefault();
 
-		if ( inputs.length === paste.length ) {
-			event.preventDefault();
-			setInputs( paste.split( '' ) );
+		const newInputs = event.clipboardData
+			.getData( 'Text' )
+			.replace( /[^0-9]/g, '' )
+			.split( '' );
+
+		if ( inputs.length === newInputs.length ) {
+			setInputs( newInputs );
+		} else {
+			setError( 'The code you pasted is not the correct length.' );
 		}
 	}, [] );
 

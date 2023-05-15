@@ -250,7 +250,12 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 				<p>Enter the six digit code provided by the app:</p>
 
-				<AutoTabbingInput inputs={ inputs } setInputs={ setInputs } error={ error } />
+				<AutoTabbingInput
+					inputs={ inputs }
+					setInputs={ setInputs }
+					error={ error }
+					setError={ setError }
+				/>
 
 				<div className="wporg-2fa__submit-btn-container">
 					<Button
