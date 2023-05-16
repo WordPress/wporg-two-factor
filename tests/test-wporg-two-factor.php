@@ -1,6 +1,6 @@
 <?php
 
-use function WordPressdotorg\Two_Factor\{ user_requires_2fa };
+use function WordPressdotorg\Two_Factor\{ user_requires_2fa, has_ordinary_provider };
 use function WordPressdotorg\MU_Plugins\Encryption\{ generate_encryption_key };
 
 defined( 'WPINC' ) || die();
@@ -68,6 +68,43 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$totp_provider->set_user_totp_key( $user_id, $totp_provider->generate_key() );
 
 		$this->assertTrue( Two_Factor_Core::is_user_using_two_factor( $user_id ) );
+	}
+
+	/**
+	 * Test that Backup Codes can't be used as the only provider.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\require_ordinary_provider
+	 */
+	public function test_require_ordinary_provider() {
+		// Enable TOTP.
+		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
+		$totp_provider->set_user_totp_key( self::$regular_user->ID, $totp_provider->generate_key() );
+		$enabled       = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
+		$this->assertTrue( $enabled );
+
+		// Enable backup codes.
+		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
+		$backup_codes_provider->generate_codes( self::$regular_user );
+		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
+		$this->assertTrue( $enabled );
+
+		$expected = [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ];
+		$actual   = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
+		$this->assertSame( $expected, $actual );
+
+		// Backup Codes should be disabled if TOTP is.
+		update_user_meta( self::$regular_user->ID, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, array( 0 => 'Two_Factor_Backup_Codes' ) );
+		$actual = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
+		$this->assertEmpty( $actual );
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\has_ordinary_provider
+	 */
+	public function test_has_ordinary_provider() {
+		$this->assertTrue( has_ordinary_provider( array( 'TwoFactor_Provider_WebAuthn' ) ) );
+		$this->assertTrue( has_ordinary_provider( array( 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ) ) );
+		$this->assertFalse( has_ordinary_provider( array( 'Two_Factor_Backup_Codes' ) ) );
 	}
 
 	/**
@@ -258,7 +295,7 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$this->assertSame( $expected_key, $provider->get_key() );
 
 		// Validate that Backup Codes are now available as secondary.
-		$expected = [ 'Two_Factor_Backup_Codes', 'Two_Factor_Totp' ];
+		$expected = [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ];
 		$actual   = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
 
 		$this->assertSame( $expected, $actual );
