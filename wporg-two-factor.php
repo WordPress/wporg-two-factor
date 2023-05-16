@@ -37,6 +37,8 @@ require_once __DIR__ . '/settings/settings.php';
  * `Two_Factor_Core::is_user_using_two_factor()` etc assume that all providers are loaded. If WebAuthn is loaded
  * too late, then `remove_capabilities_until_2fa_enabled()` would cause `get_enable_2fa_notice()` to be shown on
  * the front end if WebAuthn is enabled and TOTP isn't.
+ *
+ * @codeCoverageIgnore
  */
 function load_webauthn_plugin() {
 	global $wpdb;
@@ -260,6 +262,8 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
  * Remove the 2FA settings page from the admin menu.
  *
  * We don't want site admins making changes, etc.
+ *
+ * @codeCoverageIgnore
  */
 function block_webauthn_settings_page() {
 	$screen = get_current_screen();

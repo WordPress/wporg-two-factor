@@ -73,6 +73,11 @@ function render_custom_ui() : void {
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }
 
+/**
+ * Print JS and CSS for customizing the interim revalidation iframe.
+ *
+ * @codeCoverageIgnore
+ */
 function login_footer_revalidate_customizations() {
 	// When the revalidate_2fa page is displayed in an interim login on not-login, add some style and JS handlers.
 	if (
