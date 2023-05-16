@@ -10,7 +10,7 @@
  */
 
 namespace WordPressdotorg\Two_Factor;
-use Two_Factor_Core;
+use Two_Factor_Core, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
 use WildWolf\WordPress\TwoFactorWebAuthn\Constants as WebAuthn_Plugin_Constants;
 use WP_User, WP_Error;
@@ -61,6 +61,7 @@ function load_webauthn_plugin() {
 load_webauthn_plugin();
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
+add_filter( 'two_factor_enabled_providers_for_user', __NAMESPACE__ . '\require_ordinary_provider', 99, 2 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
 add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
@@ -83,7 +84,46 @@ function two_factor_providers( array $providers ) : array {
 }
 
 /**
- * Set the primary provider for users.
+ * Disable Backup Codes until an ordinary provider has been enabled.
+ *
+ * They should only be a fallback for when the user can't access their ordinary device (WebAuthn or TOTP). An
+ * ordinary provider is one that is meant to be used daily, rather than a fallback method that is only used when
+ * an ordinary device is lost/stolen/etc.
+ *
+ * @see set_primary_provider_for_user()
+ */
+function require_ordinary_provider( array $enabled_providers, int $user_id ) : array {
+	$user = get_userdata( $user_id );
+
+	// They were active at one point, but were then disabled (probably by this function).
+	$has_inactive_backup_codes = ! in_array( 'Two_Factor_Backup_Codes', $enabled_providers, true ) &&
+		Two_Factor_Backup_Codes::codes_remaining_for_user( $user ) > 0;
+
+	if ( has_ordinary_provider( $enabled_providers ) ) {
+		if ( $has_inactive_backup_codes ) {
+			$enabled_providers[] = 'Two_Factor_Backup_Codes';
+		}
+	} else {
+		$enabled_providers = array();
+	}
+
+	return $enabled_providers;
+}
+
+/**
+ * Check if the user has an ordinary provider enabled.
+ *
+ * @see require_ordinary_provider()
+ */
+function has_ordinary_provider( array $enabled_providers ) : bool {
+	return in_array( 'TwoFactor_Provider_WebAuthn', $enabled_providers, true ) ||
+		in_array( 'Two_Factor_Totp', $enabled_providers, true );
+}
+
+/**
+ * Set the primary provider to one that is strong and ordinary.
+ *
+ * @see require_ordinary_provider()
  */
 function set_primary_provider_for_user( string $provider, int $user_id ) : string {
 	$user                = get_user_by( 'id', $user_id );
@@ -93,10 +133,8 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 		$provider = 'TwoFactor_Provider_WebAuthn';
 	} elseif ( isset( $available_providers['Two_Factor_Totp'] ) ) {
 		$provider = 'Two_Factor_Totp';
-	} elseif ( 'Two_Factor_Backup_Codes' === $provider && 1 === count( $available_providers ) ) {
-		/*
-		 * If we only have Backup Codes enabled, 2FA is disabled on WordPress.org.
-		 */
+	} else {
+		// Backup Codes should only be a fallback for when the user can't access their WebAuthn or TOTP device.
 		$provider = '';
 	}
 
