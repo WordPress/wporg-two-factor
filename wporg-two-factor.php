@@ -185,7 +185,7 @@ function user_requires_2fa( $user ) : bool {
 			return false;
 		}
 	}
-    // @codeCoverageIgnoreEnd
+	// @codeCoverageIgnoreEnd
 
 	$required = false;
 
@@ -288,6 +288,42 @@ function get_edit_account_url() : string {
 	}
 
 	return $url;
+}
+
+/**
+ * Resolve Android NFC Security Key issues when a newer key is registered through a desktop client.
+ *
+ * This disables EdDSA (aka. Ed25519) support, which Android NFC appears to lack.
+ *
+ * @see https://github.com/sjinks/wp-two-factor-provider-webauthn/issues/221
+ * @codeCoverageIgnore
+ */
+add_action( 'wp_ajax_webauthn_preregister', __NAMESPACE__ . '\webauthn_preregister_remove_eddsa', 1 );
+function webauthn_preregister_remove_eddsa() {
+	ob_start( __NAMESPACE__ . '\webauthn_preregister_remove_eddsa_callback' );
+}
+
+/**
+ * Callback for webauthn_preregister_remove_eddsa().
+ *
+ * @codeCoverageIgnore
+ */
+function webauthn_preregister_remove_eddsa_callback( string $output ) : string {
+	$json = json_decode( $output );
+
+	if ( $json && ! empty( $json->data->options->pubKeyCredParams ) ) {
+		$json->data->options->pubKeyCredParams = array_values(
+			wp_list_filter(
+				$json->data->options->pubKeyCredParams,
+				[ 'alg' => -8 ],
+				'NOT'
+			)
+		);
+
+		$output = wp_json_encode( $json );
+	}
+
+	return $output;
 }
 
 /*
