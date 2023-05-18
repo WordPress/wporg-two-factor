@@ -11,6 +11,7 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
+use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
 use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
@@ -28,13 +29,23 @@ function is_2fa_beta_tester() : bool {
 
 require_once __DIR__ . '/settings/settings.php';
 
+/*
+ * Make sure the WebAuthn plugin loads early, because all of our functions that call
+ * `Two_Factor_Core::is_user_using_two_factor()` etc assume that all providers are loaded. If WebAuthn is loaded
+ * too late, then `remove_capabilities_until_2fa_enabled()` would cause `get_enable_2fa_notice()` to be shown on
+ * the front end if WebAuthn is enabled and TOTP isn't.
+ */
+$webauthn = WebAuthn_Plugin::instance();
+$webauthn->init();
+$webauthn->maybe_update_schema(); // This needs to run before plugins_loaded, as jetpack and wporg-two-factor do things way too early to the $current_user.
+
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
 add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
-
+add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
 
 /**
  * Determine which providers should be available to users.
@@ -42,7 +53,7 @@ add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enab
 function two_factor_providers( array $providers ) : array {
 	// Match the name => file path format of input var, but the path isn't needed.
 	$desired_providers = array(
-		'Two_Factor_WebAuthn'     => '',
+		'TwoFactor_Provider_WebAuthn' => '',
 		'Two_Factor_Totp'         => '',
 		'Two_Factor_Backup_Codes' => '',
 	);
@@ -57,8 +68,8 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 	$user                = get_user_by( 'id', $user_id );
 	$available_providers = Two_Factor_Core::get_available_providers_for_user( $user );
 
-	if ( isset( $available_providers['Two_Factor_WebAuthn'] ) ) {
-		$provider = 'Two_Factor_WebAuthn';
+	if ( isset( $available_providers['TwoFactor_Provider_WebAuthn'] ) ) {
+		$provider = 'TwoFactor_Provider_WebAuthn';
 	} elseif ( isset( $available_providers['Two_Factor_Totp'] ) ) {
 		$provider = 'Two_Factor_Totp';
 	} elseif ( 'Two_Factor_Backup_Codes' === $provider && 1 === count( $available_providers ) ) {
@@ -224,6 +235,22 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 	);
 
 	return $two_factor_notice . $existing_notices;
+}
+
+/*
+ * Remove the 2FA settings page from the admin menu.
+ *
+ * We don't want site admins making changes, etc.
+ */
+function block_webauthn_settings_page() {
+	$screen = get_current_screen();
+
+	// Prevent direct access.
+	if ( $screen->id === 'settings_page_2fa-webauthn' ) {
+		wp_die( 'Access Denied.' );
+	}
+
+	remove_submenu_page( 'options-general.php', '2fa-webauthn' );
 }
 
 /**
