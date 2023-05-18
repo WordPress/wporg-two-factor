@@ -130,6 +130,15 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
+	const { '2fa_available_providers': availableProviders, '2fa_revalidation': revalidation } =
+		record;
+	// Check that there are providers, and that there isn't only backup codes.
+	const hasPrimaryProvider =
+		!! availableProviders.length &&
+		! (
+			availableProviders.length === 1 && availableProviders[ 0 ] === 'Two_Factor_Backup_Codes'
+		);
+
 	let screenContent = (
 		<Card>
 			<CardHeader className="wporg-2fa__navigation" size="xSmall">
@@ -159,8 +168,8 @@ function Main( { userId } ) {
 		screenContent = <AccountStatus />;
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
-		record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' ) &&
-		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
+		hasPrimaryProvider &&
+		revalidation?.expires_at <= new Date().getTime() / 1000
 	) {
 		screenContent = (
 			<>
