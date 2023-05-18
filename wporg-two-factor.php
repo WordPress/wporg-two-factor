@@ -242,7 +242,7 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
  *
  * We don't want site admins making changes, etc.
  */
-function block_webauthn_settings_page( ) {
+function block_webauthn_settings_page() {
 	$screen = get_current_screen();
 
 	// Prevent direct access.
