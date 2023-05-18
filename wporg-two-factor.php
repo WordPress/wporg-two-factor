@@ -37,6 +37,7 @@ require_once __DIR__ . '/settings/settings.php';
  */
 $webauthn = WebAuthn_Plugin::instance();
 $webauthn->init();
+$webauthn->maybe_update_schema(); // This needs to run before plugins_loaded, as jetpack and wporg-two-factor do things way too early to the $current_user.
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
