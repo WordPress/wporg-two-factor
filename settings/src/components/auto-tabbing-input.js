@@ -11,7 +11,7 @@ import NumericControl from './numeric-control';
 const AutoTabbingInput = ( props ) => {
 	const { inputs, setInputs, error, setError } = props;
 
-	const handleChange = useCallback( ( value, event, index, inputRef ) => {
+	const handleChange = useCallback( ( value, event, index ) => {
 		setInputs( ( prevInputs ) => {
 			const newInputs = [ ...prevInputs ];
 
@@ -19,17 +19,25 @@ const AutoTabbingInput = ( props ) => {
 
 			return newInputs;
 		} );
+	}, [] );
 
-		if ( value && '' !== value.trim() && inputRef.current.nextElementSibling ) {
-			inputRef.current.nextElementSibling.focus();
+	const handleKeyUp = useCallback( ( value, event, index, inputElement ) => {
+		// Ignore keys associated with input navigation and paste events.
+		if ( [ 'Tab', 'Shift', 'Meta' ].includes( event.key ) ) {
+			return;
+		}
+
+		if ( event.key === 'Backspace' && inputElement.previousElementSibling ) {
+			inputElement.previousElementSibling.focus();
+		} else if ( !! value && inputElement.nextElementSibling ) {
+			inputElement.nextElementSibling.focus();
 		}
 	}, [] );
 
-	const handleKeyDown = useCallback( ( value, event, index, inputRef ) => {
-		if ( event.key === 'Backspace' && ! value && inputRef.current.previousElementSibling ) {
-			inputRef.current.previousElementSibling.focus();
-		}
-	}, [] );
+	const handleFocus = useCallback(
+		( value, event, index, inputElement ) => inputElement.select(),
+		[]
+	);
 
 	const handlePaste = useCallback( ( event ) => {
 		event.preventDefault();
@@ -58,7 +66,8 @@ const AutoTabbingInput = ( props ) => {
 					key={ index }
 					index={ index }
 					onChange={ handleChange }
-					onKeyDown={ handleKeyDown }
+					onKeyUp={ handleKeyUp }
+					onFocus={ handleFocus }
 					maxLength="1"
 					required
 				/>

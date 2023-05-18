@@ -13,27 +13,47 @@ import { useRef, useCallback } from '@wordpress/element';
  * using the underlying `input[type="number"]`, which has some accessibility issues.
  *
  * @param props
+ * @param props.autoComplete
+ * @param props.pattern
+ * @param props.title
+ * @param props.onChange
+ * @param props.onFocus
+ * @param props.onKeyDown
+ * @param props.onKeyUp
+ * @param props.index
+ * @param props.value
+ * @param props.maxLength
+ * @param props.required
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number#accessibility
  * @see https://technology.blog.gov.uk/2020/02/24/why-the-gov-uk-design-system-team-changed-the-input-type-for-numbers/
  * @see https://stackoverflow.com/a/66759105/450127
  */
-export default function NumericControl( props ) {
-	const { autoComplete, pattern, title, onChange, onKeyDown, index, value, maxLength, required } =
-		props;
-
+export default function NumericControl( {
+	autoComplete,
+	pattern,
+	title,
+	onChange,
+	onFocus,
+	onKeyDown,
+	onKeyUp,
+	index,
+	value,
+	maxLength,
+	required,
+} ) {
 	const inputRef = useRef( null );
 
-	const handleChange = useCallback(
+	const createHandler = ( handler ) => ( event ) =>
 		// Most callers will only need the value, so make it convenient for them.
-		( event ) => onChange && onChange( event.target.value, event, index, inputRef ),
-		[]
-	);
+		handler && handler( event.target.value, event, index, inputRef.current );
 
-	const handleKeyDown = useCallback(
-		// Most callers will only need the value, so make it convenient for them.
-		( event ) => onKeyDown && onKeyDown( event.target.value, event, index, inputRef ),
-		[]
-	);
+	const handleChange = useCallback( createHandler( onChange ), [] );
+
+	const handleFocus = useCallback( createHandler( onFocus ), [] );
+
+	const handleKeyDown = useCallback( createHandler( onKeyDown ), [] );
+
+	const handleKeyUp = useCallback( createHandler( onKeyUp ), [] );
 
 	return (
 		<input
@@ -44,7 +64,9 @@ export default function NumericControl( props ) {
 			pattern={ pattern || '[0-9 ]*' }
 			title={ title || 'Only numbers and spaces are allowed' }
 			onChange={ handleChange }
+			onFocus={ handleFocus }
 			onKeyDown={ handleKeyDown }
+			onKeyUp={ handleKeyUp }
 			data-1p-ignore // Prevent 1Password from showing up
 			value={ value }
 			maxLength={ maxLength }
