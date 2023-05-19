@@ -299,6 +299,15 @@ add_filter( 'two_factor_provider_classname_Two_Factor_Totp', function( string $p
 	return __NAMESPACE__ . '\Encrypted_Totp_Provider';
 } );
 
+/*
+ * Switch out the WebAuthN provider for one that uses a tiny bit of caching.
+ */
+add_filter( 'two_factor_provider_classname_TwoFactor_Provider_WebAuthn', function( string $provider ) : string {
+	require_once __DIR__ . '/class-cached-webauthn-provider.php';
+
+	return __NAMESPACE__ . '\WPORG_TwoFactor_Provider_WebAuthn';
+} );
+
 // Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
 // Hotfix for https://github.com/WordPress/gutenberg/pull/48268
 add_filter( 'block_type_metadata', function( $metadata ) {
