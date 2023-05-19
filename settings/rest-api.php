@@ -180,10 +180,21 @@ function register_user_fields(): void {
 		'user',
 		'2fa_revalidation',
 		[
-			'get_callback' => function( $user ) {
+			'get_callback' => function() {
+				/*
+				 * Note: This field is always about the authenticated user, NOT the user being requested.
+				 *       This should likely be it's own endpoint, but it's here for now, to ensure that
+				 *       when an admin is editing other users, they get prompted to update their 2FA as well.
+				 */
+
+				$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
+				if ( ! $last_validated ) {
+					return false;
+				}
+
 				$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url( true );
-				$expiry         = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, $user['id'], '' );
-				$expires_at     = Two_Factor_Core::is_current_user_session_two_factor() + $expiry;
+				$expiry         = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), '' );
+				$expires_at     = $last_validated + $expiry;
 
 				return compact( 'revalidate_url', 'expires_at' );
 			},
