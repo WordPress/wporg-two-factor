@@ -16,18 +16,20 @@ import ScreenLink from './screen-link';
  */
 export default function AccountStatus() {
 	const { userRecord } = useContext( GlobalContext );
-	const { record } = userRecord;
-	const emailStatus = record.pending_email ? 'pending' : 'ok';
-	const totpEnabled = record[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' );
-	const webAuthnEnabled = record[ '2fa_available_providers' ].includes(
-		'TwoFactor_Provider_WebAuthn'
-	);
-	const primaryProviderEnabled = totpEnabled || webAuthnEnabled;
-	const backupCodesEnabled =
-		record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
+	const {
+		record: {
+			'2fa_available_providers': availableProviders,
+			email,
+			pending_email: pendingEmail,
+		},
+		hasPrimaryProvider,
+	} = userRecord;
+	const emailStatus = pendingEmail ? 'pending' : 'ok';
+	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
+	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 
 	const backupBodyText =
-		! backupCodesEnabled && ! primaryProviderEnabled
+		! backupCodesEnabled && ! hasPrimaryProvider
 			? 'Please enable Two-Factor Authentication before enabling backup codes.'
 			: `You have
 				${ backupCodesEnabled ? '' : 'not' }
@@ -47,9 +49,9 @@ export default function AccountStatus() {
 				status={ emailStatus }
 				headerText="Account Email"
 				bodyText={
-					record.pending_email
-						? `Your account email is pending a change to ${ record.pending_email }.`
-						: `Your account email address is ${ record.email }.`
+					pendingEmail
+						? `Your account email is pending a change to ${ pendingEmail }.`
+						: `Your account email address is ${ email }.`
 				}
 			/>
 

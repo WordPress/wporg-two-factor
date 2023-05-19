@@ -18,6 +18,12 @@ export function useGetUserRecord( userId ) {
 		userRecord.record.password = '';
 	}
 
+	const availableProviders = userRecord.record?.[ '2fa_available_providers' ] ?? [];
+	const primaryProviders = [ 'Two_Factor_Totp', 'TwoFactor_Provider_WebAuthn' ];
+	userRecord.hasPrimaryProvider = !! availableProviders.filter( ( provider ) =>
+		primaryProviders.includes( provider )
+	).length;
+
 	return userRecord;
 }
 

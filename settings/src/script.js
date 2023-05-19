@@ -55,7 +55,7 @@ function renderSettings() {
  */
 function Main( { userId } ) {
 	const userRecord = useGetUserRecord( userId );
-	const { record, edit, hasEdits, hasResolved } = userRecord;
+	const { record, edit, hasEdits, hasPrimaryProvider, hasResolved } = userRecord;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	let currentUrl = new URL( document.location.href );
 
@@ -130,15 +130,6 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
-	const { '2fa_available_providers': availableProviders, '2fa_revalidation': revalidation } =
-		record;
-	// Check that there are providers, and that there isn't only backup codes.
-	const hasPrimaryProvider =
-		!! availableProviders.length &&
-		! (
-			availableProviders.length === 1 && availableProviders[ 0 ] === 'Two_Factor_Backup_Codes'
-		);
-
 	let screenContent = (
 		<Card>
 			<CardHeader className="wporg-2fa__navigation" size="xSmall">
@@ -169,7 +160,7 @@ function Main( { userId } ) {
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
 		hasPrimaryProvider &&
-		revalidation?.expires_at <= new Date().getTime() / 1000
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
 	) {
 		screenContent = (
 			<>

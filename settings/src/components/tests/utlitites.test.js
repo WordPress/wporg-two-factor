@@ -55,6 +55,65 @@ describe( 'useGetUserRecord', () => {
 
 		expect( result.record.password ).toBe( 'test-password' );
 	} );
+
+	it( 'should set hasPrimaryProvider to false if userRecord.record is undefined', () => {
+		useEntityRecord.mockReturnValue( {} );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( false );
+	} );
+
+	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is undefined', () => {
+		useEntityRecord.mockReturnValue( { record: {} } );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( false );
+	} );
+
+	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is empty', () => {
+		useEntityRecord.mockReturnValue( { record: { '2fa_available_providers': [] } } );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( false );
+	} );
+
+	it( 'should set hasPrimaryProvider to false if 2fa_available_providers only has Two_Factor_Backup_Codes', () => {
+		useEntityRecord.mockReturnValue( {
+			record: { '2fa_available_providers': [ 'Two_Factor_Backup_Codes' ] },
+		} );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( false );
+	} );
+
+	it( 'should set hasPrimaryProvider to true if 2fa_available_providers has Two_Factor_Totp', () => {
+		useEntityRecord.mockReturnValue( {
+			record: { '2fa_available_providers': [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ] },
+		} );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( true );
+	} );
+
+	it( 'should set hasPrimaryProvider to true if 2fa_available_providers has TwoFactor_Provider_WebAuthn', () => {
+		useEntityRecord.mockReturnValue( {
+			record: {
+				'2fa_available_providers': [
+					'TwoFactor_Provider_WebAuthn',
+					'Two_Factor_Backup_Codes',
+				],
+			},
+		} );
+
+		const result = useGetUserRecord( 1 );
+
+		expect( result.hasPrimaryProvider ).toBe( true );
+	} );
 } );
 
 describe( 'refreshRecord', () => {
