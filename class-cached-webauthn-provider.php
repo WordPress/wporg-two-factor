@@ -74,6 +74,9 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 
 		// Disable the admin UI if it needs revalidation.
 		add_action( 'show_user_security_settings', [ $this, '_show_user_security_settings' ], -1 );
+
+		// Extend the session revalidation after registering a new key.
+		add_action( 'wp_ajax_webauthn_register', [ $this, '_extend_revalidation' ], 1 );
 	}
 
 	/**
@@ -103,6 +106,23 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 			echo '<fieldset disabled="disabled">';
 			add_action( 'show_user_security_settings', function() { echo '</fieldset>'; }, 1001 );
 		}
+	}
+
+	/**
+	 * Extend the session revalidation after registering a new key.
+	 */
+	public function _extend_revalidation() {
+		ob_start( function( $output ) {
+			$json = json_decode( $output, true );
+			if ( ! empty( $json['success'] ) ) {
+				// Bump session revalidation.
+				Two_Factor_Core::update_current_user_session( [
+					'two-factor-login' => time(),
+				] );
+			}
+
+			return $output;
+		} );
 	}
 
 	public function _clear_cache() {
