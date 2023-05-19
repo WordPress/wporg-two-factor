@@ -21,16 +21,20 @@ const AutoTabbingInput = ( props ) => {
 		} );
 	}, [] );
 
-	const handleKeyUp = useCallback( ( value, event, index, inputElement ) => {
+	const handleKeyDown = useCallback( ( value, event, index, inputElement ) => {
 		// Ignore keys associated with input navigation and paste events.
-		if ( [ 'Tab', 'Shift', 'Meta' ].includes( event.key ) ) {
+		if ( [ 'Tab', 'Shift', 'Meta', 'Backspace' ].includes( event.key ) ) {
 			return;
 		}
 
+		if ( !! value && inputElement.nextElementSibling ) {
+			inputElement.nextElementSibling.focus();
+		}
+	}, [] );
+
+	const handleKeyUp = useCallback( ( value, event, index, inputElement ) => {
 		if ( event.key === 'Backspace' && inputElement.previousElementSibling ) {
 			inputElement.previousElementSibling.focus();
-		} else if ( !! value && inputElement.nextElementSibling ) {
-			inputElement.nextElementSibling.focus();
 		}
 	}, [] );
 
@@ -66,6 +70,7 @@ const AutoTabbingInput = ( props ) => {
 					key={ index }
 					index={ index }
 					onChange={ handleChange }
+					onKeyDown={ handleKeyDown }
 					onKeyUp={ handleKeyUp }
 					onFocus={ handleFocus }
 					maxLength="1"
