@@ -36,6 +36,24 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	}
 
 	/**
+	 * Check if the provider is available for the given user.
+	 *
+	 * This method includes caching for WordPress.org, as it's called on most pageloads.
+	 */
+	public function is_available_for_user( $user ) {
+		$is_available = wp_cache_get( 'webauthn:' . $user->ID, 'users', false, $found );
+		if ( $found ) {
+			return $is_available;
+		}
+
+		$is_available = parent::is_available_for_user( $user );
+
+		wp_cache_set( 'webauthn:' . $user->ID, $is_available, 'users', HOUR_IN_SECONDS );
+
+		return $is_available;
+	}
+
+	/**
 	 * See https://github.com/sjinks/wp-two-factor-provider-webauthn/pull/468
 	 *
 	 * @return string
@@ -66,8 +84,11 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	public function _webauthn_ajax_request() {
 		// Check the users session is still active and 2FA revalidation isn't required.
 		if ( ! Two_Factor_Core::current_user_can_update_two_factor_options() ) {
-			wp_send_json_error( __( 'Your session has expired. Please refresh the page and try again.', 'wporg-two-factor' ) );
+			wp_send_json_error( 'Your session has expired. Please refresh the page and try again.' );
 		}
+
+		// Clear the caches for this class after the request is finished.
+		add_action( 'shutdown', [ $this, '_clear_cache' ] );
 	}
 
 	/**
@@ -78,8 +99,13 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	public function _show_user_security_settings() {
 		$show_2fa_options = Two_Factor_Core::current_user_can_update_two_factor_options();
 		if ( ! $show_2fa_options ) {
+			// TODO: Perhaps the Core UI should extend it's `<fieldset>` to wrap the additional providers?
 			echo '<fieldset disabled="disabled">';
 			add_action( 'show_user_security_settings', function() { echo '</fieldset>'; }, 1001 );
 		}
+	}
+
+	public function _clear_cache() {
+		wp_cache_delete( 'webauthn:' . get_current_user_id(), 'users' );
 	}
 }
