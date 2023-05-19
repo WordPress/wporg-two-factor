@@ -12,6 +12,7 @@
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
 use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
+use WildWolf\WordPress\TwoFactorWebAuthn\Constants as WebAuthn_Plugin_Constants;
 use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
@@ -29,15 +30,33 @@ function is_2fa_beta_tester() : bool {
 
 require_once __DIR__ . '/settings/settings.php';
 
-/*
+/**
+ * Load the WebAuthn plugin.
+ *
  * Make sure the WebAuthn plugin loads early, because all of our functions that call
  * `Two_Factor_Core::is_user_using_two_factor()` etc assume that all providers are loaded. If WebAuthn is loaded
  * too late, then `remove_capabilities_until_2fa_enabled()` would cause `get_enable_2fa_notice()` to be shown on
  * the front end if WebAuthn is enabled and TOTP isn't.
  */
-$webauthn = WebAuthn_Plugin::instance();
-$webauthn->init();
-$webauthn->maybe_update_schema(); // This needs to run before plugins_loaded, as jetpack and wporg-two-factor do things way too early to the $current_user.
+function load_webauthn_plugin() {
+	global $wpdb;
+
+	$webauthn = WebAuthn_Plugin::instance();
+	$webauthn->init();
+
+	// Use central WebAuthn tables, instead of ones for each site that shares our user tables.
+	$wpdb->webauthn_credentials = 'wporg_' . WebAuthn_Plugin_Constants::WA_CREDENTIALS_TABLE_NAME;
+	$wpdb->webauthn_users       = 'wporg_' . WebAuthn_Plugin_Constants::WA_USERS_TABLE_NAME;
+
+	// The schema update checks should not check for updates on every request.
+	remove_action( 'plugins_loaded', [ $webauthn, 'maybe_update_schema' ] );
+
+	// The schema update checks do need occur, but only on admin requests on the main network.
+	if ( 'wporg_' === $wpdb->base_prefix || 'local' === wp_get_environment_type() ) {
+		add_action( 'admin_init', [ $webauthn, 'maybe_update_schema' ] );
+	}
+}
+load_webauthn_plugin();
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
