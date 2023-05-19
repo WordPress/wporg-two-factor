@@ -303,7 +303,7 @@ add_filter( 'two_factor_provider_classname_Two_Factor_Totp', function( string $p
  * Switch out the WebAuthN provider for one that uses a tiny bit of caching.
  */
 add_filter( 'two_factor_provider_classname_TwoFactor_Provider_WebAuthn', function( string $provider ) : string {
-	require_once __DIR__ . '/class-cached-webauthn-provider.php';
+	require_once __DIR__ . '/class-wporg-webauthn-provider.php';
 
 	return __NAMESPACE__ . '\WPORG_TwoFactor_Provider_WebAuthn';
 } );
