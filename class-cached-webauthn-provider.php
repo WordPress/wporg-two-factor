@@ -12,4 +12,13 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	public function get_key() {
 		return parent::class;
 	}
+
+	/**
+	 * See https://github.com/sjinks/wp-two-factor-provider-webauthn/pull/468
+	 *
+	 * @return string
+	 */
+	public function get_alternative_provider_label() {
+		return __( 'Use your security key', 'wporg-two-factor' );
+	}
 }
