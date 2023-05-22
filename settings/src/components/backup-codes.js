@@ -16,7 +16,9 @@ import { refreshRecord } from '../utilities';
  * Setup and manage backup codes.
  */
 export default function BackupCodes() {
-	const { userRecord } = useContext( GlobalContext );
+	const {
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
 	const backupCodesEnabled =
@@ -35,7 +37,10 @@ export default function BackupCodes() {
  * @param props.setRegenerating
  */
 function Setup( { setRegenerating } ) {
-	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const {
+		setGlobalNotice,
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ] = useState( false );
 
@@ -142,7 +147,9 @@ function CodeList( { codes } ) {
  * @param props.setRegenerating
  */
 function Manage( { setRegenerating } ) {
-	const { userRecord } = useContext( GlobalContext );
+	const {
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const remaining = userRecord.record[ '2fa_backup_codes_remaining' ];
 
 	return (

@@ -26,7 +26,10 @@ export default function RevalidateModal() {
 }
 
 function RevalidateIframe() {
-	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const {
+		setGlobalNotice,
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const ref = useRef();
 
 	useEffect( () => {

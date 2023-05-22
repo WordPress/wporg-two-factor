@@ -9,12 +9,12 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Local dependencies
  */
-import { useGetUserRecord, refreshRecord } from '../../utilities';
+import { useUser, refreshRecord } from '../../utilities';
 
 jest.mock( '@wordpress/data' );
 jest.mock( '@wordpress/core-data' );
 
-describe( 'useGetUserRecord', () => {
+describe( 'useUser', () => {
 	beforeEach( () => {
 		useSelect.mockClear();
 		useEntityRecord.mockClear();
@@ -23,61 +23,61 @@ describe( 'useGetUserRecord', () => {
 	it( 'should call useEntityRecord with correct arguments', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		useGetUserRecord( 1 );
+		useUser( 1 );
 
 		expect( useEntityRecord ).toHaveBeenCalledWith( 'root', 'user', 1 );
 	} );
 
-	it( 'should set isSaving in userRecord', () => {
+	it( 'should set isSaving in user', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 		useSelect.mockReturnValue( true );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
 		expect( useSelect ).toHaveBeenCalled();
-		expect( result.isSaving ).toBeTruthy();
+		expect( user.isSaving ).toBeTruthy();
 	} );
 
-	it( 'should initialize password in userRecord.record if not defined', () => {
+	it( 'should initialize password in user.userRecord.record if not defined', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.record.password ).toBe( '' );
+		expect( user.userRecord.record.password ).toBe( '' );
 	} );
 
-	it( 'should not overwrite password in userRecord.record if already defined', () => {
+	it( 'should not overwrite password in user.userRecord.record if already defined', () => {
 		useEntityRecord.mockReturnValue( {
 			record: { password: 'test-password' },
 		} );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.record.password ).toBe( 'test-password' );
+		expect( user.userRecord.record.password ).toBe( 'test-password' );
 	} );
 
-	it( 'should set hasPrimaryProvider to false if userRecord.record is undefined', () => {
+	it( 'should set hasPrimaryProvider to false if user.userRecord.record is undefined', () => {
 		useEntityRecord.mockReturnValue( {} );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( false );
+		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
 
 	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is undefined', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( false );
+		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
 
 	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is empty', () => {
 		useEntityRecord.mockReturnValue( { record: { '2fa_available_providers': [] } } );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( false );
+		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
 
 	it( 'should set hasPrimaryProvider to false if 2fa_available_providers only has Two_Factor_Backup_Codes', () => {
@@ -85,9 +85,9 @@ describe( 'useGetUserRecord', () => {
 			record: { '2fa_available_providers': [ 'Two_Factor_Backup_Codes' ] },
 		} );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( false );
+		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
 
 	it( 'should set hasPrimaryProvider to true if 2fa_available_providers has Two_Factor_Totp', () => {
@@ -95,9 +95,9 @@ describe( 'useGetUserRecord', () => {
 			record: { '2fa_available_providers': [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ] },
 		} );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( true );
+		expect( user.hasPrimaryProvider ).toBe( true );
 	} );
 
 	it( 'should set hasPrimaryProvider to true if 2fa_available_providers has TwoFactor_Provider_WebAuthn', () => {
@@ -110,9 +110,9 @@ describe( 'useGetUserRecord', () => {
 			},
 		} );
 
-		const result = useGetUserRecord( 1 );
+		const user = useUser( 1 );
 
-		expect( result.hasPrimaryProvider ).toBe( true );
+		expect( user.hasPrimaryProvider ).toBe( true );
 	} );
 } );
 

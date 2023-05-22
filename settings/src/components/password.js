@@ -25,7 +25,10 @@ import { GlobalContext } from '../script';
  * Render the Password setting.
  */
 export default function Password() {
-	const { setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const {
+		setGlobalNotice,
+		user: { userRecord, isSaving },
+	} = useContext( GlobalContext );
 	const [ inputType, setInputType ] = useState( 'password' );
 	const [ hasAttemptedSave, setHasAttemptedSave ] = useState( false );
 	let passwordStrong = true; // Saved passwords have already passed the test.
@@ -58,7 +61,7 @@ export default function Password() {
 
 			setHasAttemptedSave( true );
 
-			if ( ! passwordStrong || userRecord.isSaving ) {
+			if ( ! passwordStrong || isSaving ) {
 				return;
 			}
 
@@ -74,7 +77,7 @@ export default function Password() {
 
 			setGlobalNotice( 'New password saved.' );
 		},
-		[ passwordStrong, userRecord.isSaving ]
+		[ passwordStrong, isSaving ]
 	);
 
 	const handlePasswordChange = useCallback( ( password ) => userRecord.edit( { password } ), [] );
@@ -144,7 +147,7 @@ export default function Password() {
 
 			<p>
 				<Button isPrimary disabled={ ! userRecord.editedRecord.password } type="submit">
-					{ userRecord.isSaving ? 'Saving...' : 'Save password' }
+					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 
 				{ window.crypto?.getRandomValues && (

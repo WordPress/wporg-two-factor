@@ -15,14 +15,15 @@ import ScreenLink from './screen-link';
  * Render the Account Status.
  */
 export default function AccountStatus() {
-	const { userRecord } = useContext( GlobalContext );
+	const {
+		user: { userRecord, hasPrimaryProvider },
+	} = useContext( GlobalContext );
 	const {
 		record: {
 			'2fa_available_providers': availableProviders,
 			email,
 			pending_email: pendingEmail,
 		},
-		hasPrimaryProvider,
 	} = userRecord;
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
