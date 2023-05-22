@@ -75,6 +75,9 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 		// Disable the admin UI if it needs revalidation.
 		add_action( 'show_user_security_settings', [ $this, '_show_user_security_settings' ], -1 );
 
+		// Disable EdDSA support for keys, to enable Android NFC to work with modern keys.
+		add_action( 'wp_ajax_webauthn_preregister', [ $this, '_remove_eddsa_alg' ], 1 );
+
 		// Extend the session revalidation after registering a new key.
 		add_action( 'wp_ajax_webauthn_register', [ $this, '_extend_revalidation' ], 1 );
 	}
@@ -119,6 +122,33 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 				Two_Factor_Core::update_current_user_session( [
 					'two-factor-login' => time(),
 				] );
+			}
+
+			return $output;
+		} );
+	}
+
+	/**
+	 * Resolve Android NFC Security Key issues when a newer key is registered through a desktop client.
+	 *
+	 * This disables EdDSA (aka. ES25519) support, which Android NFC appears to lack.
+	 *
+	 * @see https://github.com/sjinks/wp-two-factor-provider-webauthn/issues/221#issuecomment-1539543124
+	 */
+	public function _remove_eddsa_alg() {
+		ob_start( function( $output ) {
+			$json = json_decode( $output );
+
+			if ( $json && ! empty( $json->data->options->pubKeyCredParams ) ) {
+				$json->data->options->pubKeyCredParams = array_values(
+					wp_list_filter(
+						$json->data->options->pubKeyCredParams,
+						[ 'alg' => -8 ],
+						'NOT'
+					)
+				);
+
+				$output = wp_json_encode( $json );
 			}
 
 			return $output;

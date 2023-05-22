@@ -185,7 +185,7 @@ function user_requires_2fa( $user ) : bool {
 			return false;
 		}
 	}
-    // @codeCoverageIgnoreEnd
+	// @codeCoverageIgnoreEnd
 
 	$required = false;
 
