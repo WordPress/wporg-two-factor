@@ -27,30 +27,33 @@ import { GlobalContext } from '../script';
 export default function Password() {
 	const {
 		setGlobalNotice,
-		user: { userRecord, isSaving },
+		user: {
+			userRecord: { hasEdits, editedRecord, record, edit, save },
+			isSaving,
+		},
 	} = useContext( GlobalContext );
 	const [ inputType, setInputType ] = useState( 'password' );
 	const [ hasAttemptedSave, setHasAttemptedSave ] = useState( false );
 	let passwordStrong = true; // Saved passwords have already passed the test.
 
-	if ( userRecord.hasEdits ) {
-		passwordStrong = isPasswordStrong( userRecord.editedRecord.password, userRecord.record );
+	if ( hasEdits ) {
+		passwordStrong = isPasswordStrong( editedRecord.password, record );
 	}
 
 	// Clear the "saved password" notice when password is being changed.
 	useEffect( () => {
-		if ( ! userRecord.hasEdits ) {
+		if ( ! hasEdits ) {
 			return;
 		}
 
 		setGlobalNotice( '' );
-	}, [ userRecord.hasEdits ] );
+	}, [ hasEdits ] );
 
 	/**
 	 * Handle clicking the `Generate Password` button.
 	 */
 	const handlePasswordGenerate = useCallback( async () => {
-		userRecord.edit( { password: generatePassword( 24, true, true ) } );
+		edit( { password: generatePassword( 24, true, true ) } );
 		setInputType( 'text' );
 	}, [] );
 
@@ -65,7 +68,7 @@ export default function Password() {
 				return;
 			}
 
-			await userRecord.save();
+			await save();
 
 			// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
 			// retry them automatically, but that results in an extra XHR request and a console error.
@@ -80,7 +83,7 @@ export default function Password() {
 		[ passwordStrong, isSaving ]
 	);
 
-	const handlePasswordChange = useCallback( ( password ) => userRecord.edit( { password } ), [] );
+	const handlePasswordChange = useCallback( ( password ) => edit( { password } ), [] );
 
 	const handlePasswordToggle = useCallback(
 		() => setInputType( inputType === 'password' ? 'text' : 'password' ),
@@ -112,7 +115,7 @@ export default function Password() {
 					help="The generate button will create a secure, random password."
 					label="New Password"
 					size="62"
-					value={ userRecord.editedRecord.password ?? '' }
+					value={ editedRecord.password ?? '' }
 					placeholder="Enter New Password..."
 					onChange={ handlePasswordChange }
 				/>
@@ -127,26 +130,23 @@ export default function Password() {
 				</Button>
 			</Flex>
 
-			{ userRecord.hasEdits && passwordStrong && (
+			{ hasEdits && passwordStrong && (
 				<Notice status="success" isDismissible={ false }>
 					<Icon icon={ check } />
 					Your password is strong enough to be saved.
 				</Notice>
 			) }
 
-			{ userRecord.hasEdits &&
-				userRecord.editedRecord.password &&
-				hasAttemptedSave &&
-				! passwordStrong && (
-					<Notice status="error" isDismissible={ false }>
-						<Icon icon={ cancelCircleFilled } />
-						That password is too easy to compromise. Please make it longer and/or add
-						random numbers/symbols.
-					</Notice>
-				) }
+			{ hasEdits && editedRecord.password && hasAttemptedSave && ! passwordStrong && (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					That password is too easy to compromise. Please make it longer and/or add random
+					numbers/symbols.
+				</Notice>
+			) }
 
 			<p>
-				<Button isPrimary disabled={ ! userRecord.editedRecord.password } type="submit">
+				<Button isPrimary disabled={ ! editedRecord.password } type="submit">
 					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 

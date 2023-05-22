@@ -30,6 +30,7 @@ function RevalidateIframe() {
 		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
+	const { record } = userRecord;
 	const ref = useRef();
 
 	useEffect( () => {
@@ -42,7 +43,7 @@ function RevalidateIframe() {
 
 			// Pretend that the expires_at is in the future (+1hr), this provides a 'faster' UI.
 			// This intentionally doesn't use `edit()` to prevent it attempting to update it on the server.
-			userRecord.record[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
+			record[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
 			refreshRecord( userRecord );
@@ -59,7 +60,7 @@ function RevalidateIframe() {
 		<iframe
 			title="Two-Factor Revalidation"
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
-			src={ userRecord.record[ '2fa_revalidation' ].revalidate_url }
+			src={ record[ '2fa_revalidation' ].revalidate_url }
 		/>
 	);
 }

@@ -55,8 +55,10 @@ function renderSettings() {
  */
 function Main( { userId } ) {
 	const user = useUser( userId );
-	const { userRecord, hasPrimaryProvider } = user;
-	const { record, edit, hasEdits, hasResolved } = userRecord;
+	const {
+		userRecord: { record, edit, hasEdits, hasResolved },
+		hasPrimaryProvider,
+	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	let currentUrl = new URL( document.location.href );
 

@@ -148,9 +148,11 @@ function CodeList( { codes } ) {
  */
 function Manage( { setRegenerating } ) {
 	const {
-		user: { userRecord },
+		user: {
+			userRecord: { record },
+		},
 	} = useContext( GlobalContext );
-	const remaining = userRecord.record[ '2fa_backup_codes_remaining' ];
+	const remaining = record[ '2fa_backup_codes_remaining' ];
 
 	return (
 		<>
