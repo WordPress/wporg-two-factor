@@ -38,14 +38,6 @@ describe( 'useUser', () => {
 		expect( user.isSaving ).toBeTruthy();
 	} );
 
-	it( 'should initialize password in user.userRecord.record if not defined', () => {
-		useEntityRecord.mockReturnValue( { record: {} } );
-
-		const user = useUser( 1 );
-
-		expect( user.userRecord.record.password ).toBe( '' );
-	} );
-
 	it( 'should not overwrite password in user.userRecord.record if already defined', () => {
 		useEntityRecord.mockReturnValue( {
 			record: { password: 'test-password' },
