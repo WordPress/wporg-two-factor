@@ -145,7 +145,7 @@ export default function Password() {
 				</Notice>
 			) }
 
-			<p>
+			<p className="wporg-2fa__submit-actions">
 				<Button isPrimary disabled={ ! editedRecord.password } type="submit">
 					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>

@@ -35,9 +35,13 @@
 		}
 	}
 
-	.components-button {
-		margin-right: 20px;
-	}
+}
+
+.wporg-2fa__submit-actions {
+	display: flex;
+	justify-content: flex-start;
+	gap: 16px 20px;
+	flex-wrap: wrap;
 }
 
 .wporg-2fa__navigation {
