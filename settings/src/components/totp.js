@@ -15,7 +15,9 @@ import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
 export default function TOTP() {
-	const { userRecord } = useContext( GlobalContext );
+	const {
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const availableProviders = userRecord.record[ '2fa_available_providers' ];
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 
@@ -30,7 +32,11 @@ export default function TOTP() {
  * Setup the TOTP provider.
  */
 function Setup() {
-	const { clickScreenLink, setGlobalNotice, userRecord } = useContext( GlobalContext );
+	const {
+		clickScreenLink,
+		setGlobalNotice,
+		user: { userRecord },
+	} = useContext( GlobalContext );
 	const [ secretKey, setSecretKey ] = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ] = useState( '' );
 	const [ error, setError ] = useState( '' );
@@ -278,7 +284,10 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
  * Disable the TOTP provider.
  */
 function Manage() {
-	const { userRecord, setGlobalNotice } = useContext( GlobalContext );
+	const {
+		user: { userRecord },
+		setGlobalNotice,
+	} = useContext( GlobalContext );
 	const [ error, setError ] = useState( '' );
 
 	// Enable TOTP when button clicked.

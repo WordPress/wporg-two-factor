@@ -14,8 +14,12 @@ import { GlobalContext } from '../script';
  * Render the Email setting.
  */
 export default function EmailAddress() {
-	const { userRecord } = useContext( GlobalContext );
-	const { record, edit, save, editedRecord, hasEdits, isSaving } = userRecord;
+	const {
+		user: {
+			userRecord: { record, edit, save, editedRecord, hasEdits },
+			isSaving,
+		},
+	} = useContext( GlobalContext );
 	const [ emailError, setEmailError ] = useState( '' );
 	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
 

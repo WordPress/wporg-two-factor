@@ -32,15 +32,17 @@ apiFetch.nonceMiddleware = { nonce: '' };
 
 // Default mock context
 const mockContext = {
-	userRecord: {
-		editedRecord: {
-			password: 'password',
-		},
-		edit: jest.fn(),
-		save: jest.fn(),
-		hasEdits: false,
-		record: {
-			'2fa_required': true,
+	user: {
+		userRecord: {
+			editedRecord: {
+				password: 'password',
+			},
+			edit: jest.fn(),
+			save: jest.fn(),
+			hasEdits: false,
+			record: {
+				'2fa_required': true,
+			},
 		},
 		isSaving: false,
 	},
@@ -57,8 +59,8 @@ describe( 'Password', () => {
 	} );
 
 	afterEach( () => {
-		mockContext.userRecord.edit.mockReset();
-		mockContext.userRecord.save.mockReset();
+		mockContext.user.userRecord.edit.mockReset();
+		mockContext.user.userRecord.save.mockReset();
 		mockContext.setGlobalNotice.mockReset();
 	} );
 
@@ -84,8 +86,8 @@ describe( 'Password', () => {
 		it( 'should display the weak password notice after submitting', () => {
 			// State: the user has updated their password to something weak
 			// although the strength is not tested here.
-			mockContext.userRecord.editedRecord.password = 'weak';
-			mockContext.userRecord.hasEdits = true;
+			mockContext.user.userRecord.editedRecord.password = 'weak';
+			mockContext.user.userRecord.hasEdits = true;
 
 			useContext.mockReturnValue( mockContext );
 
@@ -112,8 +114,8 @@ describe( 'Password', () => {
 		it( 'should display the strong password notice', () => {
 			// State: the user has updated their password to something strong
 			// although the strength is not tested here.
-			mockContext.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
-			mockContext.userRecord.hasEdits = true;
+			mockContext.user.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
+			mockContext.user.userRecord.hasEdits = true;
 
 			useContext.mockReturnValue( mockContext );
 
@@ -145,7 +147,7 @@ describe( 'Password', () => {
 		const input = getByLabelText( 'New Password' );
 		const newPassword = 'this is a password';
 		fireEvent.change( input, { target: { value: newPassword } } );
-		expect( mockContext.userRecord.edit ).toHaveBeenCalledWith( {
+		expect( mockContext.user.userRecord.edit ).toHaveBeenCalledWith( {
 			password: newPassword,
 		} );
 	} );
@@ -153,8 +155,8 @@ describe( 'Password', () => {
 	it( 'should submit form on button press', () => {
 		// State: the user has updated their password to something strong
 		// although the strength is not tested here.
-		mockContext.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
-		mockContext.userRecord.hasEdits = true;
+		mockContext.user.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
+		mockContext.user.userRecord.hasEdits = true;
 
 		useContext.mockReturnValue( mockContext );
 
@@ -171,7 +173,7 @@ describe( 'Password', () => {
 		const saveButton = buttons.filter( ( button ) => button.type === 'submit' )[ 0 ];
 		fireEvent.click( saveButton );
 
-		expect( mockContext.userRecord.save ).toHaveBeenCalled();
+		expect( mockContext.user.userRecord.save ).toHaveBeenCalled();
 	} );
 
 	it( 'should submit form on enter', () => {
@@ -186,6 +188,6 @@ describe( 'Password', () => {
 		const input = getByLabelText( 'New Password' );
 		fireEvent.submit( input );
 
-		expect( mockContext.userRecord.save ).toHaveBeenCalled();
+		expect( mockContext.user.userRecord.save ).toHaveBeenCalled();
 	} );
 } );

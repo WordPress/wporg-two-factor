@@ -15,7 +15,7 @@ import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useGetUserRecord } from './utilities';
+import { useUser } from './utilities';
 import ScreenLink from './components/screen-link';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
@@ -54,8 +54,11 @@ function renderSettings() {
  * @param props.userId
  */
 function Main( { userId } ) {
-	const userRecord = useGetUserRecord( userId );
-	const { record, edit, hasEdits, hasResolved } = userRecord;
+	const user = useUser( userId );
+	const {
+		userRecord: { record, edit, hasEdits, hasResolved },
+		hasPrimaryProvider,
+	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	let currentUrl = new URL( document.location.href );
 
@@ -156,29 +159,22 @@ function Main( { userId } ) {
 	);
 
 	if ( 'account-status' === screen ) {
-		screenContent = (
-			<div className={ 'wporg-2fa__account-status' }>
-				<AccountStatus />
-			</div>
-		);
+		screenContent = <AccountStatus />;
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
-		userRecord.record[ '2fa_available_providers' ] &&
-		userRecord.record[ '2fa_revalidation' ] &&
-		userRecord.record[ '2fa_revalidation' ].expires_at <= new Date().getTime() / 1000
+		hasPrimaryProvider &&
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
 	) {
 		screenContent = (
 			<>
-				<div className={ 'wporg-2fa__account-status' }>
-					<AccountStatus />
-				</div>
+				<AccountStatus />
 				<RevalidateModal />
 			</>
 		);
 	}
 
 	return (
-		<GlobalContext.Provider value={ { clickScreenLink, userRecord, setGlobalNotice } }>
+		<GlobalContext.Provider value={ { clickScreenLink, user, setGlobalNotice } }>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
