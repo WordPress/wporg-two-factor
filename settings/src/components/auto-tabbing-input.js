@@ -9,27 +9,13 @@ import { useCallback } from '@wordpress/element';
 import NumericControl from './numeric-control';
 
 const AutoTabbingInput = ( props ) => {
-	const { inputs, setInputs, onComplete, error } = props;
+	const { inputs, setInputs, error, setError } = props;
 
 	const handleChange = useCallback( ( value, event, index, inputRef ) => {
 		setInputs( ( prevInputs ) => {
 			const newInputs = [ ...prevInputs ];
 
-			// Clean input
-			if ( value.trim() === '' ) {
-				event.target.value = '';
-				value = '';
-			}
-
-			newInputs[ index ] = value;
-
-			// Check if all inputs are filled
-			const allFilled = newInputs.every( ( input ) => '' !== input );
-			if ( allFilled && onComplete ) {
-				onComplete( true );
-			} else {
-				onComplete( false );
-			}
+			newInputs[ index ] = value.trim() === '' ? '' : value;
 
 			return newInputs;
 		} );
@@ -45,8 +31,26 @@ const AutoTabbingInput = ( props ) => {
 		}
 	}, [] );
 
+	const handlePaste = useCallback( ( event ) => {
+		event.preventDefault();
+
+		const newInputs = event.clipboardData
+			.getData( 'Text' )
+			.replace( /[^0-9]/g, '' )
+			.split( '' );
+
+		if ( inputs.length === newInputs.length ) {
+			setInputs( newInputs );
+		} else {
+			setError( 'The code you pasted is not the correct length.' );
+		}
+	}, [] );
+
 	return (
-		<div className={ 'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' ) }>
+		<div
+			className={ 'wporg-2fa__auto-tabbing-input' + ( error ? ' is-error' : '' ) }
+			onPaste={ handlePaste }
+		>
 			{ inputs.map( ( value, index ) => (
 				<NumericControl
 					{ ...props }
