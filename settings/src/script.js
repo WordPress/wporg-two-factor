@@ -117,6 +117,12 @@ function Main( { userId } ) {
 			// Reset to initial after navigating away from a page.
 			if ( hasEdits ) {
 				edit( record );
+
+				// password is not reset by edit(record) as it's initially set as undefined.
+				// See https://github.com/WordPress/wporg-two-factor/issues/117#issuecomment-1515693367.
+				// we've tried setting its initial value as empty string, but this prevented email from being updated.
+				// See https://github.com/WordPress/wporg-two-factor/issues/175.
+				record.password = undefined;
 			}
 
 			currentUrl = new URL( document.location.href );
