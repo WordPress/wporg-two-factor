@@ -21,6 +21,7 @@ import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
+import WebAuthn from './components/webauthn';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
@@ -71,8 +72,13 @@ function Main( { userId } ) {
 		'backup-codes': BackupCodes,
 	};
 
+	// TODO: Only enable WebAuthn UI in development, until it's finished.
+	if ( 'development' === process.env.NODE_ENV ) {
+		components.webauthn = WebAuthn;
+	}
+
 	// The screens where a recent two factor challenge is required.
-	const twoFactorRequiredScreens = [ 'totp', 'backup-codes' ];
+	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
 
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
 

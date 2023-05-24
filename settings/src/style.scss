@@ -20,9 +20,13 @@ $alert-blue: #72aee6;
 .wp-block-wporg-two-factor-settings {
 	position: relative;
 
+	h3,
+	h4 {
+		clear: none;
+	}
+
 	h3 {
 		font-size: 14px;
-		clear: none;
 	}
 
 	/* Restore wporg-support styles that bbPress overrides */
@@ -37,7 +41,6 @@ $alert-blue: #72aee6;
 			font-family: "Open Sans", sans-serif;
 		}
 	}
-
 }
 
 .wporg-2fa__submit-actions {
@@ -67,6 +70,7 @@ $alert-blue: #72aee6;
 		margin: unset;
 		text-transform: capitalize;
 	}
+
 }
 
 .wporg-2fa__token {
@@ -95,6 +99,7 @@ $alert-blue: #72aee6;
 @import "components/account-status";
 @import "components/password";
 @import "components/email-address";
+@import "components/webauthn";
 @import "components/totp";
 @import "components/backup-codes";
 @import "components/setup-progress-bar";

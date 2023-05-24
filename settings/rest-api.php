@@ -2,6 +2,7 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
+use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request;
 
 defined( 'WPINC' ) || die();
@@ -197,6 +198,27 @@ function register_user_fields(): void {
 				$expires_at     = $last_validated + $expiry;
 
 				return compact( 'revalidate_url', 'expires_at' );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_webauthn_keys',
+		[
+			'get_callback' => function( $user ) {
+				$keys = WebAuthn_Credential_Store::get_user_keys( get_userdata( $user['id'] ) );
+
+				// Remove sensitive and unnecessary data.
+				array_walk( $keys, function( & $key ) {
+					$key = array_intersect_key( (array) $key, array_flip( [ 'id', 'name' ] ) );
+				} );
+
+				return $keys;
 			},
 			'schema' => [
 				'type'    => 'array',
