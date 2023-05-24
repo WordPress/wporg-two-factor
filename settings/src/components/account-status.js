@@ -28,6 +28,7 @@ export default function AccountStatus() {
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
+	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 
@@ -57,6 +58,20 @@ export default function AccountStatus() {
 						: `Your account email address is ${ email }.`
 				}
 			/>
+
+			{ /* TODO: Only enable WebAuthn UI in development, until it's finished. */ }
+			{ 'development' === process.env.NODE_ENV && (
+				<SettingStatusCard
+					screen="webauthn"
+					status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
+					headerText="Two-Factor Security Key"
+					bodyText={
+						webAuthnEnabled
+							? 'You have two-factor authentication enabled using security keys.'
+							: 'You have not registered any security keys.'
+					}
+				/>
+			) }
 
 			<SettingStatusCard
 				screen="totp"
