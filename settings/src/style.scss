@@ -1,6 +1,9 @@
 @import '~@wordpress/base-styles/colors';
 @import '~@wordpress/base-styles/colors.native';
 
+// Gutenberg doesn't provide an "info" color, so this is taken from wp-admin's `.notice-info` class.
+$alert-blue: #72aee6;
+
 #main {
 	margin-bottom: 2rem;
 }
