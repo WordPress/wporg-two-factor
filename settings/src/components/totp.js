@@ -330,12 +330,12 @@ function Manage() {
 			</p>
 
 			<p>
-				<strong>Status:</strong> Two-factor authentication is currently{ ' ' }
+				<strong>Status:</strong> Two-Factor app is currently{ ' ' }
 				<span className="wporg-2fa__enabled-status">on</span>.
 			</p>
 
 			<Button isPrimary onClick={ handleDisable }>
-				Disable Two-Factor Authentication
+				Disable Two-Factor app
 			</Button>
 
 			{ error && (
