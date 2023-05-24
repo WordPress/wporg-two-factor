@@ -3,7 +3,7 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
+import { Icon, cancelCircleFilled, check, chevronRight, info, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -60,7 +60,7 @@ export default function AccountStatus() {
 
 			<SettingStatusCard
 				screen="totp"
-				status={ totpEnabled }
+				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
 				headerText="Two-Factor App"
 				bodyText={
 					totpEnabled
@@ -132,6 +132,10 @@ function StatusIcon( { status } ) {
 		case 'ok':
 		case 'enabled':
 			icon = check;
+			break;
+
+		case 'info':
+			icon = info;
 			break;
 
 		case 'pending':
