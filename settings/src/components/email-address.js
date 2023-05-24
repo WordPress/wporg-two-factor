@@ -102,7 +102,7 @@ export default function EmailAddress() {
 				</Notice>
 			) }
 
-			<p>
+			<p className="wporg-2fa__submit-actions">
 				<Button
 					variant="primary"
 					onClick={ handleSave }

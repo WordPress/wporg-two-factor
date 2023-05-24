@@ -263,7 +263,7 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 					setError={ setError }
 				/>
 
-				<div className="wporg-2fa__submit-btn-container">
+				<div className="wporg-2fa__submit-btn-container wporg-2fa__submit-actions">
 					<Button
 						variant="secondary"
 						onClick={ handleClearClick }
