@@ -106,18 +106,13 @@
 
 	}
 
-	.wporg-2fa__submit-btn-container {
+	.wporg-2fa__submit-actions {
 		width: 100%;
-		display: flex;
 		justify-content: space-between;
 
 		* {
 			flex: 1;
 			justify-content: center;
-		}
-
-		button + button {
-			margin-right: 0 !important;
 		}
 	}
 
