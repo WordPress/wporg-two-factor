@@ -154,7 +154,10 @@ function Main( { userId } ) {
 				/>
 
 				<h3>
-					{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }
+					{ screen
+						.replace( '-', ' ' )
+						.replace( 'totp', 'Two-Factor App' )
+						.replace( 'webauthn', 'Two-Factor Security Key' ) }
 				</h3>
 			</CardHeader>
 

@@ -33,7 +33,7 @@ export default function AccountStatus() {
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider
-			? 'Please enable Two-Factor Authentication before enabling backup codes.'
+			? 'Please enable a Two-Factor security key or app before enabling backup codes.'
 			: `You have
 				${ backupCodesEnabled ? '' : 'not' }
 				verified your backup codes for two-factor authentication.`;
@@ -61,12 +61,11 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="totp"
 				status={ totpEnabled }
-				headerText="Two-Factor Authentication"
+				headerText="Two-Factor App"
 				bodyText={
 					totpEnabled
-						? /* @todo update this when hardware tokens become an additional option. */
-						  'You have two-factor authentication enabled using an app.'
-						: 'You do not have two-factor authentication enabled.'
+						? 'You have two-factor authentication enabled using an app.'
+						: 'You have not enabled an app for two-factor authentication.'
 				}
 			/>
 
