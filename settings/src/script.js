@@ -115,8 +115,14 @@ function Main( { userId } ) {
 			event.preventDefault();
 
 			// Reset to initial after navigating away from a page.
+			// Note: password was initially not in record, this would prevent incomplete state
+			// from resetting when leaving the password setting page.
+			// See https://github.com/WordPress/wporg-two-factor/issues/117#issuecomment-1515693367.
 			if ( hasEdits ) {
-				edit( record );
+				edit( {
+					...record,
+					password: undefined,
+				} );
 			}
 
 			currentUrl = new URL( document.location.href );

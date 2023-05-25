@@ -18,19 +18,11 @@ export function useUser( userId ) {
 		primaryProviders.includes( provider )
 	).length;
 
-	const user = {
+	return {
 		userRecord: { ...userRecord },
 		isSaving,
 		hasPrimaryProvider,
 	};
-
-	// Initialize the password as an empty string, necessary for resetting incomplete state when
-	// leaving the password setting page.
-	if ( user.userRecord.record && undefined === user.userRecord.record?.password ) {
-		user.userRecord.record.password = '';
-	}
-
-	return user;
 }
 
 /**
