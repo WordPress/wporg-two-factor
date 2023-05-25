@@ -41,6 +41,14 @@ require_once __DIR__ . '/settings/settings.php';
 function load_webauthn_plugin() {
 	global $wpdb;
 
+	// Bail if the WebAuthn plugin is unavailable.
+	if ( ! class_exists( '\WildWolf\WordPress\TwoFactorWebAuthn\Plugin' ) ) {
+		if ( 'production' === wp_get_environment_type() ) {
+			trigger_error( 'Two Factor WebAuthn plugin missing.', E_USER_WARNING );
+		}
+		return;
+	}
+	
 	$webauthn = WebAuthn_Plugin::instance();
 	$webauthn->init();
 
