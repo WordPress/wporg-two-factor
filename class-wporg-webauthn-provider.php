@@ -7,6 +7,8 @@ use function WordPressdotorg\Two_Factor\{ after_provider_setup, after_provider_d
  * Extends the TwoFactor_Provider_WebAuthn class for WordPress.org needs.
  */
 class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
+	static $use_caching = true;
+
 	/**
 	 * Use the parent class as the "key" in the Two Factor UI.
 	 */
@@ -43,7 +45,7 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	 */
 	public function is_available_for_user( $user ) {
 		$is_available = wp_cache_get( 'webauthn:' . $user->ID, 'users', false, $found );
-		if ( $found ) {
+		if ( $found && self::$use_caching ) {
 			return $is_available;
 		}
 
@@ -92,6 +94,9 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 	 * This is pending an upstream PR for the revalidation.
 	 */
 	public function _webauthn_ajax_request() {
+		// Disable caching while we're making WebAuthn requests.
+		self::$use_caching = false;
+
 		// Check the users session is still active and 2FA revalidation isn't required.
 		if ( ! Two_Factor_Core::current_user_can_update_two_factor_options() ) {
 			wp_send_json_error( 'Your session has expired. Please refresh the page and try again.' );
