@@ -18,13 +18,11 @@ export function useUser( userId ) {
 		primaryProviders.includes( provider )
 	).length;
 
-	const user = {
+	return {
 		userRecord: { ...userRecord },
 		isSaving,
 		hasPrimaryProvider,
 	};
-
-	return user;
 }
 
 /**
