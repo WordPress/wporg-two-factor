@@ -65,11 +65,11 @@ function Main( { userId } ) {
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
-		'account-status': AccountStatus,
-		email: EmailAddress,
-		password: Password,
-		totp: TOTP,
-		'backup-codes': BackupCodes,
+		'account-status': <AccountStatus />,
+		email: <EmailAddress />,
+		password: <Password />,
+		totp: <TOTP />,
+		'backup-codes': <BackupCodes />,
 	};
 
 	// TODO: Only enable WebAuthn UI in development, until it's finished.
@@ -89,7 +89,7 @@ function Main( { userId } ) {
 	}
 
 	const [ screen, setScreen ] = useState( initialScreen );
-	const CurrentScreen = components[ screen ];
+	const currentScreen = components[ screen ];
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -145,36 +145,33 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
-	let screenContent = (
-		<Card>
-			<CardHeader className="wporg-2fa__navigation" size="xSmall">
-				<ScreenLink
-					screen="account-status"
-					ariaLabel="Back to the account status page"
-					anchorText={
-						<>
-							<Icon icon={ chevronLeft } />
-							Back
-						</>
-					}
-				/>
+	let screenContent = currentScreen;
 
-				<h3>
-					{ screen
-						.replace( '-', ' ' )
-						.replace( 'totp', 'Two-Factor App' )
-						.replace( 'webauthn', 'Two-Factor Security Key' ) }
-				</h3>
-			</CardHeader>
+	if ( 'account-status' !== screen ) {
+		screenContent = (
+			<Card>
+				<CardHeader className="wporg-2fa__navigation" size="xSmall">
+					<ScreenLink
+						screen="account-status"
+						ariaLabel="Back to the account status page"
+						anchorText={
+							<>
+								<Icon icon={ chevronLeft } />
+								Back
+							</>
+						}
+					/>
 
-			<CardBody className={ 'wporg-2fa__' + screen }>
-				<CurrentScreen />
-			</CardBody>
-		</Card>
-	);
-
-	if ( 'account-status' === screen ) {
-		screenContent = <AccountStatus />;
+					<h3>
+						{ screen
+							.replace( '-', ' ' )
+							.replace( 'totp', 'Two-Factor Authentication' )
+							.replace( 'webauthn', 'Two-Factor Security Key' ) }
+					</h3>
+				</CardHeader>
+				<CardBody className={ 'wporg-2fa__' + screen }>{ currentScreen }</CardBody>
+			</Card>
+		);
 	} else if (
 		twoFactorRequiredScreens.includes( screen ) &&
 		hasPrimaryProvider &&
@@ -182,7 +179,7 @@ function Main( { userId } ) {
 	) {
 		screenContent = (
 			<>
-				<AccountStatus />
+				{ currentScreen }
 				<RevalidateModal />
 			</>
 		);
