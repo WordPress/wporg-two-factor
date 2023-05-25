@@ -13,8 +13,11 @@ import ScreenLink from './screen-link';
 
 /**
  * Render the Account Status.
+ *
+ * @param root0
+ * @param root0.backupCodesEnabled
  */
-export default function AccountStatus() {
+export default function AccountStatus( { backupCodesEnabled } ) {
 	const {
 		user: {
 			userRecord: {
@@ -30,7 +33,6 @@ export default function AccountStatus() {
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
 	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
-	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider

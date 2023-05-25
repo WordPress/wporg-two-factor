@@ -61,15 +61,17 @@ function Main( { userId } ) {
 		hasPrimaryProvider,
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
+	const backupCodesEnabled =
+		record?.[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 	let currentUrl = new URL( document.location.href );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
-		'account-status': <AccountStatus />,
+		'account-status': <AccountStatus backupCodesEnabled={ backupCodesEnabled } />,
 		email: <EmailAddress />,
 		password: <Password />,
 		totp: <TOTP />,
-		'backup-codes': <BackupCodes />,
+		'backup-codes': <BackupCodes backupCodesEnabled={ backupCodesEnabled } />,
 	};
 
 	// TODO: Only enable WebAuthn UI in development, until it's finished.
