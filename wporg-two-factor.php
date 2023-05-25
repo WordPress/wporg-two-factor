@@ -298,6 +298,70 @@ function get_edit_account_url() : string {
 	return $url;
 }
 
+/**
+ * Called after a provider is setup, such that we can bump the revalidation and/or flag the 2fa session.
+ *
+ * @param int $user_id
+ * @param string|null $provider
+ */
+function after_provider_setup( $user_id, $provider ) {
+	$user_id = intval( $user_id );
+
+	error_log( __FUNCTION__ . " called for user {$user_id} with provider {" . get_class( $provider ) . "}" );
+
+	if ( $user_id !== get_current_user_id() ) {
+		return;
+	}
+
+	// Bump session revalidation upon TOTP being setup.
+	if ( Two_Factor_Core::is_current_user_session_two_factor() ) {
+		// Bump time
+		Two_Factor_Core::update_current_user_session( [
+			'two-factor-login' => time(),
+		] );
+	} else {
+		// Set the session to be two-factor.
+		Two_Factor_Core::update_current_user_session( [
+			'two-factor-provider' => $provider->get_key(),
+			'two-factor-login'    => time(),
+		] );
+	}
+}
+
+/**
+ * Called after a provider is deactivated, such that deactivate a 2fa session if required.
+ *
+ * @param int $user_id
+ * @param string|null $provider
+ */
+function after_provider_deactivated( $user_id, $provider = null ) {
+	$user_id = intval( $user_id );
+	error_log( __FUNCTION__ . " called for user {$user_id} with provider {" . get_class( $provider ) . "}" );
+
+	if ( $user_id !== get_current_user_id() ) {
+		return;
+	}
+
+	if ( ! Two_Factor_Core::is_current_user_session_two_factor() ) {
+		return;
+	}
+
+	$available_providers = Two_Factor_Core::get_available_providers_for_user( $user_id );
+
+	// Workaround until #164 lands.
+	unset( $available_providers['Two_Factor_Backup_Codes'] );
+
+	error_log( print_r( $available_providers, true ) );
+
+	// If they no longer have 2FA providers setup, remove the session meta.
+	if ( ! $available_providers ) {
+		Two_Factor_Core::update_current_user_session( [
+			'two-factor-provider' => null,
+			'two-factor-login'    => null,
+		] );
+	}
+}
+
 /*
  * Switch out the TOTP provider for one that encrypts the TOTP key.
  */

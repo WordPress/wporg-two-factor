@@ -1,6 +1,7 @@
 <?php
 namespace WordPressdotorg\Two_Factor;
 use TwoFactor_Provider_WebAuthn, Two_Factor_Core;
+use function WordPressdotorg\Two_Factor\{ after_provider_setup, after_provider_deactivated };
 
 /**
  * Extends the TwoFactor_Provider_WebAuthn class for WordPress.org needs.
@@ -80,6 +81,9 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 
 		// Extend the session revalidation after registering a new key.
 		add_action( 'wp_ajax_webauthn_register', [ $this, '_extend_revalidation' ], 1 );
+
+		// Deactivate the session 2fa status after deleting keys if they don't have TOTP setup.
+		add_action( 'wp_ajax_webauthn_delete_key',  [ $this, '_delete_key' ], 1 );
 	}
 
 	/**
@@ -118,10 +122,21 @@ class WPORG_TwoFactor_Provider_WebAuthn extends TwoFactor_Provider_WebAuthn {
 		ob_start( function( $output ) {
 			$json = json_decode( $output, true );
 			if ( ! empty( $json['success'] ) ) {
-				// Bump session revalidation.
-				Two_Factor_Core::update_current_user_session( [
-					'two-factor-login' => time(),
-				] );
+				after_provider_setup( $_REQUEST['user_id'], $this );
+			}
+
+			return $output;
+		} );
+	}
+
+	/**
+	 * Fire the deactivation callback once a key is deleted.
+	 */
+	public function _delete_key() {
+		ob_start( function( $output ) {
+			$json = json_decode( $output, true );
+			if ( ! empty( $json['success'] ) ) {
+				after_provider_deactivated( $_REQUEST['user_id'], $this );
 			}
 
 			return $output;
