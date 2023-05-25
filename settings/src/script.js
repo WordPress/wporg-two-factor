@@ -63,6 +63,8 @@ function Main( { userId } ) {
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 
 	let currentUrl = new URL( document.location.href );
+	let initialScreen = currentUrl.searchParams.get( 'screen' );
+	const [ screen, setScreen ] = useState( initialScreen );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -70,7 +72,7 @@ function Main( { userId } ) {
 		email: <EmailAddress />,
 		password: <Password />,
 		totp: <TOTP />,
-		'backup-codes': <BackupCodes />,
+		'backup-codes': <BackupCodes setScreen={ setScreen } />,
 	};
 
 	// TODO: Only enable WebAuthn UI in development, until it's finished.
@@ -81,16 +83,11 @@ function Main( { userId } ) {
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
 
-	let initialScreen = currentUrl.searchParams.get( 'screen' );
-
 	if ( ! components[ initialScreen ] ) {
 		initialScreen = 'account-status';
 		currentUrl.searchParams.set( 'screen', initialScreen );
 		window.history.pushState( {}, '', currentUrl );
 	}
-
-	const [ screen, setScreen ] = useState( initialScreen );
-	const currentScreen = components[ screen ];
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -146,6 +143,7 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
+	const currentScreen = components[ screen ];
 	let screenContent = currentScreen;
 
 	if ( 'account-status' !== screen ) {
