@@ -14,13 +14,7 @@ import AutoTabbingInput from './auto-tabbing-input';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
-export default function TOTP() {
-	const {
-		user: { userRecord },
-	} = useContext( GlobalContext );
-	const availableProviders = userRecord.record[ '2fa_available_providers' ];
-	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
-
+export default function TOTP( { totpEnabled } ) {
 	if ( totpEnabled ) {
 		return <Manage />;
 	}

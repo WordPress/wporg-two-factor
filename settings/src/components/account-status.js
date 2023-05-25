@@ -16,8 +16,9 @@ import ScreenLink from './screen-link';
  *
  * @param root0
  * @param root0.backupCodesEnabled
+ * @param root0.totpEnabled
  */
-export default function AccountStatus( { backupCodesEnabled } ) {
+export default function AccountStatus( { totpEnabled, backupCodesEnabled } ) {
 	const {
 		user: {
 			userRecord: {
@@ -32,7 +33,6 @@ export default function AccountStatus( { backupCodesEnabled } ) {
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
 	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
-	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider
