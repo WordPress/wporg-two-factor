@@ -307,15 +307,12 @@ function get_edit_account_url() : string {
 function after_provider_setup( $user_id, $provider ) {
 	$user_id = intval( $user_id );
 
-	error_log( __FUNCTION__ . " called for user {$user_id} with provider {" . get_class( $provider ) . "}" );
-
 	if ( $user_id !== get_current_user_id() ) {
 		return;
 	}
 
 	// Bump session revalidation upon TOTP being setup.
 	if ( Two_Factor_Core::is_current_user_session_two_factor() ) {
-		// Bump time
 		Two_Factor_Core::update_current_user_session( [
 			'two-factor-login' => time(),
 		] );
@@ -336,7 +333,6 @@ function after_provider_setup( $user_id, $provider ) {
  */
 function after_provider_deactivated( $user_id, $provider = null ) {
 	$user_id = intval( $user_id );
-	error_log( __FUNCTION__ . " called for user {$user_id} with provider {" . get_class( $provider ) . "}" );
 
 	if ( $user_id !== get_current_user_id() ) {
 		return;
@@ -350,8 +346,6 @@ function after_provider_deactivated( $user_id, $provider = null ) {
 
 	// Workaround until #164 lands.
 	unset( $available_providers['Two_Factor_Backup_Codes'] );
-
-	error_log( print_r( $available_providers, true ) );
 
 	// If they no longer have 2FA providers setup, remove the session meta.
 	if ( ! $available_providers ) {
