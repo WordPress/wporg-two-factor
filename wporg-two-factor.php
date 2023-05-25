@@ -311,18 +311,11 @@ function after_provider_setup( $user_id, $provider ) {
 		return;
 	}
 
-	// Bump session revalidation upon TOTP being setup.
-	if ( Two_Factor_Core::is_current_user_session_two_factor() ) {
-		Two_Factor_Core::update_current_user_session( [
-			'two-factor-login' => time(),
-		] );
-	} else {
-		// Set the session to be two-factor.
-		Two_Factor_Core::update_current_user_session( [
-			'two-factor-provider' => $provider->get_key(),
-			'two-factor-login'    => time(),
-		] );
-	}
+	// Bump session revalidation upon it being setup, or a new key configured.
+	Two_Factor_Core::update_current_user_session( [
+		'two-factor-provider' => $provider->get_key(),
+		'two-factor-login'    => time(),
+	] );
 }
 
 /**
