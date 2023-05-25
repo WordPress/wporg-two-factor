@@ -1,6 +1,7 @@
 <?php
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Totp;
+use function WordPressdotorg\Two_Factor\{ after_provider_setup, after_provider_deactivated };
 
 /**
  * Extends the default Two_Factor_Totp class to encrypt the TOTP key.
@@ -25,7 +26,30 @@ class Encrypted_Totp_Provider extends Two_Factor_Totp {
 			$key = wporg_encrypt( $key, (string) $user_id, 'two-factor' );
 		}
 
-		return parent::set_user_totp_key( $user_id, (string) $key );
+		$result = parent::set_user_totp_key( $user_id, (string) $key );
+
+		if ( $result ) {
+			after_provider_setup( $user_id, $this );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Delete the TOTP secret key for a user.
+	 *
+	 * @param  int $user_id User ID.
+	 *
+	 * @return boolean If the key was deleted successfully.
+	 */
+	public function delete_user_totp_key( $user_id ) {
+		$result = parent::delete_user_totp_key( $user_id );
+
+		if ( $result ) {
+			after_provider_deactivated( $user_id, $this );
+		}
+
+		return $result;
 	}
 
 	/**
