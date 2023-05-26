@@ -84,9 +84,10 @@ function Setup( { setRegenerating } ) {
 	}, [] );
 
 	// Finish the setup process.
-	const handleFinished = useCallback( () => {
+	const handleFinished = useCallback( async () => {
+		// TODO: Add try catch here after https://github.com/WordPress/wporg-two-factor/pull/187/files is merged.
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
-		refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
+		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
 	} );
