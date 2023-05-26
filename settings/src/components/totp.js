@@ -74,7 +74,7 @@ function Setup() {
 				},
 			} );
 
-			refreshRecord( userRecord );
+			await refreshRecord( userRecord );
 			clickScreenLink( event, 'backup-codes' );
 			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
 		} catch ( handleEnableError ) {
@@ -304,7 +304,7 @@ function Manage() {
 				data: { user_id: userRecord.record.id },
 			} );
 
-			refreshRecord( userRecord );
+			await refreshRecord( userRecord );
 			setGlobalNotice( 'Successfully disabled One Time Passwords.' );
 		} catch ( handleDisableError ) {
 			setError( handleDisableError.message );

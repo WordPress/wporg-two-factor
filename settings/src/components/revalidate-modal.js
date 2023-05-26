@@ -37,7 +37,7 @@ function RevalidateIframe() {
 	const ref = useRef();
 
 	useEffect( () => {
-		function maybeRefreshUser( { data: { type, message } = {} } ) {
+		async function maybeRefreshUser( { data: { type, message } = {} } ) {
 			if ( type !== 'reValidationComplete' ) {
 				return;
 			}
@@ -49,7 +49,12 @@ function RevalidateIframe() {
 			record[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
-			refreshRecord( userRecord );
+			try {
+				await refreshRecord( userRecord );
+			} catch ( error ) {
+				// TODO: handle error more properly here, likely by showing a error notice
+				console.error( 'Failed to refresh user record:', error );
+			}
 		}
 
 		window.addEventListener( 'message', maybeRefreshUser );
