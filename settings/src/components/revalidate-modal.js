@@ -53,6 +53,7 @@ function RevalidateIframe() {
 				await refreshRecord( userRecord );
 			} catch ( error ) {
 				// TODO: handle error more properly here, likely by showing a error notice
+				// eslint-disable-next-line no-console
 				console.error( 'Failed to refresh user record:', error );
 			}
 		}
