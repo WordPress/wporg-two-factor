@@ -14,12 +14,25 @@ import { refreshRecord } from '../utilities';
 
 /**
  * Setup and manage backup codes.
+ *
+ * @param props
+ * @param props.setScreen
  */
-export default function BackupCodes() {
+export default function BackupCodes( { setScreen } ) {
 	const {
-		user: { backupCodesEnabled },
+		user: { totpEnabled, backupCodesEnabled },
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
+
+	// If TOTP hasn't been enabled, the user should not have access to BackupCodes component.
+	// This is primarily added to prevent users from accessing through the URL.
+	if ( ! totpEnabled ) {
+		const currentUrl = new URL( document.location.href );
+		currentUrl.searchParams.set( 'screen', 'account-status' );
+		window.history.pushState( {}, '', currentUrl );
+		setScreen( 'account-status' );
+		return;
+	}
 
 	if ( backupCodesEnabled && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
