@@ -64,12 +64,19 @@ function Main( { userId } ) {
 	const totpEnabled = record?.[ '2fa_available_providers' ].includes( 'Two_Factor_Totp' );
 	const backupCodesEnabled =
 		record?.[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
+	const webAuthnEnabled = record?.[ '2fa_available_providers' ].includes(
+		'TwoFactor_Provider_WebAuthn'
+	);
 	let currentUrl = new URL( document.location.href );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
 		'account-status': (
-			<AccountStatus totpEnabled={ totpEnabled } backupCodesEnabled={ backupCodesEnabled } />
+			<AccountStatus
+				totpEnabled={ totpEnabled }
+				backupCodesEnabled={ backupCodesEnabled }
+				webAuthnEnabled={ webAuthnEnabled }
+			/>
 		),
 		email: <EmailAddress />,
 		password: <Password />,

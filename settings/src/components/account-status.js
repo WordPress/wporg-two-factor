@@ -15,24 +15,20 @@ import ScreenLink from './screen-link';
  * Render the Account Status.
  *
  * @param root0
- * @param root0.backupCodesEnabled
  * @param root0.totpEnabled
+ * @param root0.backupCodesEnabled
+ * @param root0.webAuthnEnabled
  */
-export default function AccountStatus( { totpEnabled, backupCodesEnabled } ) {
+export default function AccountStatus( { totpEnabled, backupCodesEnabled, webAuthnEnabled } ) {
 	const {
 		user: {
 			userRecord: {
-				record: {
-					'2fa_available_providers': availableProviders,
-					email,
-					pending_email: pendingEmail,
-				},
+				record: { email, pending_email: pendingEmail },
 			},
 			hasPrimaryProvider,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
-	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider
