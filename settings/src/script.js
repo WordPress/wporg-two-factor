@@ -21,7 +21,7 @@ import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
 import TOTP from './components/totp';
-import WebAuthn from './components/webauthn';
+import WebAuthn from './components/webauthn/webauthn';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
