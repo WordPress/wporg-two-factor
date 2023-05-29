@@ -213,9 +213,11 @@ function register_user_fields(): void {
 			'get_callback' => function( $user ) {
 				$keys = WebAuthn_Credential_Store::get_user_keys( get_userdata( $user['id'] ) );
 
-				// Remove sensitive and unnecessary data.
 				array_walk( $keys, function( & $key ) {
-					$key = array_intersect_key( (array) $key, array_flip( [ 'id', 'name' ] ) );
+					$key->delete_nonce = wp_create_nonce( 'delete-key_' . $key->credential_id );
+
+					// Remove unnecessary data.
+					$key = array_intersect_key( (array) $key, array_flip( [ 'id', 'credential_id', 'name', 'delete_nonce' ] ) );
 				} );
 
 				return $keys;

@@ -11,6 +11,9 @@ import { Icon, check } from '@wordpress/icons';
 import { GlobalContext } from '../../script';
 import ListKeys from './list-keys';
 
+/**
+ * Global dependencies
+ */
 const confirm = window.confirm;
 
 /**
@@ -20,7 +23,6 @@ export default function WebAuthn() {
 	const {
 		user: { userRecord },
 	} = useContext( GlobalContext );
-	const userKeys = userRecord.record[ '2fa_webauthn_keys' ];
 	const backupCodesEnabled =
 		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 	const [ step, setStep ] = useState( 'manage' );
@@ -44,10 +46,12 @@ export default function WebAuthn() {
 
 	return (
 		<>
-			{ 'manage' === step && <Manage setStep={ setStep } userKeys={ userKeys } /> }
+			{ 'manage' === step && <Manage setStep={ setStep } /> }
 
 			{ 'register' === step && (
 				<RegisterKey registerClickHandler={ () => setStep( 'waiting' ) } />
+				// convert to named func that makes api call to register key
+				// handle failure
 			) }
 
 			{ 'waiting' === step && (
@@ -64,9 +68,8 @@ export default function WebAuthn() {
  *
  * @param props
  * @param props.setStep
- * @param props.userKeys
  */
-function Manage( { setStep, userKeys } ) {
+function Manage( { setStep } ) {
 	return (
 		<>
 			<p>
@@ -77,7 +80,8 @@ function Manage( { setStep, userKeys } ) {
 			</p>
 
 			<h4>Security Keys</h4>
-			<ListKeys keys={ userKeys } />
+
+			<ListKeys />
 
 			<p className="wporg-2fa__submit-actions">
 				<Button variant="primary" onClick={ () => setStep( 'register' ) }>
@@ -108,7 +112,8 @@ function Manage( { setStep, userKeys } ) {
 function RegisterKey( { registerClickHandler } ) {
 	return (
 		<form>
-			<TextControl label="Give the security key a name"></TextControl>
+			<TextControl label="Give the security key a name" />
+			{ /* todo add basic clientside validation */ }
 
 			<div className="wporg-2fa__submit-actions">
 				<Button variant="primary" onClick={ registerClickHandler }>
