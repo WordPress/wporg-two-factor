@@ -17,7 +17,7 @@
 	"textdomain": "wporg",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"viewScript": [ "zxcvbn-async", "two-factor-qr-code-generator", "file:./script.js" ],
+	"viewScript": [ "wp-util", "zxcvbn-async", "two-factor-qr-code-generator", "file:./script.js" ],
 	"style": [ "file:./style-index.css", "wp-components" ],
 	"render": "file:./render.php"
 }
