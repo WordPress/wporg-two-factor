@@ -29,16 +29,18 @@ export default function WebAuthn() {
 	// and then replace userkeys with the value returned by the call
 	// probably also refreshRecord( userRecord );
 	const onRegisterSuccess = useCallback( () => {
-		userKeys.push( {
-			id: 1111,
+		const newKeys = userRecord.record[ '2fa_webauthn_keys' ].push( {
+			id: Math.random(),
 			name: 'New Key',
 		} );
+
+		userRecord.edit( { '2fa_webauthn_keys': newKeys } );
 		setStep( 'success' );
 
 		if ( ! backupCodesEnabled ) {
 			// todo redirect to backup codes
 		}
-	}, [ userKeys ] );
+	}, [ userRecord.record[ '2fa_webauthn_keys' ] ] );
 
 	return (
 		<>
