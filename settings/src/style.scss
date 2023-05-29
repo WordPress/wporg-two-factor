@@ -99,7 +99,7 @@ $alert-blue: #72aee6;
 @import "components/account-status";
 @import "components/password";
 @import "components/email-address";
-@import "components/webauthn";
+@import "components/webauthn/webauthn";
 @import "components/totp";
 @import "components/backup-codes";
 @import "components/setup-progress-bar";
