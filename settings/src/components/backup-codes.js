@@ -4,12 +4,11 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
 import { Button, CheckboxControl, Notice, Spinner } from '@wordpress/components';
-import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import RevalidateModal from './revalidate-modal';
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities';
 
@@ -91,33 +90,21 @@ function Setup( { setRegenerating } ) {
 
 			<p>Please print the codes and keep them in a safe place.</p>
 
-			{ error ? (
-				<>
-					{ error.code === 'revalidation_required' && <RevalidateModal /> }
-					<Notice status="error" isDismissible={ false }>
-						<Icon icon={ cancelCircleFilled } />
-						{ error.message }
-					</Notice>
-				</>
-			) : (
-				<>
-					<CodeList codes={ backupCodes } />
+			<CodeList codes={ backupCodes } />
 
-					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-						Without access to the one-time password app or a backup code, you will lose
-						access to your account. Once you navigate away from this page, you will not
-						be able to view these codes again.
-					</Notice>
+			<Notice status="warning" isDismissible={ false }>
+				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+				Without access to the one-time password app or a backup code, you will lose access
+				to your account. Once you navigate away from this page, you will not be able to view
+				these codes again.
+			</Notice>
 
-					<CheckboxControl
-						label="I have printed or saved these codes"
-						checked={ hasPrinted }
-						onChange={ setHasPrinted }
-						disabled={ error }
-					/>
-				</>
-			) }
+			<CheckboxControl
+				label="I have printed or saved these codes"
+				checked={ hasPrinted }
+				onChange={ setHasPrinted }
+				disabled={ error }
+			/>
 
 			<p className="wporg-2fa__submit-actions">
 				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>

@@ -89,7 +89,7 @@ export default function AccountStatus() {
 				status={ backupCodesEnabled }
 				headerText="Two-Factor Backup Codes"
 				bodyText={ backupBodyText }
-				disabled={ ! backupCodesEnabled }
+				// disabled={ ! backupCodesEnabled }
 			/>
 		</div>
 	);
