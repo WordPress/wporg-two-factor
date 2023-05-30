@@ -13,19 +13,17 @@ import ScreenLink from './screen-link';
 
 /**
  * Render the Account Status.
- *
- * @param props
- * @param props.totpEnabled
- * @param props.backupCodesEnabled
- * @param props.webAuthnEnabled
  */
-export default function AccountStatus( { totpEnabled, backupCodesEnabled, webAuthnEnabled } ) {
+export default function AccountStatus() {
 	const {
 		user: {
 			userRecord: {
 				record: { email, pending_email: pendingEmail },
 			},
 			hasPrimaryProvider,
+			totpEnabled,
+			backupCodesEnabled,
+			webAuthnEnabled,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';

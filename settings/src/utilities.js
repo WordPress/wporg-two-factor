@@ -17,11 +17,17 @@ export function useUser( userId ) {
 	const hasPrimaryProvider = !! availableProviders.filter( ( provider ) =>
 		primaryProviders.includes( provider )
 	).length;
+	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
+	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
+	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
 
 	return {
 		userRecord: { ...userRecord },
 		isSaving,
 		hasPrimaryProvider,
+		totpEnabled,
+		backupCodesEnabled,
+		webAuthnEnabled,
 	};
 }
 

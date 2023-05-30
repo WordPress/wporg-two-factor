@@ -14,11 +14,11 @@ import { refreshRecord } from '../utilities';
 
 /**
  * Setup and manage backup codes.
- *
- * @param props
- * @param props.backupCodesEnabled
  */
-export default function BackupCodes( { backupCodesEnabled } ) {
+export default function BackupCodes() {
+	const {
+		user: { backupCodesEnabled },
+	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
 	if ( backupCodesEnabled && ! regenerating ) {

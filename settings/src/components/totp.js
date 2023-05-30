@@ -14,7 +14,11 @@ import AutoTabbingInput from './auto-tabbing-input';
 import { refreshRecord } from '../utilities';
 import { GlobalContext } from '../script';
 
-export default function TOTP( { totpEnabled } ) {
+export default function TOTP() {
+	const {
+		user: { totpEnabled },
+	} = useContext( GlobalContext );
+
 	if ( totpEnabled ) {
 		return <Manage />;
 	}
