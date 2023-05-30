@@ -14,10 +14,10 @@ import ScreenLink from './screen-link';
 /**
  * Render the Account Status.
  *
- * @param root0
- * @param root0.totpEnabled
- * @param root0.backupCodesEnabled
- * @param root0.webAuthnEnabled
+ * @param props
+ * @param props.totpEnabled
+ * @param props.backupCodesEnabled
+ * @param props.webAuthnEnabled
  */
 export default function AccountStatus( { totpEnabled, backupCodesEnabled, webAuthnEnabled } ) {
 	const {

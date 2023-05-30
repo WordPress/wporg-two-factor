@@ -15,8 +15,8 @@ import { refreshRecord } from '../utilities';
 /**
  * Setup and manage backup codes.
  *
- * @param root0
- * @param root0.backupCodesEnabled
+ * @param props
+ * @param props.backupCodesEnabled
  */
 export default function BackupCodes( { backupCodesEnabled } ) {
 	const [ regenerating, setRegenerating ] = useState( false );
