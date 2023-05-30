@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
 import { Button, CheckboxControl, Notice, Spinner } from '@wordpress/components';
-import { Icon, warning } from '@wordpress/icons';
+import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,6 +43,7 @@ function Setup( { setRegenerating } ) {
 	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ] = useState( false );
+	const [ error, setError ] = useState( '' );
 
 	// Generate new backup codes and save them in usermeta.
 	useEffect( () => {
@@ -52,16 +53,20 @@ function Setup( { setRegenerating } ) {
 			// mimics the upstream plugin. It's probably better to fix it there first, and then update this, to
 			// make sure we stay in sync with upstream.
 			// See https://github.com/WordPress/two-factor/issues/507
-			const response = await apiFetch( {
-				path: '/two-factor/1.0/generate-backup-codes',
-				method: 'POST',
-				data: {
-					user_id: userRecord.record.id,
-					enable_provider: true,
-				},
-			} );
+			try {
+				const response = await apiFetch( {
+					path: '/two-factor/1.0/generate-backup-codes',
+					method: 'POST',
+					data: {
+						user_id: userRecord.record.id,
+						enable_provider: true,
+					},
+				} );
 
-			setBackupCodes( response.codes );
+				setBackupCodes( response.codes );
+			} catch ( apiFetchError ) {
+				setError( apiFetchError );
+			}
 		};
 
 		generateCodes();
@@ -85,20 +90,30 @@ function Setup( { setRegenerating } ) {
 
 			<p>Please print the codes and keep them in a safe place.</p>
 
-			<CodeList codes={ backupCodes } />
+			{ error ? (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ error.message }
+				</Notice>
+			) : (
+				<>
+					<CodeList codes={ backupCodes } />
 
-			<Notice status="warning" isDismissible={ false }>
-				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-				Without access to the one-time password app or a backup code, you will lose access
-				to your account. Once you navigate away from this page, you will not be able to view
-				these codes again.
-			</Notice>
+					<Notice status="warning" isDismissible={ false }>
+						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+						Without access to the one-time password app or a backup code, you will lose
+						access to your account. Once you navigate away from this page, you will not
+						be able to view these codes again.
+					</Notice>
 
-			<CheckboxControl
-				label="I have printed or saved these codes"
-				checked={ hasPrinted }
-				onChange={ setHasPrinted }
-			/>
+					<CheckboxControl
+						label="I have printed or saved these codes"
+						checked={ hasPrinted }
+						onChange={ setHasPrinted }
+						disabled={ error }
+					/>
+				</>
+			) }
 
 			<p className="wporg-2fa__submit-actions">
 				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
