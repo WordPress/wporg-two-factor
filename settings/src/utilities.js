@@ -13,13 +13,10 @@ export function useUser( userId ) {
 	);
 
 	const availableProviders = userRecord.record?.[ '2fa_available_providers' ] ?? [];
-	const primaryProviders = [ 'Two_Factor_Totp', 'TwoFactor_Provider_WebAuthn' ];
-	const hasPrimaryProvider = !! availableProviders.filter( ( provider ) =>
-		primaryProviders.includes( provider )
-	).length;
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
+	const hasPrimaryProvider = totpEnabled || webAuthnEnabled;
 
 	return {
 		userRecord: { ...userRecord },
