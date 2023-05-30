@@ -170,18 +170,14 @@ function Main( { userId } ) {
 				<CardBody className={ 'wporg-2fa__' + screen }>{ currentScreen }</CardBody>
 			</Card>
 		);
-	} else if (
+	}
+
+	const isRevalidationExpired =
 		twoFactorRequiredScreens.includes( screen ) &&
 		hasPrimaryProvider &&
-		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
-	) {
-		screenContent = (
-			<>
-				{ currentScreen }
-				<RevalidateModal />
-			</>
-		);
-	}
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000;
+
+	const shouldRevalidate = 'revalidation_required' === error.code || isRevalidationExpired;
 
 	return (
 		<GlobalContext.Provider
@@ -189,7 +185,7 @@ function Main( { userId } ) {
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
-			{ 'revalidation_required' === error.code && <RevalidateModal /> }
+			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
 }
