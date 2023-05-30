@@ -86,7 +86,7 @@ function Main( { userId } ) {
 
 	// TODO: Only enable WebAuthn UI in development, until it's finished.
 	if ( 'development' === process.env.NODE_ENV ) {
-		components.webauthn = WebAuthn;
+		components.webauthn = <WebAuthn />;
 	}
 
 	// The screens where a recent two factor challenge is required.
