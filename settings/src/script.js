@@ -61,6 +61,7 @@ function Main( { userId } ) {
 		hasPrimaryProvider,
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
+	const [ error, setError ] = useState( '' );
 
 	let currentUrl = new URL( document.location.href );
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
@@ -183,9 +184,12 @@ function Main( { userId } ) {
 	}
 
 	return (
-		<GlobalContext.Provider value={ { navigateToScreen, user, setGlobalNotice } }>
+		<GlobalContext.Provider
+			value={ { navigateToScreen, user, setGlobalNotice, setError, error } }
+		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
+			{ 'revalidation_required' === error.code && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
 }
