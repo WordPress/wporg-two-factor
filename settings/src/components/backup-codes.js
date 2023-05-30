@@ -9,7 +9,6 @@ import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import RevalidateModal from './revalidate-modal';
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities';
 
@@ -92,13 +91,10 @@ function Setup( { setRegenerating } ) {
 			<p>Please print the codes and keep them in a safe place.</p>
 
 			{ error ? (
-				<>
-					{ error.code === 'revalidation_required' && <RevalidateModal /> }
-					<Notice status="error" isDismissible={ false }>
-						<Icon icon={ cancelCircleFilled } />
-						{ error.message }
-					</Notice>
-				</>
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ error.message }
+				</Notice>
 			) : (
 				<>
 					<CodeList codes={ backupCodes } />
