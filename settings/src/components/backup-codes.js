@@ -46,10 +46,11 @@ function Setup( { setRegenerating } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
+		setError,
+		error,
 	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ] = useState( false );
-	const [ error, setError ] = useState( '' );
 
 	// Generate new backup codes and save them in usermeta.
 	useEffect( () => {
