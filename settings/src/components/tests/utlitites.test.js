@@ -5,6 +5,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
+import { renderHook } from '@testing-library/react';
 
 /**
  * Local dependencies
@@ -23,7 +24,7 @@ describe( 'useUser', () => {
 	it( 'should call useEntityRecord with correct arguments', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		useUser( 1 );
+		renderHook( () => useUser( 1 ) );
 
 		expect( useEntityRecord ).toHaveBeenCalledWith( 'root', 'user', 1 );
 	} );
@@ -32,7 +33,9 @@ describe( 'useUser', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 		useSelect.mockReturnValue( true );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( useSelect ).toHaveBeenCalled();
 		expect( user.isSaving ).toBeTruthy();
@@ -43,7 +46,9 @@ describe( 'useUser', () => {
 			record: { password: 'test-password' },
 		} );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.userRecord.record.password ).toBe( 'test-password' );
 	} );
@@ -51,7 +56,9 @@ describe( 'useUser', () => {
 	it( 'should set hasPrimaryProvider to false if user.userRecord.record is undefined', () => {
 		useEntityRecord.mockReturnValue( {} );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
@@ -59,7 +66,9 @@ describe( 'useUser', () => {
 	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is undefined', () => {
 		useEntityRecord.mockReturnValue( { record: {} } );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
@@ -67,7 +76,9 @@ describe( 'useUser', () => {
 	it( 'should set hasPrimaryProvider to false if 2fa_available_providers is empty', () => {
 		useEntityRecord.mockReturnValue( { record: { '2fa_available_providers': [] } } );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
@@ -77,7 +88,9 @@ describe( 'useUser', () => {
 			record: { '2fa_available_providers': [ 'Two_Factor_Backup_Codes' ] },
 		} );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( false );
 	} );
@@ -87,7 +100,9 @@ describe( 'useUser', () => {
 			record: { '2fa_available_providers': [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ] },
 		} );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( true );
 	} );
@@ -102,7 +117,9 @@ describe( 'useUser', () => {
 			},
 		} );
 
-		const user = useUser( 1 );
+		const {
+			result: { current: user },
+		} = renderHook( () => useUser( 1 ) );
 
 		expect( user.hasPrimaryProvider ).toBe( true );
 	} );
