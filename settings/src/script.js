@@ -121,8 +121,12 @@ function Main( { userId } ) {
 	 */
 	const navigateToScreen = useCallback(
 		( { currentScreen, nextScreen } ) => {
-			if ( 'backup-codes' === currentScreen ) {
-				// TODO
+			if ( 'backup-codes' === currentScreen && ! hasBackupCodesPrinted ) {
+				setError( {
+					code: 'checkbox_confirmation_required',
+					message: 'Confirmation is required. Please check the checkbox to continue.',
+				} );
+				return;
 			}
 
 			// Reset to initial after navigating away from a page.
@@ -144,7 +148,7 @@ function Main( { userId } ) {
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
 		},
-		[ hasEdits ]
+		[ hasEdits, hasBackupCodesPrinted ]
 	);
 
 	if ( ! hasResolved ) {

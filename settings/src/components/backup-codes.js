@@ -87,7 +87,18 @@ function Setup( { setRegenerating } ) {
 		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
-	} );
+	}, [] );
+
+	const handleCheckboxChange = useCallback(
+		( checked ) => {
+			setHasBackupCodesPrinted( checked );
+			// Error should disappear when the user interacts with the checkbox again.
+			if ( 'checkbox_confirmation_required' === error.code ) {
+				setError( '' );
+			}
+		},
+		[ error.code ]
+	);
 
 	return (
 		<>
@@ -99,30 +110,28 @@ function Setup( { setRegenerating } ) {
 
 			<p>Please print the codes and keep them in a safe place.</p>
 
-			{ error ? (
+			<CodeList codes={ backupCodes } />
+
+			<Notice status="warning" isDismissible={ false }>
+				<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+				Without access to the one-time password app or a backup code, you will lose access
+				to your account. Once you navigate away from this page, you will not be able to view
+				these codes again.
+			</Notice>
+
+			{ error && (
 				<Notice status="error" isDismissible={ false }>
 					<Icon icon={ cancelCircleFilled } />
 					{ error.message }
 				</Notice>
-			) : (
-				<>
-					<CodeList codes={ backupCodes } />
-
-					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-						Without access to the one-time password app or a backup code, you will lose
-						access to your account. Once you navigate away from this page, you will not
-						be able to view these codes again.
-					</Notice>
-
-					<CheckboxControl
-						label="I have printed or saved these codes"
-						checked={ hasBackupCodesPrinted }
-						onChange={ setHasBackupCodesPrinted }
-						disabled={ error }
-					/>
-				</>
 			) }
+
+			<CheckboxControl
+				label="I have printed or saved these codes"
+				checked={ hasBackupCodesPrinted }
+				onChange={ handleCheckboxChange }
+				disabled={ error && 'checkbox_confirmation_required' !== error.code }
+			/>
 
 			<p className="wporg-2fa__submit-actions">
 				<Button isPrimary disabled={ ! hasBackupCodesPrinted } onClick={ handleFinished }>
