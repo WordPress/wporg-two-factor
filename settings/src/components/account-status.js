@@ -18,19 +18,15 @@ export default function AccountStatus() {
 	const {
 		user: {
 			userRecord: {
-				record: {
-					'2fa_available_providers': availableProviders,
-					email,
-					pending_email: pendingEmail,
-				},
+				record: { email, pending_email: pendingEmail },
 			},
 			hasPrimaryProvider,
+			totpEnabled,
+			backupCodesEnabled,
+			webAuthnEnabled,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
-	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
-	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
-	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider

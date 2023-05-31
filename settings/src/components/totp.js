@@ -16,10 +16,8 @@ import { GlobalContext } from '../script';
 
 export default function TOTP() {
 	const {
-		user: { userRecord },
+		user: { totpEnabled },
 	} = useContext( GlobalContext );
-	const availableProviders = userRecord.record[ '2fa_available_providers' ];
-	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 
 	if ( totpEnabled ) {
 		return <Manage />;

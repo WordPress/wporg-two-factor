@@ -17,16 +17,14 @@ import { refreshRecord } from '../utilities';
  */
 export default function BackupCodes() {
 	const {
-		user: { userRecord },
+		user: { backupCodesEnabled },
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
-
-	const backupCodesEnabled =
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 
 	if ( backupCodesEnabled && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
 	}
+
 	return <Setup setRegenerating={ setRegenerating } />;
 }
 
