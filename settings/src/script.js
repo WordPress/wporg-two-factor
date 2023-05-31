@@ -121,7 +121,10 @@ function Main( { userId } ) {
 	 */
 	const navigateToScreen = useCallback(
 		( { currentScreen, nextScreen } ) => {
-			if ( 'backup-codes' === currentScreen && ! hasBackupCodesPrinted ) {
+			// If there's already another error, do not overwrite it with the error below.
+			// Because usually, if there are other errors, it means there's a problem with the backup code generation.
+			// When this happens, users shouldn't need to confirm the checkbox to leave the current screen.
+			if ( 'backup-codes' === currentScreen && ! error && ! hasBackupCodesPrinted ) {
 				setError( {
 					code: 'checkbox_confirmation_required',
 					message: 'Confirmation is required. Please check the checkbox to continue.',
@@ -148,7 +151,7 @@ function Main( { userId } ) {
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
 		},
-		[ hasEdits, hasBackupCodesPrinted ]
+		[ hasEdits, hasBackupCodesPrinted, error ]
 	);
 
 	if ( ! hasResolved ) {
