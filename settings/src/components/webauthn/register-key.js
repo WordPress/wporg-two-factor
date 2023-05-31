@@ -21,9 +21,6 @@ export default function RegisterKey( { onSuccess } ) {
 		user: { userRecord },
 	} = useContext( GlobalContext );
 
-	const backupCodesEnabled =
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ); // maybe this should be passed in instead of using context?
-
 	const [ step, setStep ] = useState( 'input' );
 	// have state for the key name etc?, and it gets passed down as props?
 
@@ -48,11 +45,6 @@ export default function RegisterKey( { onSuccess } ) {
 		} );
 
 		userRecord.edit( { '2fa_webauthn_keys': newKeys } );
-
-		if ( ! backupCodesEnabled ) {
-			// TODO redirect to backup codes
-			// maybe do this in WebAuthn rather than here? probably not something this component should be aware of
-		}
 
 		setStep( 'success' );
 	}, [ userRecord.record[ '2fa_webauthn_keys' ] ] );
