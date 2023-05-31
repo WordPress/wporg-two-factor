@@ -1,0 +1,22 @@
+.wporg-2fa__navigation {
+	padding: 24px 0 !important; /* Override Gutenberg auto-generated. */
+	justify-content: center !important;
+	position: relative;
+
+	a {
+		display: flex;
+    	align-items: center;
+		position: absolute;
+		left: 24px;
+	}
+
+	svg {
+		fill: #4ca6cf;
+	}
+
+	h3 {
+		margin: unset;
+		text-transform: capitalize;
+	}
+
+}

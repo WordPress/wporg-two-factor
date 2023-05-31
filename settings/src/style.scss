@@ -50,29 +50,6 @@ $alert-blue: #72aee6;
 	flex-wrap: wrap;
 }
 
-.wporg-2fa__navigation {
-	padding: 24px 0 !important; /* Override Gutenberg auto-generated. */
-	justify-content: center !important;
-	position: relative;
-
-	a {
-		display: flex;
-    	align-items: center;
-		position: absolute;
-		left: 24px;
-	}
-
-	svg {
-		fill: #4ca6cf;
-	}
-
-	h3 {
-		margin: unset;
-		text-transform: capitalize;
-	}
-
-}
-
 .wporg-2fa__token {
 	letter-spacing: .3em;
 }
@@ -105,5 +82,6 @@ $alert-blue: #72aee6;
 @import "components/setup-progress-bar";
 @import "components/global-notice";
 @import "components/screen-link";
+@import "components/screen-navigation";
 @import "components/auto-tabbing-input";
 @import "components/revalidate-modal";
