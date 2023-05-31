@@ -26,7 +26,7 @@ export default function WebAuthn() {
 	} = useContext( GlobalContext );
 
 	const backupCodesEnabled =
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ); // maybe this should be passed in instead of using context?
+		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 	const [ flow, setFlow ] = useState( 'manage' );
 
 	/**

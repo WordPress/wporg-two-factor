@@ -14,9 +14,9 @@ import { GlobalContext } from '../../script';
  * Render the form to register new security keys.
  *
  * @param {Object}   props
- * @param {Function} props.onSuccess
+ * @param {Function} props.onRegisterSuccess
  */
-export default function RegisterKey( { onSuccess } ) {
+export default function RegisterKey( { onRegisterSuccess } ) {
 	const {
 		user: { userRecord },
 	} = useContext( GlobalContext );
@@ -36,9 +36,15 @@ export default function RegisterKey( { onSuccess } ) {
 		setStep( 'waiting' );
 	}, [] );
 
-	// TODO this is just a placeholder. the real one would probably make an API request to save the new key,
-	// and then refreshRecord( userRecord );
-	const onRegisterSuccess = useCallback( () => {
+	/**
+	 * Save the user's new security key in the database.
+	 *
+	 */
+	const saveKeyToDatabase = useCallback( () => {
+		// TODO make an API request to save the new key,
+		// then refreshRecord( userRecord );
+
+		// TODO the following is just a placeholder to demonstrate the flow until the above is implemented
 		const newKeys = userRecord.record[ '2fa_webauthn_keys' ].push( {
 			id: Math.random(),
 			name: 'New Key',
@@ -48,13 +54,14 @@ export default function RegisterKey( { onSuccess } ) {
 
 		setStep( 'success' );
 	}, [ userRecord.record[ '2fa_webauthn_keys' ] ] );
+	// todo probably wont need userrecord dependency once the above is implemented
 
 	if ( 'waiting' === step ) {
-		return <WaitingForSecurityKey onSuccess={ onRegisterSuccess } />;
+		return <WaitingForSecurityKey onCeremonySuccess={ saveKeyToDatabase } />;
 	}
 
 	if ( 'success' === step ) {
-		return <Success newKeyName={ 'Test key' } onSuccess={ onSuccess } />;
+		return <Success newKeyName={ 'Test key' } afterTimeout={ onRegisterSuccess } />;
 	}
 
 	return (
@@ -79,15 +86,17 @@ export default function RegisterKey( { onSuccess } ) {
 /**
  * Render the "waiting for security key" component.
  *
- * This is what the user sees while their browser is handling the authentication process.
+ * This is what the user sees while their browser is handling the registration ceremony.
+ *
+ * @see https://www.w3.org/TR/webauthn-2/#registration-ceremony
  *
  * @param props
- * @param props.onSuccess
+ * @param props.onCeremonySuccess
  */
-function WaitingForSecurityKey( { onSuccess } ) {
+function WaitingForSecurityKey( { onCeremonySuccess } ) {
 	// TODO this is tmp placeholder to demonstrate the user activating their device
 	setTimeout( () => {
-		onSuccess();
+		onCeremonySuccess();
 	}, 1500 );
 
 	return (
@@ -106,13 +115,13 @@ function WaitingForSecurityKey( { onSuccess } ) {
  *
  * @param props
  * @param props.newKeyName
- * @param props.onSuccess
+ * @param props.afterTimeout
  */
-function Success( { newKeyName, onSuccess } ) {
+function Success( { newKeyName, afterTimeout } ) {
 	// TODO this may actually be similar to how it's done permanently
 	// need to sync this with the animation
 	setTimeout( () => {
-		onSuccess();
+		afterTimeout();
 	}, 2000 );
 
 	return (
