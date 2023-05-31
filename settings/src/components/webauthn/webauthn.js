@@ -1,15 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, TextControl } from '@wordpress/components';
-import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, check } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { GlobalContext } from '../../script';
 import ListKeys from './list-keys';
+import { RegisterKey, WaitingForSecurityKey, Success } from './register';
 
 /**
  * Global dependencies
@@ -20,29 +19,7 @@ const confirm = window.confirm;
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
-	const {
-		user: { userRecord },
-	} = useContext( GlobalContext );
-	const backupCodesEnabled =
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
 	const [ step, setStep ] = useState( 'manage' );
-
-	// todo this is just a placeholder. the real one would probably make an API request to save the new key,
-	// and then replace userkeys with the value returned by the call
-	// probably also refreshRecord( userRecord );
-	const onRegisterSuccess = useCallback( () => {
-		const newKeys = userRecord.record[ '2fa_webauthn_keys' ].push( {
-			id: Math.random(),
-			name: 'New Key',
-		} );
-
-		userRecord.edit( { '2fa_webauthn_keys': newKeys } );
-		setStep( 'success' );
-
-		if ( ! backupCodesEnabled ) {
-			// todo redirect to backup codes
-		}
-	}, [ userRecord.record[ '2fa_webauthn_keys' ] ] );
 
 	return (
 		<>
@@ -54,9 +31,7 @@ export default function WebAuthn() {
 				// handle failure
 			) }
 
-			{ 'waiting' === step && (
-				<WaitingForSecurityKey onRegisterSuccess={ onRegisterSuccess } />
-			) }
+			{ 'waiting' === step && <WaitingForSecurityKey /> }
 
 			{ 'success' === step && <Success newKeyName={ 'Test key' } setStep={ setStep } /> }
 		</>
@@ -99,77 +74,6 @@ function Manage( { setStep } ) {
 					Disable Security Keys
 				</Button>
 			</p>
-		</>
-	);
-}
-
-/**
- * Render the form to register new security keys.
- *
- * @param props
- * @param props.registerClickHandler
- */
-function RegisterKey( { registerClickHandler } ) {
-	return (
-		<form>
-			<TextControl label="Give the security key a name" />
-			{ /* todo add basic clientside validation */ }
-
-			<div className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ registerClickHandler }>
-					Register Key
-				</Button>
-				<Button variant="secondary">Cancel</Button>
-			</div>
-		</form>
-	);
-}
-
-/**
- * Render the "waiting for security key" component.
- *
- * This is what the user sees while their browser is handling the authentication process.
- *
- * @param props
- * @param props.onRegisterSuccess
- */
-function WaitingForSecurityKey( { onRegisterSuccess } ) {
-	// todo this is tmp placeholder to demonstrate the user activating their device
-	setTimeout( () => {
-		onRegisterSuccess();
-	}, 1500 );
-
-	return (
-		<>
-			<p>Waiting for security key. Connect and touch your security key to register it.</p>
-
-			<Spinner />
-		</>
-	);
-}
-
-/**
- * Render the "Success" component.
- *
- * The user sees this once their security key has successfully been registered.
- *
- * @param props
- * @param props.newKeyName
- * @param props.setStep
- */
-function Success( { newKeyName, setStep } ) {
-	// todo this may actually be similar to how it's done permanently
-	// need to sync this with the animation
-	setTimeout( () => {
-		setStep( 'manage' );
-	}, 2000 );
-
-	return (
-		<>
-			<p>Success! Your { newKeyName } is successfully registered.</p>
-
-			{ /* todo replace w/ custom animation */ }
-			<Icon icon={ check } />
 		</>
 	);
 }
