@@ -1,5 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Get the user.
@@ -8,6 +9,7 @@ import { store as coreDataStore, useEntityRecord } from '@wordpress/core-data';
  */
 export function useUser( userId ) {
 	const userRecord = useEntityRecord( 'root', 'user', userId );
+	const [ hasBackupCodesPrinted, setHasBackupCodesPrinted ] = useState( false );
 	const isSaving = useSelect( ( select ) =>
 		select( coreDataStore ).isSavingEntityRecord( 'root', 'user', userId )
 	);
@@ -25,6 +27,8 @@ export function useUser( userId ) {
 		totpEnabled,
 		backupCodesEnabled,
 		webAuthnEnabled,
+		hasBackupCodesPrinted,
+		setHasBackupCodesPrinted,
 	};
 }
 

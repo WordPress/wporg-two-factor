@@ -58,6 +58,8 @@ function Main( { userId } ) {
 	const {
 		userRecord: { record, edit, hasEdits, hasResolved },
 		hasPrimaryProvider,
+		hasBackupCodesPrinted,
+		setHasBackupCodesPrinted,
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	const [ error, setError ] = useState( '' );
@@ -165,7 +167,15 @@ function Main( { userId } ) {
 
 	return (
 		<GlobalContext.Provider
-			value={ { navigateToScreen, user, setGlobalNotice, setError, error } }
+			value={ {
+				navigateToScreen,
+				user,
+				setGlobalNotice,
+				setError,
+				error,
+				hasBackupCodesPrinted,
+				setHasBackupCodesPrinted,
+			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ currentScreenComponent }

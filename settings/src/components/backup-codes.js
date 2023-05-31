@@ -48,9 +48,10 @@ function Setup( { setRegenerating } ) {
 		user: { userRecord },
 		setError,
 		error,
+		hasBackupCodesPrinted,
+		setHasBackupCodesPrinted,
 	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
-	const [ hasPrinted, setHasPrinted ] = useState( false );
 
 	// Generate new backup codes and save them in usermeta.
 	useEffect( () => {
@@ -116,15 +117,15 @@ function Setup( { setRegenerating } ) {
 
 					<CheckboxControl
 						label="I have printed or saved these codes"
-						checked={ hasPrinted }
-						onChange={ setHasPrinted }
+						checked={ hasBackupCodesPrinted }
+						onChange={ setHasBackupCodesPrinted }
 						disabled={ error }
 					/>
 				</>
 			) }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
+				<Button isPrimary disabled={ ! hasBackupCodesPrinted } onClick={ handleFinished }>
 					All Finished
 				</Button>
 			</p>
