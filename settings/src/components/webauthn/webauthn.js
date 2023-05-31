@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { GlobalContext } from '../../script';
 import ListKeys from './list-keys';
 import RegisterKey from './register-key';
 
@@ -14,12 +15,33 @@ import RegisterKey from './register-key';
  * Global dependencies
  */
 const confirm = window.confirm;
+const alert = window.alert;
 
 /**
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
+	const {
+		user: { userRecord },
+	} = useContext( GlobalContext );
+
+	const backupCodesEnabled =
+		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' ); // maybe this should be passed in instead of using context?
 	const [ flow, setFlow ] = useState( 'manage' );
+
+	/**
+	 * Handle post-registration prcessing.
+	 */
+	const onRegisterSuccess = useCallback( () => {
+		enableProvider();
+
+		if ( ! backupCodesEnabled ) {
+			// TODO maybe redirect to backup codes, pending discussion.
+			alert( 'redirect to backup codes' );
+		} else {
+			setFlow( 'manage' );
+		}
+	}, [ backupCodesEnabled ] );
 
 	/**
 	 * Enable the WebAuthn provider.
@@ -29,8 +51,6 @@ export default function WebAuthn() {
 		//
 		// call api to enable provider
 		// handle failure
-
-		setFlow( 'manage' );
 	}, [] ); // todo any dependencies?
 
 	/**
@@ -51,7 +71,7 @@ export default function WebAuthn() {
 	}, [] ); // todo any dependencies?
 
 	if ( 'register' === flow ) {
-		return <RegisterKey onSuccess={ enableProvider } />;
+		return <RegisterKey onSuccess={ onRegisterSuccess } />;
 	}
 
 	return (
