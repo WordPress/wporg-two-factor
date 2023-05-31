@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ListKeys from './list-keys';
-import { RegisterKey, WaitingForSecurityKey, Success } from './register';
+import RegisterKey from './register-key';
 
 /**
  * Global dependencies
@@ -19,32 +19,31 @@ const confirm = window.confirm;
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
-	const [ step, setStep ] = useState( 'manage' );
+	const [ step, setStep ] = useState( 'register' );
+	// maybe rename to something more descripive, these aren't really steps, they're more like screens or subscreen or flows or something
 
-	return (
-		<>
-			{ 'manage' === step && <Manage setStep={ setStep } /> }
+	const enableProvider = useCallback( () => {
+		// return early if already enabled
+		//
+		// call api to enable provider
 
-			{ 'register' === step && (
-				<RegisterKey registerClickHandler={ () => setStep( 'waiting' ) } />
-				// convert to named func that makes api call to register key
-				// handle failure
-			) }
+		setStep( 'manage' );
+	}, [] ); // todo any dependencies?
 
-			{ 'waiting' === step && <WaitingForSecurityKey /> }
+	const disableProvider = useCallback( () => {
+		// return early if already disabled?
+		//
+		// call api to enable provider
 
-			{ 'success' === step && <Success newKeyName={ 'Test key' } setStep={ setStep } /> }
-		</>
-	);
-}
+		confirm(
+			'TODO Modal H4 Disable Security Keys? p Are you sure you want to disable Security Keys? Button Cancel Button Disable'
+		);
+	}, [] ); // todo any dependencies?
 
-/**
- * Render the Manage component.
- *
- * @param props
- * @param props.setStep
- */
-function Manage( { setStep } ) {
+	if ( 'register' === step ) {
+		return <RegisterKey onSuccess={ enableProvider } />;
+	}
+
 	return (
 		<>
 			<p>
@@ -63,14 +62,7 @@ function Manage( { setStep } ) {
 					Register New Key
 				</Button>
 
-				<Button
-					variant="secondary"
-					onClick={ () =>
-						confirm(
-							'Modal H4 Disable Security Keys? p Are you sure you want to disable Security Keys? Button Cancel Button Disable'
-						)
-					}
-				>
+				<Button variant="secondary" onClick={ disableProvider }>
 					Disable Security Keys
 				</Button>
 			</p>
