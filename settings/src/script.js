@@ -113,9 +113,16 @@ function Main( { userId } ) {
 	 *
 	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
 	 * behaviors that are broken otherwise.
+	 *
+	 * @param currentScreen Optional. Only needed when you'd like to do some processing on the current screen before navigating away.
+	 * @param nextScreen    Next screen you're navigating to
 	 */
 	const navigateToScreen = useCallback(
-		( nextScreen ) => {
+		( { currentScreen, nextScreen } ) => {
+			if ( 'backup-codes' === currentScreen ) {
+				// TODO
+			}
+
 			// Reset to initial after navigating away from a page.
 			// Note: password was initially not in record, this would prevent incomplete state
 			// from resetting when leaving the password setting page.

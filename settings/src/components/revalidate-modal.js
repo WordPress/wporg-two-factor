@@ -12,7 +12,7 @@ export default function RevalidateModal() {
 
 	const goBack = useCallback( ( event ) => {
 		event.preventDefault();
-		navigateToScreen( 'account-status' );
+		navigateToScreen( { nextScreen: 'account-status' } );
 	}, [] );
 
 	return (

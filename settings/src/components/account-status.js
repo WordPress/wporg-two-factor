@@ -121,7 +121,11 @@ function SettingStatusCard( { screen, status, headerText, bodyText, disabled = f
 
 	return (
 		<Card className={ classes }>
-			{ disabled ? cardContent : <ScreenLink screen={ screen } anchorText={ cardContent } /> }
+			{ disabled ? (
+				cardContent
+			) : (
+				<ScreenLink nextScreen={ screen } anchorText={ cardContent } />
+			) }
 		</Card>
 	);
 }

@@ -25,7 +25,7 @@ export default function BackupCodes() {
 	// If TOTP hasn't been enabled, the user should not have access to BackupCodes component.
 	// This is primarily added to prevent users from accessing through the URL.
 	if ( ! totpEnabled ) {
-		navigateToScreen( 'account-status' );
+		navigateToScreen( { nextScreen: 'account-status' } );
 		return;
 	}
 

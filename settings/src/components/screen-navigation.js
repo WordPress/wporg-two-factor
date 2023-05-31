@@ -18,7 +18,8 @@ const ScreenNavigation = ( { screen, children } ) => (
 	<Card>
 		<CardHeader className="wporg-2fa__navigation" size="xSmall">
 			<ScreenLink
-				screen="account-status"
+				currentScreen={ screen }
+				nextScreen="account-status"
 				ariaLabel="Back to the account status page"
 				anchorText={
 					<>

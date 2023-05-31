@@ -8,12 +8,27 @@ import { useCallback, useContext } from '@wordpress/element';
  */
 import { GlobalContext } from '../script';
 
-export default function ScreenLink( { screen, anchorText, buttonStyle = false, ariaLabel } ) {
+/**
+ *
+ * @param props
+ * @param props.currentScreen
+ * @param props.nextScreen
+ * @param props.anchorText
+ * @param props.buttonStyle
+ * @param props.ariaLabel
+ */
+export default function ScreenLink( {
+	currentScreen = '',
+	nextScreen,
+	anchorText,
+	buttonStyle = false,
+	ariaLabel,
+} ) {
 	const { navigateToScreen } = useContext( GlobalContext );
 	const classes = [];
 	const screenUrl = new URL( document.location.href );
 
-	screenUrl.searchParams.set( 'screen', screen );
+	screenUrl.searchParams.set( 'screen', nextScreen );
 
 	if ( 'primary' === buttonStyle ) {
 		classes.push( 'components-button' );
@@ -25,7 +40,7 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 
 	const onClick = useCallback( ( event ) => {
 		event.preventDefault();
-		navigateToScreen( screen );
+		navigateToScreen( { currentScreen, nextScreen } );
 	}, [] );
 
 	return (

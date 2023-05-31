@@ -75,7 +75,7 @@ function Setup() {
 			} );
 
 			await refreshRecord( userRecord );
-			clickScreenLink( event, 'backup-codes' );
+			clickScreenLink( { event, nextScreen: 'backup-codes' } );
 			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
 		} catch ( handleEnableError ) {
 			setError( handleEnableError.message );
@@ -321,8 +321,8 @@ function Manage() {
 
 			<p>
 				Make sure you&apos;ve created{ ' ' }
-				<ScreenLink screen="backup-codes" anchorText="backup codes" /> and saved them in a
-				safe location, in case you ever lose your device. You may also need them when
+				<ScreenLink nextScreen="backup-codes" anchorText="backup codes" /> and saved them in
+				a safe location, in case you ever lose your device. You may also need them when
 				transitioning to a new device. Without them you may permanently lose access to your
 				account.
 			</p>
