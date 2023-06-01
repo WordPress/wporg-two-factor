@@ -17,9 +17,17 @@ import { refreshRecord } from '../utilities';
  */
 export default function BackupCodes() {
 	const {
-		user: { backupCodesEnabled },
+		user: { backupCodesEnabled, totpEnabled },
+		navigateToScreen,
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
+
+	// If TOTP hasn't been enabled, the user should not have access to BackupCodes component.
+	// This is primarily added to prevent users from accessing through the URL.
+	if ( ! totpEnabled ) {
+		navigateToScreen( 'account-status' );
+		return;
+	}
 
 	if ( backupCodesEnabled && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
