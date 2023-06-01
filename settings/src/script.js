@@ -132,6 +132,7 @@ function Main( { userId } ) {
 			currentUrl.searchParams.set( 'screen', nextScreen );
 			window.history.pushState( {}, '', currentUrl );
 
+			setError( '' );
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
 		},
