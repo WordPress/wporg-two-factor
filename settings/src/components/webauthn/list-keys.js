@@ -12,11 +12,6 @@ import { GlobalContext } from '../../script';
 import { refreshRecord } from '../../utilities';
 
 /**
- * Global dependencies
- */
-const ajax = wp.ajax;
-
-/**
  * Render the list of keys.
  */
 export default function ListKeys() {
@@ -37,7 +32,7 @@ export default function ListKeys() {
 		setDeleting( true );
 
 		try {
-			await ajax.post( 'webauthn_delete_key', {
+			await wp.ajax.post( 'webauthn_delete_key', {
 				user_id: userRecord.record.id,
 				handle: modalKey.credential_id,
 				_ajax_nonce: modalKey.delete_nonce,
