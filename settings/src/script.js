@@ -114,10 +114,8 @@ function Main( { userId } ) {
 	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
 	 * behaviors that are broken otherwise.
 	 */
-	const clickScreenLink = useCallback(
-		( event, nextScreen ) => {
-			event.preventDefault();
-
+	const navigateToScreen = useCallback(
+		( nextScreen ) => {
 			// Reset to initial after navigating away from a page.
 			// Note: password was initially not in record, this would prevent incomplete state
 			// from resetting when leaving the password setting page.
@@ -185,7 +183,7 @@ function Main( { userId } ) {
 	}
 
 	return (
-		<GlobalContext.Provider value={ { clickScreenLink, user, setGlobalNotice } }>
+		<GlobalContext.Provider value={ { navigateToScreen, user, setGlobalNotice } }>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
