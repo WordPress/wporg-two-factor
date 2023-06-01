@@ -1,16 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { GlobalContext } from '../script';
 import { Modal } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities';
 
 export default function RevalidateModal() {
-	const { clickScreenLink } = useContext( GlobalContext );
+	const { navigateToScreen } = useContext( GlobalContext );
 
-	const goBack = ( event ) => clickScreenLink( event, 'account-status' );
+	const goBack = useCallback( ( event ) => {
+		event.preventDefault();
+		navigateToScreen( 'account-status' );
+	}, [] );
 
 	return (
 		<Modal
