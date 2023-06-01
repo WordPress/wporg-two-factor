@@ -10,6 +10,7 @@
     "wp-env": "wp-env",
     "setup:tools": "yarn wp-env run composer install",
     "test": "yarn wp-env run phpunit phpunit -c /var/www/html/wp-content/plugins/wporg-two-factor/phpunit.xml.dist",
+    "test:js": "yarn workspace wporg-two-factor-settings test:unit",
     "lint:js": "yarn workspace wporg-two-factor-settings lint:js"
   },
   "repository": {
