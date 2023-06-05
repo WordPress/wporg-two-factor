@@ -228,6 +228,21 @@ function register_user_fields(): void {
 			],
 		]
 	);
+
+	register_rest_field(
+		'user',
+		'2fa_webauthn_register_nonce',
+		[
+			'get_callback' => function( $user ) {
+				return wp_create_nonce( "webauthn-register_key_{$user[ 'id' ]}" );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
 }
 
 /**

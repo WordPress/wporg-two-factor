@@ -1,84 +1,113 @@
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, TextControl } from '@wordpress/components';
+import { Button, Notice, Spinner, TextControl } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, check } from '@wordpress/icons';
+import { Icon, check, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { GlobalContext } from '../../script';
+import { refreshRecord } from '../../utilities';
+import {
+	preparePublicKeyCreationOptions,
+	preparePublicKeyCredential,
+} from '../../utilities/webauthn';
 
 /**
  * Render the form to register new security keys.
  *
  * @param {Object}   props
- * @param {Function} props.onRegisterSuccess
+ * @param {Function} props.onCancel
+ * @param {Function} props.onSuccess
  */
-export default function RegisterKey( { onRegisterSuccess } ) {
+export default function RegisterKey( { onSuccess, onCancel } ) {
 	const {
 		user: { userRecord },
 	} = useContext( GlobalContext );
+	const record = userRecord.record;
 
+	const [ error, setError ] = useState( false );
+	const [ keyName, setKeyName ] = useState( '' );
 	const [ step, setStep ] = useState( 'input' );
-	// have state for the key name etc?, and it gets passed down as props?
+	const [ registerCeremonyActive, setRegisterCeremonyActive ] = useState( false );
 
-	const startRegistration = useCallback( () => {
-		// call preprgister endpoint to get options and nonce
-		// 	 why is this necessary? why not just ship it with the initial page build?
-		// handle failure
-		//
-		// call navigator.credentials.create with options from previous step
-		// handle failure
-		//
+	const onRegister = useCallback(
+		async ( event ) => {
+			try {
+				event.preventDefault();
+				setRegisterCeremonyActive( true );
 
-		setStep( 'waiting' );
-	}, [] );
+				const nonce = record[ '2fa_webauthn_register_nonce' ];
+				const preRegisterResponse = await wp.ajax.post( 'webauthn_preregister', {
+					user_id: record.id,
+					_ajax_nonce: nonce,
+				} );
+				const publicKey = preparePublicKeyCreationOptions( preRegisterResponse.options );
 
-	/**
-	 * Save the user's new security key in the database.
-	 *
-	 */
-	const saveKeyToDatabase = useCallback( () => {
-		// TODO make an API request to save the new key,
-		// then refreshRecord( userRecord );
+				setStep( 'waiting' );
 
-		// TODO the following is just a placeholder to demonstrate the flow until the above is implemented
-		const newKeys = userRecord.record[ '2fa_webauthn_keys' ].push( {
-			id: Math.random(),
-			name: 'New Key',
-		} );
+				const credential = await navigator.credentials.create( { publicKey } );
 
-		userRecord.edit( { '2fa_webauthn_keys': newKeys } );
+				await wp.ajax.post( 'webauthn_register', {
+					user_id: record.id,
+					_ajax_nonce: nonce,
+					name: keyName,
+					credential: JSON.stringify( preparePublicKeyCredential( credential ) ),
+				} );
 
-		setStep( 'success' );
-	}, [ userRecord.record[ '2fa_webauthn_keys' ] ] );
-	// todo probably wont need userrecord dependency once the above is implemented
+				await refreshRecord( userRecord );
+				setStep( 'success' );
+			} catch ( exception ) {
+				setError( exception?.message || exception?.responseJSON?.data || exception );
+				setStep( 'input' );
+			} finally {
+				setRegisterCeremonyActive( false );
+			}
+		},
+		[ keyName ]
+	);
 
 	if ( 'waiting' === step ) {
-		return <WaitingForSecurityKey onCeremonySuccess={ saveKeyToDatabase } />;
+		return <WaitingForSecurityKey />;
 	}
 
 	if ( 'success' === step ) {
-		return <Success newKeyName={ 'Test key' } afterTimeout={ onRegisterSuccess } />;
+		return <Success newKeyName={ keyName } afterTimeout={ onSuccess } />;
 	}
 
 	return (
-		<form>
-			<TextControl label="Give the security key a name" />
-			{ /* TODO add basic clientside validation
-			what? lendth? chars?
-			TextControl doesn't have anything special, just pass `maxlength`, `pattern`, etc
-			*/ }
+		<form onSubmit={ onRegister }>
+			<TextControl
+				label="Give the security key a name"
+				onChange={ ( name ) => setKeyName( name ) }
+				value={ keyName }
+				required
+			/>
 
 			<div className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ startRegistration }>
+				<Button type="submit" variant="primary" disabled={ registerCeremonyActive }>
 					Register Key
 				</Button>
 
-				<Button variant="secondary">Cancel</Button>
+				<Button variant="secondary" onClick={ onCancel }>
+					Cancel
+				</Button>
 			</div>
+
+			{ registerCeremonyActive && (
+				<p>
+					<Spinner />
+				</p>
+			) }
+
+			{ error && (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ error }
+				</Notice>
+			) }
 		</form>
 	);
 }
@@ -89,21 +118,15 @@ export default function RegisterKey( { onRegisterSuccess } ) {
  * This is what the user sees while their browser is handling the registration ceremony.
  *
  * @see https://www.w3.org/TR/webauthn-2/#registration-ceremony
- *
- * @param props
- * @param props.onCeremonySuccess
  */
-function WaitingForSecurityKey( { onCeremonySuccess } ) {
-	// TODO this is tmp placeholder to demonstrate the user activating their device
-	setTimeout( () => {
-		onCeremonySuccess();
-	}, 1500 );
-
+function WaitingForSecurityKey() {
 	return (
 		<>
 			<p>Waiting for security key. Connect and touch your security key to register it.</p>
 
-			<Spinner />
+			<p>
+				<Spinner />
+			</p>
 		</>
 	);
 }
@@ -118,8 +141,7 @@ function WaitingForSecurityKey( { onCeremonySuccess } ) {
  * @param props.afterTimeout
  */
 function Success( { newKeyName, afterTimeout } ) {
-	// TODO this may actually be similar to how it's done permanently
-	// need to sync this with the animation
+	// TODO need to sync this with the animation
 	setTimeout( () => {
 		afterTimeout();
 	}, 2000 );
