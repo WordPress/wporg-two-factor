@@ -21,19 +21,16 @@ const alert = window.alert;
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
-	const {
-		user: { userRecord },
-	} = useContext( GlobalContext );
-
-	const backupCodesEnabled =
-		userRecord.record[ '2fa_available_providers' ].includes( 'Two_Factor_Backup_Codes' );
+	const { webAuthnEnabled, backupCodesEnabled } = useContext( GlobalContext );
 	const [ flow, setFlow ] = useState( 'manage' );
 
 	/**
 	 * Handle post-registration prcessing.
 	 */
 	const onRegisterSuccess = useCallback( () => {
-		enableProvider();
+		if ( ! webAuthnEnabled ) {
+			enableProvider();
+		}
 
 		if ( ! backupCodesEnabled ) {
 			// TODO maybe redirect to backup codes, pending discussion.
@@ -47,9 +44,11 @@ export default function WebAuthn() {
 	 * Enable the WebAuthn provider.
 	 */
 	const enableProvider = useCallback( () => {
-		// return early if already enabled
-		//
+		// TODO this will be done in a separate PR
+		// maybe merge this into onRegisterSuccess() if it's small enough
 		// call api to enable provider
+		// 		have to write one? yes. neither the webauthn plugin nor the upstream plugin have one
+		// 		eventually calls twofaccor::enable_provider_for_user()
 		// handle failure
 	}, [] ); // todo any dependencies?
 
@@ -57,10 +56,13 @@ export default function WebAuthn() {
 	 * Disable the WebAuthn provider.
 	 */
 	const disableProvider = useCallback( () => {
+		// TODO this will be done in a separate PR
+		// Also pending outcome of https://github.com/WordPress/wporg-two-factor/issues/194#issuecomment-1564930700
+
 		// return early if already disabled?
 		// this shouldn't be called in the first place if that's the case, maybe the button should be disabled or not even shown
 		//
-		// call api to enable provider
+		// call api to disable provider
 		// handle failure
 
 		confirm(
@@ -71,7 +73,9 @@ export default function WebAuthn() {
 	}, [] ); // todo any dependencies?
 
 	if ( 'register' === flow ) {
-		return <RegisterKey onSuccess={ onRegisterSuccess } />;
+		return (
+			<RegisterKey onSuccess={ onRegisterSuccess } onCancel={ () => setFlow( 'manage' ) } />
+		);
 	}
 
 	return (
