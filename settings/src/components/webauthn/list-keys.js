@@ -40,7 +40,7 @@ export default function ListKeys() {
 
 			setGlobalNotice( modalKey.name + ' has been deleted.' );
 			setModalKey( null );
-			refreshRecord( userRecord );
+			await refreshRecord( userRecord );
 		} catch ( error ) {
 			// The endpoint returns some errors as a string, but others as an object.
 			setModalError( error?.responseJSON?.data || error );
