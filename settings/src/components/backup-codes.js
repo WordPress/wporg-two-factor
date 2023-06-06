@@ -186,6 +186,11 @@ function Manage( { setRegenerating } ) {
 			setHasBackupCodesPrinted,
 		},
 	} = useContext( GlobalContext );
+
+	// In Manage screen, always initialize "hasBackupCodesPrinted" as true.
+	// Otherwise, if users leave the account screen and return, it would default back to false, and the 'Back' button would be unclickable.
+	useEffect( () => setHasBackupCodesPrinted( true ), [] );
+
 	const remaining = record[ '2fa_backup_codes_remaining' ];
 
 	return (
