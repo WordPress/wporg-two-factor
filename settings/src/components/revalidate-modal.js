@@ -10,10 +10,13 @@ import { refreshRecord } from '../utilities/common';
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
 
-	const goBack = useCallback( ( event ) => {
-		event.preventDefault();
-		navigateToScreen( 'account-status' );
-	}, [] );
+	const goBack = useCallback(
+		( event ) => {
+			event.preventDefault();
+			navigateToScreen( 'account-status' );
+		},
+		[ navigateToScreen ]
+	);
 
 	return (
 		<Modal

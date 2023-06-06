@@ -23,10 +23,13 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 		classes.push( 'is-secondary' );
 	}
 
-	const onClick = useCallback( ( event ) => {
-		event.preventDefault();
-		navigateToScreen( screen );
-	}, [] );
+	const onClick = useCallback(
+		( event ) => {
+			event.preventDefault();
+			navigateToScreen( screen );
+		},
+		[ navigateToScreen ]
+	);
 
 	return (
 		<a
