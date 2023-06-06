@@ -121,15 +121,21 @@ function Main( { userId } ) {
 	 */
 	const navigateToScreen = useCallback(
 		( { currentScreen, nextScreen } ) => {
-			// If there's already another error, do not overwrite it with the error below.
-			// Because usually, if there are other errors, it means there's a problem with the backup code generation.
-			// When this happens, users shouldn't need to confirm the checkbox to leave the current screen.
-			if ( 'backup-codes' === currentScreen && ! error && ! hasBackupCodesPrinted ) {
-				setError( {
-					code: 'checkbox_confirmation_required',
-					message: 'Confirmation is required. Please check the checkbox to continue.',
-				} );
-				return;
+			if ( 'backup-codes' === currentScreen ) {
+				// If there's already another error, do not overwrite it with the error below.
+				// Because usually, if there are other errors, it means there's a problem with the backup code generation.
+				// When this happens, users shouldn't need to confirm the checkbox to leave the current screen.
+				if ( ! error && ! hasBackupCodesPrinted ) {
+					setError( {
+						code: 'checkbox_confirmation_required',
+						message: 'Confirmation is required. Please check the checkbox to continue.',
+					} );
+					return;
+				}
+
+				if ( error.code === 'checkbox_confirmation_required' ) {
+					return;
+				}
 			}
 
 			// Reset to initial after navigating away from a page.
