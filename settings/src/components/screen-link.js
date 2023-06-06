@@ -38,10 +38,13 @@ export default function ScreenLink( {
 		classes.push( 'is-secondary' );
 	}
 
-	const onClick = useCallback( ( event ) => {
-		event.preventDefault();
-		navigateToScreen( { currentScreen, nextScreen } );
-	}, [] );
+	const onClick = useCallback(
+		( event ) => {
+			event.preventDefault();
+			navigateToScreen( { currentScreen, nextScreen } );
+		},
+		[ navigateToScreen ]
+	);
 
 	return (
 		<a
