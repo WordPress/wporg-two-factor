@@ -183,6 +183,7 @@ function Manage( { setRegenerating } ) {
 	const {
 		user: {
 			userRecord: { record },
+			setHasBackupCodesPrinted,
 		},
 	} = useContext( GlobalContext );
 	const remaining = record[ '2fa_backup_codes_remaining' ];
@@ -214,6 +215,7 @@ function Manage( { setRegenerating } ) {
 				isSecondary
 				onClick={ () => {
 					setRegenerating( true );
+					setHasBackupCodesPrinted( false );
 				} }
 			>
 				Generate new backup codes
