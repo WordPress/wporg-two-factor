@@ -13,6 +13,7 @@ export function useUser( userId ) {
 	);
 
 	const availableProviders = userRecord.record?.[ '2fa_available_providers' ] ?? [];
+	const primaryProvider = userRecord.record?.[ '2fa_primary_provider' ] ?? null;
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
@@ -22,6 +23,7 @@ export function useUser( userId ) {
 		userRecord: { ...userRecord },
 		isSaving,
 		hasPrimaryProvider,
+		primaryProvider,
 		totpEnabled,
 		backupCodesEnabled,
 		webAuthnEnabled,
