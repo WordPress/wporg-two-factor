@@ -3,7 +3,7 @@
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
-use WP_REST_Server, WP_REST_Request;
+use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
 
 defined( 'WPINC' ) || die();
 
@@ -90,6 +90,45 @@ function register_rest_routes() : void {
 			),
 		),
 	);
+
+	register_rest_route(
+		'wporg-two-factor/1.0',
+		'/provider-status',
+		array(
+			'methods'  => WP_REST_Server::EDITABLE,
+			'callback' => __NAMESPACE__ . '\rest_update_provider_status',
+			'permission_callback' => function( $request ) {
+				return current_user_can( 'edit_user', $request['user_id'] );
+			},
+			'args' => array(
+				'user_id' => array(
+					'required' => true,
+					'type'     => 'number',
+					'sanitize_callback' => 'absint',
+					'validate_callback' => function( $user_id ) {
+						return get_userdata( $user_id ) instanceof WP_User;
+					},
+				),
+
+				'provider' => array(
+					'required' => true,
+					'type'     => 'string',
+					'validate_callback' => function( $provider ) {
+						$valid_providers = Two_Factor_Core::get_providers();
+						return array_key_exists( $provider, $valid_providers );
+					},
+				),
+
+				'status' => array(
+					'required' => true,
+					'type'     => 'string',
+					'validate_callback' => function( $status ) {
+						return 'enable' === $status || 'disable' === $status;
+					},
+				),
+			),
+		),
+	);
 }
 
 /**
@@ -104,6 +143,29 @@ function rest_get_totp_setup( WP_REST_Request $request ) : array {
 		'secret_key'  => $key,
 		'qr_code_url' => Two_Factor_Totp::generate_qr_code_url( $user, $key ),
 	);
+}
+
+/**
+ * Update a 2FA provider status.
+ *
+ * @return bool|WP_Error
+ */
+function rest_update_provider_status( WP_REST_Request $request ) {
+	$user_id  = $request->get_param( 'user_id' );
+	$provider = $request->get_param( 'provider' );
+	$status   = $request->get_param( 'status' );
+
+	switch ( $status ) {
+		case 'enable':
+			$result = Two_Factor_Core::enable_provider_for_user( $user_id, $provider );
+			break;
+
+		case 'disable':
+			$result = new WP_Error( 'todo_pending_194', 'TODO pending #194.', array( 'status' => 501 ) );
+			break;
+	}
+
+	return $result;
 }
 
 /**
