@@ -141,10 +141,13 @@ function WaitingForSecurityKey() {
  * @param props.afterTimeout
  */
 function Success( { newKeyName, afterTimeout } ) {
-	// TODO need to sync this with the animation
-	setTimeout( () => {
-		afterTimeout();
-	}, 2000 );
+	const [ hasTimer, setHasTimer ] = useState( false );
+
+	if ( ! hasTimer ) {
+		// TODO need to sync this timing with the animation below
+		setTimeout( afterTimeout, 2000 );
+		setHasTimer( true );
+	}
 
 	return (
 		<>
