@@ -165,6 +165,22 @@ function register_user_fields(): void {
 
 	register_rest_field(
 		'user',
+		'2fa_primary_provider',
+		[
+			'get_callback' => function( $user ) {
+				$provider = Two_Factor_Core::get_primary_provider_for_user( get_userdata( $user['id'] ) );
+
+				return is_a( $provider, 'Two_Factor_Provider' ) ? $provider->get_key() : null;
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
+	register_rest_field(
+		'user',
 		'2fa_backup_codes_remaining',
 		[
 			'get_callback' => function( $user ) {
