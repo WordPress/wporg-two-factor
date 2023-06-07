@@ -21,6 +21,10 @@ const alert = window.alert;
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
+	const {
+		user: { userRecord },
+	} = useContext( GlobalContext );
+	const keys = userRecord.record[ '2fa_webauthn_keys' ];
 	const { webAuthnEnabled, backupCodesEnabled } = useContext( GlobalContext );
 	const [ flow, setFlow ] = useState( 'manage' );
 
@@ -87,19 +91,25 @@ export default function WebAuthn() {
 				security than passwords alone.
 			</p>
 
-			<h4>Security Keys</h4>
+			{ keys.length > 0 && (
+				<>
+					<h4>Security Keys</h4>
 
-			<ListKeys />
+					<ListKeys />
+				</>
+			) }
 
 			<p className="wporg-2fa__submit-actions">
 				<Button variant="primary" onClick={ () => setFlow( 'register' ) }>
 					Register New Key
 				</Button>
 
-				<Button variant="secondary" onClick={ disableProvider }>
-					Disable Security Keys
-					{ /* TODO change this to Enable if the provider is disabled? */ }
-				</Button>
+				{ keys.length > 0 && (
+					<Button variant="secondary" onClick={ disableProvider }>
+						Disable Security Keys
+						{ /* TODO change this to Enable if the provider is disabled? */ }
+					</Button>
+				) }
 			</p>
 		</>
 	);
