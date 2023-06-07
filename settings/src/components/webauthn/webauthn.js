@@ -3,11 +3,13 @@
  */
 import { Button } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { GlobalContext } from '../../script';
+import { refreshRecord } from '../../utilities';
 import ListKeys from './list-keys';
 import RegisterKey from './register-key';
 
@@ -22,18 +24,22 @@ const alert = window.alert;
  */
 export default function WebAuthn() {
 	const {
-		user: { userRecord },
+		user: {
+			userRecord,
+			userRecord: { record },
+			webAuthnEnabled,
+			backupCodesEnabled,
+		},
 	} = useContext( GlobalContext );
 	const keys = userRecord.record[ '2fa_webauthn_keys' ];
-	const { webAuthnEnabled, backupCodesEnabled } = useContext( GlobalContext );
 	const [ flow, setFlow ] = useState( 'manage' );
 
 	/**
 	 * Handle post-registration prcessing.
 	 */
-	const onRegisterSuccess = useCallback( () => {
+	const onRegisterSuccess = useCallback( async () => {
 		if ( ! webAuthnEnabled ) {
-			enableProvider();
+			await enableProvider();
 		}
 
 		if ( ! backupCodesEnabled ) {
@@ -42,19 +48,26 @@ export default function WebAuthn() {
 		} else {
 			setFlow( 'manage' );
 		}
-	}, [ backupCodesEnabled ] );
+	}, [ webAuthnEnabled, backupCodesEnabled ] );
 
 	/**
 	 * Enable the WebAuthn provider.
 	 */
-	const enableProvider = useCallback( () => {
-		// TODO this will be done in a separate PR
-		// maybe merge this into onRegisterSuccess() if it's small enough
-		// call api to enable provider
-		// 		have to write one? yes. neither the webauthn plugin nor the upstream plugin have one
-		// 		eventually calls twofaccor::enable_provider_for_user()
-		// handle failure
-	}, [] ); // todo any dependencies?
+	const enableProvider = useCallback( async () => {
+		try {
+			await apiFetch( {
+				path: '/wporg-two-factor/1.0/provider-status',
+				method: 'POST',
+				data: {
+					user_id: record.id,
+					provider: 'TwoFactor_Provider_WebAuthn',
+					status: 'enable',
+				},
+			} );
+
+			await refreshRecord( userRecord );
+		}
+	}, [] );
 
 	/**
 	 * Disable the WebAuthn provider.
@@ -74,6 +87,8 @@ export default function WebAuthn() {
 		);
 
 		// refresuserRecord should result in this screen re-rendering with the enable button visible instead of the disable button
+
+		// maybe refactor to use some of enableProvider() b/c they're calling the same endpoint, just with a different `status` value
 	}, [] ); // todo any dependencies?
 
 	if ( 'register' === flow ) {
