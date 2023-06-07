@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, Notice, Spinner } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
+import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -30,9 +31,12 @@ export default function WebAuthn() {
 			webAuthnEnabled,
 			backupCodesEnabled,
 		},
+		setGlobalNotice,
 	} = useContext( GlobalContext );
 	const keys = userRecord.record[ '2fa_webauthn_keys' ];
 	const [ flow, setFlow ] = useState( 'manage' );
+	const [ statusError, setStatusError ] = useState( '' );
+	const [ statusWaiting, setStatusWaiting ] = useState( false );
 
 	/**
 	 * Handle post-registration prcessing.
@@ -55,6 +59,9 @@ export default function WebAuthn() {
 	 */
 	const enableProvider = useCallback( async () => {
 		try {
+			setStatusError( '' );
+			setStatusWaiting( true );
+
 			await apiFetch( {
 				path: '/wporg-two-factor/1.0/provider-status',
 				method: 'POST',
@@ -66,6 +73,11 @@ export default function WebAuthn() {
 			} );
 
 			await refreshRecord( userRecord );
+			setGlobalNotice( 'Successfully enabled Security Keys.' );
+		} catch ( error ) {
+			setStatusError( error?.message || error?.responseJSON?.data || error );
+		} finally {
+			setStatusWaiting( false );
 		}
 	}, [] );
 
@@ -120,12 +132,24 @@ export default function WebAuthn() {
 				</Button>
 
 				{ keys.length > 0 && (
-					<Button variant="secondary" onClick={ disableProvider }>
-						Disable Security Keys
-						{ /* TODO change this to Enable if the provider is disabled? */ }
+					<Button
+						variant="secondary"
+						onClick={ webAuthnEnabled ? disableProvider : enableProvider }
+						disabled={ statusWaiting }
+					>
+						{ webAuthnEnabled ? 'Disable Security Keys' : 'Enable Security Keys' }
 					</Button>
 				) }
+
+				{ statusWaiting && <Spinner /> }
 			</p>
+
+			{ statusError && (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ statusError }
+				</Notice>
+			) }
 		</>
 	);
 }
