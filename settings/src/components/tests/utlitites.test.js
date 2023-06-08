@@ -9,7 +9,8 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Local dependencies
  */
-import { useUser, refreshRecord } from '../../utilities/common';
+import { refreshRecord } from '../../utilities/common';
+import { useUser } from '../../hooks/useUser';
 
 jest.mock( '@wordpress/data' );
 jest.mock( '@wordpress/core-data' );
