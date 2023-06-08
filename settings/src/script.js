@@ -15,7 +15,7 @@ import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useUser } from './utilities';
+import { useUser } from './utilities/common';
 import ScreenLink from './components/screen-link';
 import AccountStatus from './components/account-status';
 import Password from './components/password';

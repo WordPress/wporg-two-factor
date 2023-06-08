@@ -9,7 +9,7 @@ import { Icon, check, cancelCircleFilled } from '@wordpress/icons';
  * Internal dependencies
  */
 import { GlobalContext } from '../../script';
-import { refreshRecord } from '../../utilities';
+import { refreshRecord } from '../../utilities/common';
 import {
 	preparePublicKeyCreationOptions,
 	preparePublicKeyCredential,

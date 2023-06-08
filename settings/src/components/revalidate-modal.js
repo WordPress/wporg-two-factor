@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { GlobalContext } from '../script';
 import { Modal } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
-import { refreshRecord } from '../utilities';
+import { refreshRecord } from '../utilities/common';
 
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
