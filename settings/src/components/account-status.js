@@ -21,6 +21,7 @@ export default function AccountStatus() {
 				record: { email, pending_email: pendingEmail },
 			},
 			hasPrimaryProvider,
+			primaryProvider,
 			totpEnabled,
 			backupCodesEnabled,
 			webAuthnEnabled,
@@ -60,7 +61,12 @@ export default function AccountStatus() {
 				<SettingStatusCard
 					screen="webauthn"
 					status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-					headerText="Two-Factor Security Key"
+					headerText={
+						'Two-Factor Security Key' +
+						( 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled
+							? ' (Default)'
+							: '' )
+					}
 					bodyText={
 						webAuthnEnabled
 							? 'You have two-factor authentication enabled using security keys.'
@@ -72,7 +78,10 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="totp"
 				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
-				headerText="Two-Factor App"
+				headerText={
+					'Two-Factor App' +
+					( 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled ? ' (Default)' : '' )
+				}
 				bodyText={
 					totpEnabled
 						? 'You have two-factor authentication enabled using an app.'
@@ -105,10 +114,13 @@ function SettingStatusCard( { screen, status, headerText, bodyText, disabled = f
 	const cardContent = (
 		<CardBody>
 			<StatusIcon status={ status } />
+
 			<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
 				{ headerText }
 			</h3>
-			<p>{ bodyText }</p>
+
+			<p className="wporg-2fa__status-card-body">{ bodyText }</p>
+
 			<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
 		</CardBody>
 	);
