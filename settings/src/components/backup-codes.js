@@ -33,6 +33,10 @@ export default function BackupCodes() {
 		return;
 	}
 
+	// TODO: record.isSetupFinished and its related logic should be removed
+	// once https://github.com/WordPress/two-factor/issues/507 is fixed.
+	// This is a workaround that fixes the side effect brought up by #507.
+	// See more in https://github.com/WordPress/wporg-two-factor/issues/216 and its PR.
 	if ( backupCodesEnabled && record.isSetupFinished && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
 	}
