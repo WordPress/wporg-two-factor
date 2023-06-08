@@ -59,7 +59,6 @@ function Main( { userId } ) {
 		userRecord: { record, edit, hasEdits, hasResolved },
 		hasPrimaryProvider,
 		hasBackupCodesPrinted,
-		setHasBackupCodesPrinted,
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	const [ error, setError ] = useState( '' );
@@ -186,8 +185,6 @@ function Main( { userId } ) {
 				setGlobalNotice,
 				setError,
 				error,
-				hasBackupCodesPrinted,
-				setHasBackupCodesPrinted,
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
