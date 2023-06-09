@@ -72,7 +72,7 @@ function Main( { userId } ) {
 		email: <EmailAddress />,
 		password: <Password />,
 		totp: <TOTP />,
-		'backup-codes': <BackupCodes setScreen={ setScreen } />,
+		'backup-codes': <BackupCodes />,
 	};
 
 	// TODO: Only enable WebAuthn UI in development, until it's finished.
