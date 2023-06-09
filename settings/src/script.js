@@ -61,6 +61,7 @@ function Main( { userId } ) {
 		hasPrimaryProvider,
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
+	const [ error, setError ] = useState( '' );
 
 	let currentUrl = new URL( document.location.href );
 	let initialScreen = currentUrl.searchParams.get( 'screen' );
@@ -131,6 +132,7 @@ function Main( { userId } ) {
 			currentUrl.searchParams.set( 'screen', nextScreen );
 			window.history.pushState( {}, '', currentUrl );
 
+			setError( '' );
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
 		},
@@ -169,23 +171,22 @@ function Main( { userId } ) {
 				<CardBody className={ 'wporg-2fa__' + screen }>{ currentScreen }</CardBody>
 			</Card>
 		);
-	} else if (
-		twoFactorRequiredScreens.includes( screen ) &&
-		hasPrimaryProvider &&
-		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000
-	) {
-		screenContent = (
-			<>
-				{ currentScreen }
-				<RevalidateModal />
-			</>
-		);
 	}
 
+	const isRevalidationExpired =
+		twoFactorRequiredScreens.includes( screen ) &&
+		hasPrimaryProvider &&
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000;
+
+	const shouldRevalidate = 'revalidation_required' === error.code || isRevalidationExpired;
+
 	return (
-		<GlobalContext.Provider value={ { navigateToScreen, user, setGlobalNotice } }>
+		<GlobalContext.Provider
+			value={ { navigateToScreen, user, setGlobalNotice, setError, error } }
+		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
+			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
 }
