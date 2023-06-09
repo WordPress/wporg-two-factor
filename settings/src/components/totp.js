@@ -31,7 +31,7 @@ export default function TOTP() {
  */
 function Setup() {
 	const {
-		clickScreenLink,
+		navigateToScreen,
 		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
@@ -74,8 +74,8 @@ function Setup() {
 				},
 			} );
 
-			refreshRecord( userRecord );
-			clickScreenLink( event, 'backup-codes' );
+			await refreshRecord( userRecord );
+			navigateToScreen( 'backup-codes' );
 			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
 		} catch ( handleEnableError ) {
 			setError( handleEnableError.message );
@@ -304,7 +304,7 @@ function Manage() {
 				data: { user_id: userRecord.record.id },
 			} );
 
-			refreshRecord( userRecord );
+			await refreshRecord( userRecord );
 			setGlobalNotice( 'Successfully disabled One Time Passwords.' );
 		} catch ( handleDisableError ) {
 			setError( handleDisableError.message );

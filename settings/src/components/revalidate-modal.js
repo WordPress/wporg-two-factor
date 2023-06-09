@@ -1,16 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { GlobalContext } from '../script';
 import { Modal } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities';
 
 export default function RevalidateModal() {
-	const { clickScreenLink } = useContext( GlobalContext );
+	const { navigateToScreen } = useContext( GlobalContext );
 
-	const goBack = ( event ) => clickScreenLink( event, 'account-status' );
+	const goBack = useCallback( ( event ) => {
+		event.preventDefault();
+		navigateToScreen( 'account-status' );
+	}, [] );
 
 	return (
 		<Modal
@@ -37,7 +40,7 @@ function RevalidateIframe() {
 	const ref = useRef();
 
 	useEffect( () => {
-		function maybeRefreshUser( { data: { type, message } = {} } ) {
+		async function maybeRefreshUser( { data: { type, message } = {} } ) {
 			if ( type !== 'reValidationComplete' ) {
 				return;
 			}
@@ -49,7 +52,13 @@ function RevalidateIframe() {
 			record[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
-			refreshRecord( userRecord );
+			try {
+				await refreshRecord( userRecord );
+			} catch ( error ) {
+				// TODO: handle error more properly here, likely by showing a error notice
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to refresh user record:', error );
+			}
 		}
 
 		window.addEventListener( 'message', maybeRefreshUser );

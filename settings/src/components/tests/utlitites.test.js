@@ -123,8 +123,8 @@ describe( 'refreshRecord', () => {
 		mockRecord.save.mockReset();
 	} );
 
-	it( 'should call edit and save methods on the record object', () => {
-		refreshRecord( mockRecord );
+	it( 'should call edit and save methods on the record object', async () => {
+		await refreshRecord( mockRecord );
 
 		expect( mockRecord.edit ).toHaveBeenCalledWith( {
 			refreshRecordFakeKey: '',

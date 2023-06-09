@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import { useContext } from '@wordpress/element';
 import { GlobalContext } from '../script';
 
 export default function ScreenLink( { screen, anchorText, buttonStyle = false, ariaLabel } ) {
-	const { clickScreenLink } = useContext( GlobalContext );
+	const { navigateToScreen } = useContext( GlobalContext );
 	const classes = [];
 	const screenUrl = new URL( document.location.href );
 
@@ -23,10 +23,15 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 		classes.push( 'is-secondary' );
 	}
 
+	const onClick = useCallback( ( event ) => {
+		event.preventDefault();
+		navigateToScreen( screen );
+	}, [] );
+
 	return (
 		<a
 			href={ screenUrl.href }
-			onClick={ ( event ) => clickScreenLink( event, screen ) }
+			onClick={ onClick }
 			className={ classes.join( ' ' ) }
 			aria-label={ ariaLabel }
 		>

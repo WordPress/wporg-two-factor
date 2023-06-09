@@ -63,6 +63,8 @@ function Main( { userId } ) {
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 
 	let currentUrl = new URL( document.location.href );
+	let initialScreen = currentUrl.searchParams.get( 'screen' );
+	const [ screen, setScreen ] = useState( initialScreen );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
@@ -81,16 +83,11 @@ function Main( { userId } ) {
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
 
-	let initialScreen = currentUrl.searchParams.get( 'screen' );
-
 	if ( ! components[ initialScreen ] ) {
 		initialScreen = 'account-status';
 		currentUrl.searchParams.set( 'screen', initialScreen );
 		window.history.pushState( {}, '', currentUrl );
 	}
-
-	const [ screen, setScreen ] = useState( initialScreen );
-	const currentScreen = components[ screen ];
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -117,10 +114,8 @@ function Main( { userId } ) {
 	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
 	 * behaviors that are broken otherwise.
 	 */
-	const clickScreenLink = useCallback(
-		( event, nextScreen ) => {
-			event.preventDefault();
-
+	const navigateToScreen = useCallback(
+		( nextScreen ) => {
 			// Reset to initial after navigating away from a page.
 			// Note: password was initially not in record, this would prevent incomplete state
 			// from resetting when leaving the password setting page.
@@ -146,6 +141,7 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
+	const currentScreen = components[ screen ];
 	let screenContent = currentScreen;
 
 	if ( 'account-status' !== screen ) {
@@ -187,7 +183,7 @@ function Main( { userId } ) {
 	}
 
 	return (
-		<GlobalContext.Provider value={ { clickScreenLink, user, setGlobalNotice } }>
+		<GlobalContext.Provider value={ { navigateToScreen, user, setGlobalNotice } }>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ screenContent }
 		</GlobalContext.Provider>
