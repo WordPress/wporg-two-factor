@@ -5,15 +5,18 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { GlobalContext } from '../script';
 import { Modal } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
-import { refreshRecord } from '../utilities';
+import { refreshRecord } from '../utilities/common';
 
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
 
-	const goBack = useCallback( ( event ) => {
-		event.preventDefault();
-		navigateToScreen( 'account-status' );
-	}, [] );
+	const goBack = useCallback(
+		( event ) => {
+			event.preventDefault();
+			navigateToScreen( 'account-status' );
+		},
+		[ navigateToScreen ]
+	);
 
 	return (
 		<Modal

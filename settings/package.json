@@ -27,7 +27,7 @@
 		"@wordpress/data": "^8.4.0",
 		"@wordpress/element": "^5.4.0",
 		"@wordpress/icons": "^9.18.0",
-		"@wordpress/scripts": "^24.6.0",
+		"@wordpress/scripts": "^25.0.0",
 		"lodash": "^4.17.21"
 	}
 }

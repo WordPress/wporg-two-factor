@@ -14,8 +14,8 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Local dependencies
  */
-import { GlobalContext } from '../../../script';
-import Password from '../../password';
+import { GlobalContext } from '../../script';
+import Password from '../../components/password';
 import { mockPasswordEstimator } from './mocks';
 
 // Mock the context

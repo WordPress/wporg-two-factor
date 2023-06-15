@@ -11,7 +11,7 @@ import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@
  */
 import ScreenLink from './screen-link';
 import AutoTabbingInput from './auto-tabbing-input';
-import { refreshRecord } from '../utilities';
+import { refreshRecord } from '../utilities/common';
 import { GlobalContext } from '../script';
 
 export default function TOTP() {

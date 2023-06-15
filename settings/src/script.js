@@ -9,14 +9,13 @@ import {
 	useState,
 	createRoot,
 } from '@wordpress/element';
-import { Icon, chevronLeft } from '@wordpress/icons';
-import { Card, CardHeader, CardBody, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { useUser } from './utilities';
-import ScreenLink from './components/screen-link';
+import { useUser } from './hooks/useUser';
+import ScreenNavigation from './components/screen-navigation';
 import AccountStatus from './components/account-status';
 import Password from './components/password';
 import EmailAddress from './components/email-address';
@@ -143,35 +142,12 @@ function Main( { userId } ) {
 		return <Spinner />;
 	}
 
-	const currentScreen = components[ screen ];
-	let screenContent = currentScreen;
-
-	if ( 'account-status' !== screen ) {
-		screenContent = (
-			<Card>
-				<CardHeader className="wporg-2fa__navigation" size="xSmall">
-					<ScreenLink
-						screen="account-status"
-						ariaLabel="Back to the account status page"
-						anchorText={
-							<>
-								<Icon icon={ chevronLeft } />
-								Back
-							</>
-						}
-					/>
-
-					<h3>
-						{ screen
-							.replace( '-', ' ' )
-							.replace( 'totp', 'Two-Factor Authentication' )
-							.replace( 'webauthn', 'Two-Factor Security Key' ) }
-					</h3>
-				</CardHeader>
-				<CardBody className={ 'wporg-2fa__' + screen }>{ currentScreen }</CardBody>
-			</Card>
+	const currentScreenComponent =
+		'account-status' === screen ? (
+			components[ screen ]
+		) : (
+			<ScreenNavigation screen={ screen }>{ components[ screen ] }</ScreenNavigation>
 		);
-	}
 
 	const isRevalidationExpired =
 		twoFactorRequiredScreens.includes( screen ) &&
@@ -185,7 +161,7 @@ function Main( { userId } ) {
 			value={ { navigateToScreen, user, setGlobalNotice, setError, error } }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-			{ screenContent }
+			{ currentScreenComponent }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
