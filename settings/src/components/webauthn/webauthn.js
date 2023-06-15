@@ -10,7 +10,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { GlobalContext } from '../../script';
-import { refreshRecord } from '../../utilities';
+import { refreshRecord } from '../../utilities/common';
 import ListKeys from './list-keys';
 import RegisterKey from './register-key';
 
