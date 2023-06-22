@@ -17,7 +17,11 @@ import { refreshRecord } from '../utilities/common';
  */
 export default function BackupCodes() {
 	const {
-		user: { backupCodesEnabled, totpEnabled },
+		user: {
+			backupCodesEnabled,
+			totpEnabled,
+			userRecord: { record },
+		},
 		navigateToScreen,
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
@@ -29,7 +33,11 @@ export default function BackupCodes() {
 		return;
 	}
 
-	if ( backupCodesEnabled && ! regenerating ) {
+	// TODO: record.isSetupFinished and its related logic should be removed
+	// once https://github.com/WordPress/two-factor/issues/507 is fixed.
+	// This is a workaround that fixes the side effect brought up by #507.
+	// See more in https://github.com/WordPress/wporg-two-factor/issues/216 and its PR.
+	if ( backupCodesEnabled && record.isSetupFinished && ! regenerating ) {
 		return <Manage setRegenerating={ setRegenerating } />;
 	}
 
@@ -81,12 +89,12 @@ function Setup( { setRegenerating } ) {
 
 	// Finish the setup process.
 	const handleFinished = useCallback( async () => {
-		// TODO: Add try catch here after https://github.com/WordPress/wporg-two-factor/pull/187/files is merged.
-		// The codes have already been saved to usermeta, see `generateCodes()` above.
-		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
-	} );
+		userRecord.record.isSetupFinished = true;
+		// The codes have already been saved to usermeta, see `generateCodes()` above.
+		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
+	}, [] );
 
 	return (
 		<>
@@ -171,11 +179,9 @@ function CodeList( { codes } ) {
  */
 function Manage( { setRegenerating } ) {
 	const {
-		user: {
-			userRecord: { record },
-		},
+		user: { userRecord },
 	} = useContext( GlobalContext );
-	const remaining = record[ '2fa_backup_codes_remaining' ];
+	const remaining = userRecord.record[ '2fa_backup_codes_remaining' ];
 
 	return (
 		<>
@@ -202,8 +208,10 @@ function Manage( { setRegenerating } ) {
 
 			<Button
 				isSecondary
-				onClick={ () => {
+				onClick={ async () => {
 					setRegenerating( true );
+					userRecord.record.isSetupFinished = false;
+					await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 				} }
 			>
 				Generate new backup codes
