@@ -43,7 +43,12 @@ $alert-blue: #72aee6;
 	}
 }
 
+.wporg-2fa__screen-intro {
+	margin-bottom: 40px;
+}
+
 .wporg-2fa__submit-actions {
+	margin: 40px 0;
 	display: flex;
 	justify-content: flex-start;
 	gap: 16px 20px;

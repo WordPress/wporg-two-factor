@@ -79,8 +79,10 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 
 	return (
 		<form onSubmit={ onRegister }>
+			<p className="wporg-2fa__screen-intro">Give the security key a name</p>
+
 			<TextControl
-				label="Give the security key a name"
+				label="Name"
 				onChange={ ( name ) => setKeyName( name ) }
 				value={ keyName }
 				required

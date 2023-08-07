@@ -111,7 +111,7 @@ export default function WebAuthn() {
 
 	return (
 		<>
-			<p>
+			<p className="wporg-2fa__screen-intro">
 				A security key is a physical or software-based device that adds an extra layer of
 				authentication and protection to online accounts. It generates unique codes or
 				cryptographic signatures to verify the user&apos;s identity, offering stronger

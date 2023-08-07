@@ -2,10 +2,6 @@
 	.wporg-2fa__totp_setup-container {
 		position: relative;
 
-		p {
-			margin-top: unset;
-		}
-
 		> .components-button {
 			position: absolute;
 			right: 0;
@@ -15,13 +11,6 @@
 
 		> .components-notice {
 			width: 100%;
-		}
-
-		.wporg-2fa__totp_setup-instruction {
-			max-width: 550px;
-			margin-bottom: 32px;
-			align-self: center;
-			margin-top: revert;
 		}
 	}
 
@@ -47,6 +36,17 @@
 		width: fit-content;
 		align-self: center;
 		text-align: center;
+
+		.wporg-2fa__submit-actions {
+			width: 100%;
+			justify-content: space-between;
+			margin-top: unset;
+	
+			* {
+				flex: 1;
+				justify-content: center;
+			}
+		}
 
 		& > .components-notice.is-error {
 			opacity: 0;
@@ -103,16 +103,6 @@
 			margin-top: 32px;
 		}
 
-	}
-
-	.wporg-2fa__submit-actions {
-		width: 100%;
-		justify-content: space-between;
-
-		* {
-			flex: 1;
-			justify-content: center;
-		}
 	}
 
 	.wporg-2fa__enabled-status {
