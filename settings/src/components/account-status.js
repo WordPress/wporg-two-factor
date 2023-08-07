@@ -59,31 +59,25 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="webauthn"
 				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-				headerText={
-					'Two-Factor Security Key' +
-					( 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled
-						? ' (Default)'
-						: '' )
-				}
+				headerText="Two-Factor Security Key"
 				bodyText={
 					webAuthnEnabled
 						? 'You have two-factor authentication enabled using security keys.'
 						: 'You have not registered any security keys.'
 				}
+				isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
 			/>
 
 			<SettingStatusCard
 				screen="totp"
 				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
-				headerText={
-					'Two-Factor App' +
-					( 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled ? ' (Default)' : '' )
-				}
+				headerText="Two-Factor App"
 				bodyText={
 					totpEnabled
 						? 'You have two-factor authentication enabled using an app.'
 						: 'You have not enabled an app for two-factor authentication.'
 				}
+				isPrimary={ 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled }
 			/>
 
 			<SettingStatusCard
@@ -106,17 +100,29 @@ export default function AccountStatus() {
  * @param props.headerText
  * @param props.bodyText
  * @param props.disabled
+ * @param props.isPrimary
  */
-function SettingStatusCard( { screen, status, headerText, bodyText, disabled = false } ) {
+function SettingStatusCard( {
+	screen,
+	status,
+	headerText,
+	bodyText,
+	isPrimary = false,
+	disabled = false,
+} ) {
 	const cardContent = (
 		<CardBody>
 			<StatusIcon status={ status } />
 
+			<div>
 			<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
 				{ headerText }
 			</h3>
 
 			<p className="wporg-2fa__status-card-body">{ bodyText }</p>
+			</div>
+
+			{ isPrimary && <div className="wporg-2fa__status-card-badge">Primary</div> }
 
 			<Icon icon={ chevronRight } size={ 26 } className="wporg-2fa__status-card-open" />
 		</CardBody>
