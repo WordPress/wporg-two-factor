@@ -56,24 +56,21 @@ export default function AccountStatus() {
 				}
 			/>
 
-			{ /* TODO: Only enable WebAuthn UI in development, until it's finished. */ }
-			{ 'development' === process.env.NODE_ENV && (
-				<SettingStatusCard
-					screen="webauthn"
-					status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-					headerText={
-						'Two-Factor Security Key' +
-						( 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled
-							? ' (Default)'
-							: '' )
-					}
-					bodyText={
-						webAuthnEnabled
-							? 'You have two-factor authentication enabled using security keys.'
-							: 'You have not registered any security keys.'
-					}
-				/>
-			) }
+			<SettingStatusCard
+				screen="webauthn"
+				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
+				headerText={
+					'Two-Factor Security Key' +
+					( 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled
+						? ' (Default)'
+						: '' )
+				}
+				bodyText={
+					webAuthnEnabled
+						? 'You have two-factor authentication enabled using security keys.'
+						: 'You have not registered any security keys.'
+				}
+			/>
 
 			<SettingStatusCard
 				screen="totp"
