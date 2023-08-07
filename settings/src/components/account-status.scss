@@ -76,14 +76,11 @@
 			fill: $alert-green;
 		}
 
-		&.is-info {
-			fill: $alert-blue;
-		}
-
 		&.is-pending {
 			fill: $alert-yellow;
 		}
 
+		&.is-info,
 		&.is-disabled,
 		&.is-error {
 			fill: $alert-red;

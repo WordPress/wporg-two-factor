@@ -3,7 +3,7 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, chevronRight, info, warning } from '@wordpress/icons';
+import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -115,11 +115,11 @@ function SettingStatusCard( {
 			<StatusIcon status={ status } />
 
 			<div>
-			<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
-				{ headerText }
-			</h3>
+				<h3 aria-label={ 'Click to enter the ' + headerText + ' setting page.' }>
+					{ headerText }
+				</h3>
 
-			<p className="wporg-2fa__status-card-body">{ bodyText }</p>
+				<p className="wporg-2fa__status-card-body">{ bodyText }</p>
 			</div>
 
 			{ isPrimary && <div className="wporg-2fa__status-card-badge">Primary</div> }
@@ -160,14 +160,11 @@ function StatusIcon( { status } ) {
 			icon = check;
 			break;
 
-		case 'info':
-			icon = info;
-			break;
-
 		case 'pending':
 			icon = warning;
 			break;
 
+		case 'info':
 		case 'error':
 		case 'disabled':
 		default:
