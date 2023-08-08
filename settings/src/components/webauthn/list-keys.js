@@ -97,7 +97,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			className="wporg-2fa__confirm-delete-key"
 			onRequestClose={ onClose }
 		>
-			<p>
+			<p className="wporg-2fa__screen-intro">
 				Are you sure you want to remove the <code>{ keyToRemove.name }</code> security key?
 			</p>
 
@@ -112,7 +112,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			</div>
 
 			{ deleting && (
-				<p>
+				<p className="wporg-2fa__webauthn-register-key-status">
 					<Spinner />
 				</p>
 			) }

@@ -128,7 +128,7 @@ export default function WebAuthn() {
 
 			<p className="wporg-2fa__submit-actions">
 				<Button variant="primary" onClick={ () => setFlow( 'register' ) }>
-					Register New Key
+					Register new key
 				</Button>
 
 				{ keys.length > 0 && (
@@ -137,11 +137,15 @@ export default function WebAuthn() {
 						onClick={ webAuthnEnabled ? disableProvider : enableProvider }
 						disabled={ statusWaiting }
 					>
-						{ webAuthnEnabled ? 'Disable Security Keys' : 'Enable Security Keys' }
+						{ webAuthnEnabled ? 'Disable security keys' : 'Enable security keys' }
 					</Button>
 				) }
 
-				{ statusWaiting && <Spinner /> }
+				{ statusWaiting && (
+					<p className="wporg-2fa__webauthn-register-key-status">
+						<Spinner />
+					</p>
+				) }
 			</p>
 
 			{ statusError && (

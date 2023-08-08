@@ -8,3 +8,14 @@
 		margin-top: 18px;
 	}
 }
+
+.wporg-2fa__webauthn-register-key-status {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 40px 0;
+
+	svg.components-spinner {
+		overflow: visible;
+	}
+}

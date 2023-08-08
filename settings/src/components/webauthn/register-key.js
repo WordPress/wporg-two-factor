@@ -79,7 +79,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 
 	return (
 		<form onSubmit={ onRegister }>
-			<p className="wporg-2fa__screen-intro">Give the security key a name</p>
+			<p className="wporg-2fa__screen-intro">Give the security key a name.</p>
 
 			<TextControl
 				label="Name"
@@ -90,7 +90,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 
 			<div className="wporg-2fa__submit-actions">
 				<Button type="submit" variant="primary" disabled={ registerCeremonyActive }>
-					Register Key
+					Register
 				</Button>
 
 				<Button variant="secondary" onClick={ onCancel }>
@@ -99,7 +99,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 			</div>
 
 			{ registerCeremonyActive && (
-				<p>
+				<p className="wporg-2fa__webauthn-register-key-status">
 					<Spinner />
 				</p>
 			) }
@@ -124,9 +124,11 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 function WaitingForSecurityKey() {
 	return (
 		<>
-			<p>Waiting for security key. Connect and touch your security key to register it.</p>
+			<p className="wporg-2fa__screen-intro">
+				Waiting for security key. Connect and touch your security key to register it.
+			</p>
 
-			<p>
+			<p className="wporg-2fa__webauthn-register-key-status">
 				<Spinner />
 			</p>
 		</>
@@ -153,10 +155,14 @@ function Success( { newKeyName, afterTimeout } ) {
 
 	return (
 		<>
-			<p>Success! Your { newKeyName } is successfully registered.</p>
+			<p className="wporg-2fa__screen-intro">
+				Success! Your { newKeyName } is successfully registered.
+			</p>
 
 			{ /* TODO replace w/ custom animation */ }
-			<Icon icon={ check } />
+			<p className="wporg-2fa__webauthn-register-key-status">
+				<Icon icon={ check } />
+			</p>
 		</>
 	);
 }
