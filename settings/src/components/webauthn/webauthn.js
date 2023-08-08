@@ -140,13 +140,13 @@ export default function WebAuthn() {
 						{ webAuthnEnabled ? 'Disable security keys' : 'Enable security keys' }
 					</Button>
 				) }
-
-				{ statusWaiting && (
-					<p className="wporg-2fa__webauthn-register-key-status">
-						<Spinner />
-					</p>
-				) }
 			</p>
+
+			{ statusWaiting && (
+				<p className="wporg-2fa__webauthn-register-key-status">
+					<Spinner />
+				</p>
+			) }
 
 			{ statusError && (
 				<Notice status="error" isDismissible={ false }>
