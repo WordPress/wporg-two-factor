@@ -10,6 +10,7 @@ import { Icon, cancelCircleFilled } from '@wordpress/icons';
  */
 import { GlobalContext } from '../../script';
 import { refreshRecord } from '../../utilities/common';
+
 /**
  * Render the list of keys.
  */
@@ -50,10 +51,10 @@ export default function ListKeys() {
 
 	return (
 		<>
-			<ul>
+			<ul className="wporg-2fa__webauthn-keys-list">
 				{ keys.map( ( key ) => (
 					<li key={ key.id }>
-						{ key.name }
+						<div className="wporg-2fa__webauthn-key-name">{ key.name }</div>
 
 						<Button
 							variant="link"
