@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Notice, Spinner } from '@wordpress/components';
+import { Button, Notice, Spinner, Modal } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -17,7 +17,6 @@ import RegisterKey from './register-key';
 /**
  * Global dependencies
  */
-const confirm = window.confirm;
 const alert = window.alert;
 
 /**
@@ -27,7 +26,9 @@ export default function WebAuthn() {
 	const {
 		user: {
 			userRecord,
-			userRecord: { record },
+			userRecord: {
+				record: { id: userId },
+			},
 			webAuthnEnabled,
 			backupCodesEnabled,
 		},
@@ -37,27 +38,14 @@ export default function WebAuthn() {
 	const [ flow, setFlow ] = useState( 'manage' );
 	const [ statusError, setStatusError ] = useState( '' );
 	const [ statusWaiting, setStatusWaiting ] = useState( false );
-
-	/**
-	 * Handle post-registration prcessing.
-	 */
-	const onRegisterSuccess = useCallback( async () => {
-		if ( ! webAuthnEnabled ) {
-			await enableProvider();
-		}
-
-		if ( ! backupCodesEnabled ) {
-			// TODO maybe redirect to backup codes, pending discussion.
-			alert( 'redirect to backup codes' );
-		} else {
-			setFlow( 'manage' );
-		}
-	}, [ webAuthnEnabled, backupCodesEnabled ] );
+	const [ confirmingDisable, setConfirmingDisable ] = useState( false );
 
 	/**
 	 * Enable the WebAuthn provider.
 	 */
-	const enableProvider = useCallback( async () => {
+	const toggleProvider = useCallback( async () => {
+		const newStatus = webAuthnEnabled ? 'disable' : 'enable';
+
 		try {
 			setStatusError( '' );
 			setStatusWaiting( true );
@@ -66,42 +54,50 @@ export default function WebAuthn() {
 				path: '/wporg-two-factor/1.0/provider-status',
 				method: 'POST',
 				data: {
-					user_id: record.id,
+					user_id: userId,
 					provider: 'TwoFactor_Provider_WebAuthn',
-					status: 'enable',
+					status: newStatus,
 				},
 			} );
 
 			await refreshRecord( userRecord );
-			setGlobalNotice( 'Successfully enabled Security Keys.' );
+			setGlobalNotice( `Successfully ${ newStatus }d Security Keys.` );
 		} catch ( error ) {
 			setStatusError( error?.message || error?.responseJSON?.data || error );
 		} finally {
 			setStatusWaiting( false );
 		}
+	}, [ userId, setGlobalNotice, userRecord, webAuthnEnabled ] );
+
+	/**
+	 * Handle post-registration processing.
+	 */
+	const onRegisterSuccess = useCallback( async () => {
+		if ( ! webAuthnEnabled ) {
+			await toggleProvider();
+		}
+
+		if ( ! backupCodesEnabled ) {
+			// TODO maybe redirect to backup codes, pending discussion.
+			alert( 'redirect to backup codes' );
+		} else {
+			setFlow( 'manage' );
+		}
+	}, [ webAuthnEnabled, backupCodesEnabled, toggleProvider ] );
+
+	/**
+	 * Display the modal to confirm disabling the WebAuthn provider.
+	 */
+	const showConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( true );
 	}, [] );
 
 	/**
-	 * Disable the WebAuthn provider.
+	 * Hide te modal to confirm disabling the WebAuthn provider.
 	 */
-	const disableProvider = useCallback( () => {
-		// TODO this will be done in a separate PR
-		// Also pending outcome of https://github.com/WordPress/wporg-two-factor/issues/194#issuecomment-1564930700
-
-		// return early if already disabled?
-		// this shouldn't be called in the first place if that's the case, maybe the button should be disabled or not even shown
-		//
-		// call api to disable provider
-		// handle failure
-
-		confirm(
-			'TODO Modal H4 Disable Security Keys? p Are you sure you want to disable Security Keys? Button Cancel Button Disable'
-		);
-
-		// refresuserRecord should result in this screen re-rendering with the enable button visible instead of the disable button
-
-		// maybe refactor to use some of enableProvider() b/c they're calling the same endpoint, just with a different `status` value
-	}, [] ); // todo any dependencies?
+	const hideConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( false );
+	}, [] );
 
 	if ( 'register' === flow ) {
 		return (
@@ -134,7 +130,7 @@ export default function WebAuthn() {
 				{ keys.length > 0 && (
 					<Button
 						variant="secondary"
-						onClick={ webAuthnEnabled ? disableProvider : enableProvider }
+						onClick={ webAuthnEnabled ? showConfirmDisableModal : toggleProvider }
 						disabled={ statusWaiting }
 					>
 						{ webAuthnEnabled ? 'Disable security keys' : 'Enable security keys' }
@@ -154,6 +150,59 @@ export default function WebAuthn() {
 					{ statusError }
 				</Notice>
 			) }
+
+			{ confirmingDisable && (
+				<ConfirmDisableKeys
+					error={ statusError }
+					disabling={ statusWaiting }
+					onClose={ hideConfirmDisableModal }
+					onConfirm={ toggleProvider }
+				/>
+			) }
 		</>
+	);
+}
+
+/**
+ * Prompt the user to confirm they want to disable security keys.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onConfirm
+ * @param {Function} props.onClose
+ * @param {string}   props.error
+ * @param {boolean}  props.disabling
+ */
+function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
+	if ( !! error ) {
+		onClose();
+		return null;
+	}
+
+	return (
+		<Modal
+			title={ `Disable security keys` }
+			className="wporg-2fa__confirm-disable-keys"
+			onRequestClose={ onClose }
+		>
+			<p className="wporg-2fa__screen-intro">
+				Are you sure you want to disable security keys?
+			</p>
+
+			<div className="wporg-2fa__submit-actions">
+				<Button variant="primary" onClick={ onConfirm }>
+					Disable
+				</Button>
+
+				<Button variant="secondary" onClick={ onClose }>
+					Cancel
+				</Button>
+			</div>
+
+			{ disabling && (
+				<p className="wporg-2fa__webauthn-register-key-status">
+					<Spinner />
+				</p>
+			) }
+		</Modal>
 	);
 }
