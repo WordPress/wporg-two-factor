@@ -122,7 +122,7 @@ export default function WebAuthn() {
 						onClick={ webAuthnEnabled ? showConfirmDisableModal : toggleProvider }
 						disabled={ statusWaiting }
 					>
-						{ webAuthnEnabled ? 'Disable security keys' : 'Enable security keys' }
+						{ `${ webAuthnEnabled ? 'Disable' : 'Enable' } security keys` }
 					</Button>
 				) }
 			</p>
