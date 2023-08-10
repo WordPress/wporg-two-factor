@@ -15,11 +15,6 @@ import ListKeys from './list-keys';
 import RegisterKey from './register-key';
 
 /**
- * Global dependencies
- */
-const alert = window.alert;
-
-/**
  * Render the WebAuthn setting.
  */
 export default function WebAuthn() {
@@ -30,7 +25,6 @@ export default function WebAuthn() {
 				record: { id: userId },
 			},
 			webAuthnEnabled,
-			backupCodesEnabled,
 		},
 		setGlobalNotice,
 	} = useContext( GlobalContext );
@@ -77,13 +71,8 @@ export default function WebAuthn() {
 			await toggleProvider();
 		}
 
-		if ( ! backupCodesEnabled ) {
-			// TODO maybe redirect to backup codes, pending discussion.
-			alert( 'redirect to backup codes' );
-		} else {
-			setFlow( 'manage' );
-		}
-	}, [ webAuthnEnabled, backupCodesEnabled, toggleProvider ] );
+		setFlow( 'manage' );
+	}, [ webAuthnEnabled, toggleProvider ] );
 
 	/**
 	 * Display the modal to confirm disabling the WebAuthn provider.
