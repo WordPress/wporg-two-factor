@@ -50,6 +50,10 @@ $alert-blue: #72aee6;
 	justify-content: flex-start;
 	gap: 16px 20px;
 	flex-wrap: wrap;
+
+	& + .components-notice.is-error {
+		margin-top: 40px;
+	}
 }
 
 .wporg-2fa__token {
