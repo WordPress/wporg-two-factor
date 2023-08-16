@@ -60,7 +60,10 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 				await refreshRecord( userRecord );
 				setStep( 'success' );
 			} catch ( exception ) {
-				setError( exception?.message || exception?.responseJSON?.data || exception );
+				// Ignore exceptions thrown by the browser when the user cancels adding the key
+				if ( 'NotAllowedError' !== exception?.name ) {
+					setError( exception?.message || exception?.responseJSON?.data || exception );
+				}
 				setStep( 'input' );
 			} finally {
 				setRegisterCeremonyActive( false );
