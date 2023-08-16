@@ -91,15 +91,15 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 				required
 			/>
 
-			<div className="wporg-2fa__submit-actions">
+			<p className="wporg-2fa__submit-actions">
 				<Button type="submit" variant="primary" disabled={ registerCeremonyActive }>
 					Register
 				</Button>
 
-				<Button variant="secondary" onClick={ onCancel }>
+				<Button variant="tertiary" onClick={ onCancel }>
 					Cancel
 				</Button>
-			</div>
+			</p>
 
 			{ registerCeremonyActive && (
 				<p className="wporg-2fa__webauthn-register-key-status">

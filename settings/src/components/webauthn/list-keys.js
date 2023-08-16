@@ -107,7 +107,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 					Remove { keyToRemove.name }
 				</Button>
 
-				<Button variant="secondary" onClick={ onClose }>
+				<Button variant="tertiary" onClick={ onClose }>
 					Cancel
 				</Button>
 			</div>

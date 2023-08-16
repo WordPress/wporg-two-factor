@@ -118,7 +118,7 @@ export default function WebAuthn() {
 
 				{ keys.length > 0 && (
 					<Button
-						variant="secondary"
+						variant="tertiary"
 						onClick={ webAuthnEnabled ? showConfirmDisableModal : toggleProvider }
 						disabled={ statusWaiting }
 					>
@@ -182,7 +182,7 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
 					Disable
 				</Button>
 
-				<Button variant="secondary" onClick={ onClose }>
+				<Button variant="tertiary" onClick={ onClose }>
 					Cancel
 				</Button>
 			</div>
