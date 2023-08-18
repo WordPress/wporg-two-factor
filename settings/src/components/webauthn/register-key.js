@@ -80,7 +80,14 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 		return <Success newKeyName={ keyName } afterTimeout={ onSuccess } />;
 	}
 
-	return (
+	return registerCeremonyActive ? (
+		<>
+			<p className="wporg-2fa__screen-intro">Connecting...</p>
+			<p className="wporg-2fa__webauthn-register-key-status">
+				<Spinner />
+			</p>
+		</>
+	) : (
 		<form onSubmit={ onRegister }>
 			<p className="wporg-2fa__screen-intro">Give the security key a name.</p>
 
@@ -100,12 +107,6 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 					Cancel
 				</Button>
 			</p>
-
-			{ registerCeremonyActive && (
-				<p className="wporg-2fa__webauthn-register-key-status">
-					<Spinner />
-				</p>
-			) }
 
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
