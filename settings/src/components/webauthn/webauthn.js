@@ -103,13 +103,7 @@ export default function WebAuthn() {
 				security than passwords alone.
 			</p>
 
-			{ keys.length > 0 && (
-				<>
-					<h4>Security Keys</h4>
-
-					<ListKeys />
-				</>
-			) }
+			{ keys.length > 0 && <ListKeys /> }
 
 			<p className="wporg-2fa__submit-actions">
 				<Button variant="primary" onClick={ () => setFlow( 'register' ) }>

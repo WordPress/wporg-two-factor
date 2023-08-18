@@ -1,23 +1,25 @@
-.wporg-2fa__webauthn-keys-list {
-	li {
-		display: flex;
-		padding: 20px 0;
-		border-bottom: 1px solid $gray-300;
-
-		&:last-of-type {
-			border-bottom: none;
-		}
-	}
-
-	.wporg-2fa__webauthn-key-name {
-		flex: 1;
-		font-size: 13px;
-	}
-}
-
 .wporg-2fa__webauthn,
 .bbp-single-user .wporg-2fa__webauthn {
-	// todo all styles here, except modal (which isn't in this DOM tree)
+	.wporg-2fa__webauthn-keys-header {
+		margin-bottom: 0;
+	}
+	
+	.wporg-2fa__webauthn-keys-list {
+		li {
+			display: flex;
+			padding: 20px 0;
+			border-bottom: 1px solid $gray-300;
+	
+			&:last-of-type {
+				border-bottom: none;
+			}
+		}
+	
+		.wporg-2fa__webauthn-key-name {
+			flex: 1;
+			font-size: 13px;
+		}
+	}
 }
 
 .components-modal__frame.wporg-2fa__confirm-delete-key {
