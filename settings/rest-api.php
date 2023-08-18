@@ -161,7 +161,7 @@ function rest_update_provider_status( WP_REST_Request $request ) {
 			break;
 
 		case 'disable':
-			$result = new WP_Error( 'todo_pending_194', 'TODO pending #194.', array( 'status' => 501 ) );
+			$result = Two_Factor_Core::disable_provider_for_user( $user_id, $provider );
 			break;
 	}
 

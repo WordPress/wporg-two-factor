@@ -83,7 +83,9 @@ export default function EmailAddress() {
 				</Notice>
 			) }
 
-			<p>To change your email address enter a new one below.</p>
+			<p className="wporg-2fa__screen-intro">
+				To change your email address enter a new one below.
+			</p>
 
 			<TextControl
 				type="email"

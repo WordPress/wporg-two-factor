@@ -92,19 +92,21 @@ export default function Password() {
 
 	return (
 		<form onSubmit={ handleFormSubmit }>
-			<p>
-				To update your password enter a new one below. Strong passwords are random, at least
-				twenty characters long, and include uppercase letters and symbols.
-			</p>
+			<div className="wporg-2fa__screen-intro">
+				<p>
+					To update your password enter a new one below. Strong passwords are random, at
+					least twenty characters long, and include uppercase letters and symbols.
+				</p>
 
-			<p>
-				For convenience, use a password manager to store and automatically enter passwords.
-				For more information, read about{ ' ' }
-				<a href="https://wordpress.org/documentation/article/password-best-practices/">
-					password best practices
-				</a>
-				.
-			</p>
+				<p>
+					For convenience, use a password manager to store and automatically enter
+					passwords. For more information, read about{ ' ' }
+					<a href="https://wordpress.org/documentation/article/password-best-practices/">
+						password best practices
+					</a>
+					.
+				</p>
+			</div>
 
 			<Flex className="wporg-2fa__password_container">
 				<TextControl

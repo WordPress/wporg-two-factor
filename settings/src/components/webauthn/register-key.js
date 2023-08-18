@@ -60,7 +60,10 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 				await refreshRecord( userRecord );
 				setStep( 'success' );
 			} catch ( exception ) {
-				setError( exception?.message || exception?.responseJSON?.data || exception );
+				// Ignore exceptions thrown by the browser when the user cancels adding the key
+				if ( 'NotAllowedError' !== exception?.name ) {
+					setError( exception?.message || exception?.responseJSON?.data || exception );
+				}
 				setStep( 'input' );
 			} finally {
 				setRegisterCeremonyActive( false );
@@ -77,30 +80,33 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 		return <Success newKeyName={ keyName } afterTimeout={ onSuccess } />;
 	}
 
-	return (
+	return registerCeremonyActive ? (
+		<>
+			<p className="wporg-2fa__screen-intro">Connecting...</p>
+			<p className="wporg-2fa__webauthn-register-key-status">
+				<Spinner />
+			</p>
+		</>
+	) : (
 		<form onSubmit={ onRegister }>
+			<p className="wporg-2fa__screen-intro">Give the security key a name.</p>
+
 			<TextControl
-				label="Give the security key a name"
+				label="Name"
 				onChange={ ( name ) => setKeyName( name ) }
 				value={ keyName }
 				required
 			/>
 
-			<div className="wporg-2fa__submit-actions">
+			<p className="wporg-2fa__submit-actions">
 				<Button type="submit" variant="primary" disabled={ registerCeremonyActive }>
-					Register Key
+					Register
 				</Button>
 
-				<Button variant="secondary" onClick={ onCancel }>
+				<Button variant="tertiary" onClick={ onCancel }>
 					Cancel
 				</Button>
-			</div>
-
-			{ registerCeremonyActive && (
-				<p>
-					<Spinner />
-				</p>
-			) }
+			</p>
 
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
@@ -122,9 +128,11 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 function WaitingForSecurityKey() {
 	return (
 		<>
-			<p>Waiting for security key. Connect and touch your security key to register it.</p>
+			<p className="wporg-2fa__screen-intro">
+				Waiting for security key. Connect and touch your security key to register it.
+			</p>
 
-			<p>
+			<p className="wporg-2fa__webauthn-register-key-status">
 				<Spinner />
 			</p>
 		</>
@@ -151,10 +159,14 @@ function Success( { newKeyName, afterTimeout } ) {
 
 	return (
 		<>
-			<p>Success! Your { newKeyName } is successfully registered.</p>
+			<p className="wporg-2fa__screen-intro">
+				Success! Your { newKeyName } is successfully registered.
+			</p>
 
 			{ /* TODO replace w/ custom animation */ }
-			<Icon icon={ check } />
+			<p className="wporg-2fa__webauthn-register-key-status">
+				<Icon icon={ check } />
+			</p>
 		</>
 	);
 }

@@ -10,6 +10,7 @@ import { Icon, cancelCircleFilled } from '@wordpress/icons';
  */
 import { GlobalContext } from '../../script';
 import { refreshRecord } from '../../utilities/common';
+
 /**
  * Render the list of keys.
  */
@@ -50,10 +51,11 @@ export default function ListKeys() {
 
 	return (
 		<>
-			<ul>
+			<h4 className="wporg-2fa__webauthn-keys-header">Security Keys</h4>
+			<ul className="wporg-2fa__webauthn-keys-list">
 				{ keys.map( ( key ) => (
 					<li key={ key.id }>
-						{ key.name }
+						<div className="wporg-2fa__webauthn-key-name">{ key.name }</div>
 
 						<Button
 							variant="link"
@@ -97,7 +99,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			className="wporg-2fa__confirm-delete-key"
 			onRequestClose={ onClose }
 		>
-			<p>
+			<p className="wporg-2fa__screen-intro">
 				Are you sure you want to remove the <code>{ keyToRemove.name }</code> security key?
 			</p>
 
@@ -106,13 +108,13 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 					Remove { keyToRemove.name }
 				</Button>
 
-				<Button variant="secondary" onClick={ onClose }>
+				<Button variant="tertiary" onClick={ onClose }>
 					Cancel
 				</Button>
 			</div>
 
 			{ deleting && (
-				<p>
+				<p className="wporg-2fa__webauthn-register-key-status">
 					<Spinner />
 				</p>
 			) }

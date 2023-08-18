@@ -23,9 +23,6 @@ $alert-blue: #72aee6;
 	h3,
 	h4 {
 		clear: none;
-	}
-
-	h3 {
 		font-size: 14px;
 	}
 
@@ -43,11 +40,20 @@ $alert-blue: #72aee6;
 	}
 }
 
+.wporg-2fa__screen-intro {
+	margin-bottom: 40px;
+}
+
 .wporg-2fa__submit-actions {
+	margin-top: 40px;
 	display: flex;
 	justify-content: flex-start;
 	gap: 16px 20px;
 	flex-wrap: wrap;
+
+	& + .components-notice.is-error {
+		margin-top: 40px;
+	}
 }
 
 .wporg-2fa__token {
