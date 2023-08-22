@@ -3,7 +3,7 @@
  */
 import { Button, Notice, Spinner, TextControl } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, check, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ import {
 	preparePublicKeyCreationOptions,
 	preparePublicKeyCredential,
 } from '../../utilities/webauthn';
+import Success from '../success';
 
 /**
  * Render the form to register new security keys.
@@ -77,7 +78,12 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 	}
 
 	if ( 'success' === step ) {
-		return <Success newKeyName={ keyName } afterTimeout={ onSuccess } />;
+		return (
+			<Success
+				message={ `Success! Your ${ keyName } is successfully registered.` }
+				afterTimeout={ onSuccess }
+			/>
+		);
 	}
 
 	return registerCeremonyActive ? (
@@ -134,39 +140,6 @@ function WaitingForSecurityKey() {
 
 			<p className="wporg-2fa__webauthn-register-key-status">
 				<Spinner />
-			</p>
-		</>
-	);
-}
-
-/**
- * Render the "Success" component.
- *
- * The user sees this once their security key has successfully been registered.
- *
- * @param props
- * @param props.newKeyName
- * @param props.afterTimeout
- */
-function Success( { newKeyName, afterTimeout } ) {
-	const [ hasTimer, setHasTimer ] = useState( false );
-
-	if ( ! hasTimer ) {
-		// Matches the length of the CSS animation property on .wporg-2fa__success
-		setTimeout( afterTimeout, 4000 );
-		setHasTimer( true );
-	}
-
-	return (
-		<>
-			<p className="wporg-2fa__screen-intro">
-				Success! Your { newKeyName } is successfully registered.
-			</p>
-
-			<p className="wporg-2fa__webauthn-register-key-status">
-				<div className="wporg-2fa__success">
-					<Icon icon={ check } />
-				</div>
 			</p>
 		</>
 	);

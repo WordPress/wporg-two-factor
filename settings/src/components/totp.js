@@ -13,28 +13,49 @@ import ScreenLink from './screen-link';
 import AutoTabbingInput from './auto-tabbing-input';
 import { refreshRecord } from '../utilities/common';
 import { GlobalContext } from '../script';
+import Success from './success';
 
 export default function TOTP() {
 	const {
 		user: { totpEnabled },
+		navigateToScreen,
 	} = useContext( GlobalContext );
+	const [ success, setSuccess ] = useState( false );
+
+	const afterTimeout = useCallback( () => {
+		setSuccess( false );
+		navigateToScreen( 'backup-codes' );
+	}, [ navigateToScreen ] );
+
+	if ( success ) {
+		return (
+			<Success
+				message="Success! Your two-factor authentication app is set up."
+				afterTimeout={ afterTimeout }
+			/>
+		);
+	}
 
 	if ( totpEnabled ) {
 		return <Manage />;
 	}
 
-	return <Setup />;
+	return <Setup setSuccess={ setSuccess } />;
 }
 
 /**
  * Setup the TOTP provider.
+ *
+ * @param props
+ * @param props.setSuccess
  */
-function Setup() {
+function Setup( { setSuccess } ) {
 	const {
-		navigateToScreen,
-		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
+	const {
+		record: { id: userId },
+	} = userRecord;
 	const [ secretKey, setSecretKey ] = useState( '' );
 	const [ qrCodeUrl, setQrCodeUrl ] = useState( '' );
 	const [ error, setError ] = useState( '' );
@@ -46,7 +67,7 @@ function Setup() {
 		// useEffect callbacks can't be async directly, because that'd return the promise as a "cleanup" function.
 		const fetchSetupData = async () => {
 			const response = await apiFetch( {
-				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userRecord.record.id,
+				path: '/wporg-two-factor/1.0/totp-setup?user_id=' + userId,
 			} );
 
 			setSecretKey( response.secret_key );
@@ -54,33 +75,35 @@ function Setup() {
 		};
 
 		fetchSetupData();
-	}, [] );
+	}, [ userId ] );
 
 	// Enable TOTP when button clicked.
-	const handleEnable = useCallback( async ( event ) => {
-		event.preventDefault();
+	const handleEnable = useCallback(
+		async ( event ) => {
+			event.preventDefault();
 
-		const code = inputs.join( '' );
+			const code = inputs.join( '' );
 
-		try {
-			await apiFetch( {
-				path: '/two-factor/1.0/totp/',
-				method: 'POST',
-				data: {
-					user_id: userRecord.record.id,
-					key: secretKey,
-					code,
-					enable_provider: true,
-				},
-			} );
+			try {
+				await apiFetch( {
+					path: '/two-factor/1.0/totp/',
+					method: 'POST',
+					data: {
+						user_id: userId,
+						key: secretKey,
+						code,
+						enable_provider: true,
+					},
+				} );
 
-			await refreshRecord( userRecord );
-			navigateToScreen( 'backup-codes' );
-			setGlobalNotice( 'Successfully enabled One Time Passwords.' ); // Must be After `clickScreenEvent` clears it.
-		} catch ( handleEnableError ) {
-			setError( handleEnableError.message );
-		}
-	} );
+				await refreshRecord( userRecord );
+				setSuccess( true );
+			} catch ( handleEnableError ) {
+				setError( handleEnableError.message );
+			}
+		},
+		[ inputs, secretKey, userId, userRecord, setSuccess ]
+	);
 
 	return (
 		<Flex
