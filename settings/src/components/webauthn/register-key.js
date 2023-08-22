@@ -152,8 +152,8 @@ function Success( { newKeyName, afterTimeout } ) {
 	const [ hasTimer, setHasTimer ] = useState( false );
 
 	if ( ! hasTimer ) {
-		// TODO need to sync this timing with the animation below
-		setTimeout( afterTimeout, 2000 );
+		// Matches the length of the CSS animation property on .wporg-2fa__success
+		setTimeout( afterTimeout, 4000 );
 		setHasTimer( true );
 	}
 
@@ -163,9 +163,10 @@ function Success( { newKeyName, afterTimeout } ) {
 				Success! Your { newKeyName } is successfully registered.
 			</p>
 
-			{ /* TODO replace w/ custom animation */ }
 			<p className="wporg-2fa__webauthn-register-key-status">
-				<Icon icon={ check } />
+				<div className="wporg-2fa__success">
+					<Icon icon={ check } />
+				</div>
 			</p>
 		</>
 	);
