@@ -35,6 +35,18 @@ export default function WebAuthn() {
 	const [ confirmingDisable, setConfirmingDisable ] = useState( false );
 
 	/**
+	 * Clear any notices then move to the desired step in the flow
+	 */
+	const updateFlow = useCallback(
+		( nextFlow ) => {
+			setGlobalNotice( '' );
+			setStatusError( '' );
+			setFlow( nextFlow );
+		},
+		[ setGlobalNotice ]
+	);
+
+	/**
 	 * Enable the WebAuthn provider.
 	 */
 	const toggleProvider = useCallback( async () => {
@@ -71,8 +83,8 @@ export default function WebAuthn() {
 			await toggleProvider();
 		}
 
-		setFlow( 'manage' );
-	}, [ webAuthnEnabled, toggleProvider ] );
+		updateFlow( 'manage' );
+	}, [ webAuthnEnabled, toggleProvider, updateFlow ] );
 
 	/**
 	 * Display the modal to confirm disabling the WebAuthn provider.
@@ -90,7 +102,10 @@ export default function WebAuthn() {
 
 	if ( 'register' === flow ) {
 		return (
-			<RegisterKey onSuccess={ onRegisterSuccess } onCancel={ () => setFlow( 'manage' ) } />
+			<RegisterKey
+				onSuccess={ onRegisterSuccess }
+				onCancel={ () => updateFlow( 'manage' ) }
+			/>
 		);
 	}
 
@@ -106,7 +121,7 @@ export default function WebAuthn() {
 			{ keys.length > 0 && <ListKeys /> }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ () => setFlow( 'register' ) }>
+				<Button variant="primary" onClick={ () => updateFlow( 'register' ) }>
 					Register new key
 				</Button>
 
