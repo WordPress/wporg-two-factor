@@ -7,7 +7,8 @@
 	"category": "widgets",
 	"icon": "lock",
 	"supports": {
-		"html": false
+		"html": false,
+		"inserter": false
 	},
 	"attributes": {
 		"userId": {
