@@ -19,16 +19,12 @@ import RegisterKey from './register-key';
  */
 export default function WebAuthn() {
 	const {
-		user: {
-			userRecord,
-			userRecord: {
-				record: { id: userId },
-			},
-			webAuthnEnabled,
-		},
+		user: { userRecord, webAuthnEnabled },
 		setGlobalNotice,
 	} = useContext( GlobalContext );
-	const keys = userRecord.record[ '2fa_webauthn_keys' ];
+	const {
+		record: { id: userId, '2fa_webauthn_keys': keys },
+	} = userRecord;
 	const [ flow, setFlow ] = useState( 'manage' );
 	const [ statusError, setStatusError ] = useState( '' );
 	const [ statusWaiting, setStatusWaiting ] = useState( false );
