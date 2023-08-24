@@ -63,6 +63,7 @@ function Setup( { setSuccess } ) {
 	const [ error, setError ] = useState( '' );
 	const [ setupMethod, setSetupMethod ] = useState( 'qr-code' );
 	const [ inputs, setInputs ] = useState( Array( 6 ).fill( '' ) );
+	const [ statusWaiting, setStatusWaiting ] = useState( false );
 
 	// Fetch the data needed to setup TOTP.
 	useEffect( () => {
@@ -87,6 +88,9 @@ function Setup( { setSuccess } ) {
 			const code = inputs.join( '' );
 
 			try {
+				setError( '' );
+				setStatusWaiting( true );
+
 				await apiFetch( {
 					path: '/two-factor/1.0/totp/',
 					method: 'POST',
@@ -102,6 +106,8 @@ function Setup( { setSuccess } ) {
 				setSuccess( true );
 			} catch ( handleEnableError ) {
 				setError( handleEnableError.message );
+			} finally {
+				setStatusWaiting( false );
 			}
 		},
 		[ inputs, secretKey, userId, userRecord, setSuccess ]
@@ -125,23 +131,37 @@ function Setup( { setSuccess } ) {
 				when logging in to WordPress.org.
 			</p>
 
-			{ 'qr-code' === setupMethod && (
-				<SetupMethodQRCode setSetupMethod={ setSetupMethod } qrCodeUrl={ qrCodeUrl } />
-			) }
+			{ statusWaiting ? (
+				<div className="wporg-2fa__process-status">
+					<Spinner />
+				</div>
+			) : (
+				<>
+					{ 'qr-code' === setupMethod && (
+						<SetupMethodQRCode
+							setSetupMethod={ setSetupMethod }
+							qrCodeUrl={ qrCodeUrl }
+						/>
+					) }
 
-			{ 'manual' === setupMethod && (
-				<SetupMethodManual setSetupMethod={ setSetupMethod } secretKey={ secretKey } />
-			) }
+					{ 'manual' === setupMethod && (
+						<SetupMethodManual
+							setSetupMethod={ setSetupMethod }
+							secretKey={ secretKey }
+						/>
+					) }
 
-			<SetupForm
-				handleEnable={ handleEnable }
-				qrCodeUrl={ qrCodeUrl }
-				secretKey={ secretKey }
-				inputs={ inputs }
-				setInputs={ setInputs }
-				error={ error }
-				setError={ setError }
-			/>
+					<SetupForm
+						handleEnable={ handleEnable }
+						qrCodeUrl={ qrCodeUrl }
+						secretKey={ secretKey }
+						inputs={ inputs }
+						setInputs={ setInputs }
+						error={ error }
+						setError={ setError }
+					/>
+				</>
+			) }
 		</Flex>
 	);
 }
@@ -320,30 +340,6 @@ function Manage() {
 	const [ disabling, setDisabling ] = useState( false );
 	const [ confirmingDisable, setConfirmingDisable ] = useState( false );
 
-	// Enable TOTP when button clicked.
-	const handleDisable = useCallback(
-		async ( event ) => {
-			event.preventDefault();
-			setDisabling( true );
-
-			try {
-				await apiFetch( {
-					path: '/two-factor/1.0/totp/',
-					method: 'DELETE',
-					data: { user_id: userRecord.record.id },
-				} );
-
-				await refreshRecord( userRecord );
-				setGlobalNotice( 'Successfully disabled One Time Passwords.' );
-			} catch ( handleDisableError ) {
-				setError( handleDisableError.message );
-			} finally {
-				setDisabling( false );
-			}
-		},
-		[ setGlobalNotice, userRecord ]
-	);
-
 	/**
 	 * Display the modal to confirm disabling the WebAuthn provider.
 	 */
@@ -357,6 +353,32 @@ function Manage() {
 	const hideConfirmDisableModal = useCallback( () => {
 		setConfirmingDisable( false );
 	}, [] );
+
+	// Disable TOTP when button clicked.
+	const handleDisable = useCallback(
+		async ( event ) => {
+			event.preventDefault();
+			setError( '' );
+			setDisabling( true );
+
+			try {
+				await apiFetch( {
+					path: '/two-factor/1.0/totp/',
+					method: 'DELETE',
+					data: { user_id: userRecord.record.id },
+				} );
+
+				await refreshRecord( userRecord );
+				setGlobalNotice( 'Successfully disabled your two-factor app.' );
+			} catch ( handleDisableError ) {
+				hideConfirmDisableModal();
+				setError( handleDisableError.message );
+			} finally {
+				setDisabling( false );
+			}
+		},
+		[ hideConfirmDisableModal, setGlobalNotice, userRecord ]
+	);
 
 	return (
 		<>
@@ -413,15 +435,9 @@ function Manage() {
  * @param {Object}   props
  * @param {Function} props.onConfirm
  * @param {Function} props.onClose
- * @param {string}   props.error
  * @param {boolean}  props.disabling
  */
-function ConfirmDisableApp( { onConfirm, onClose, disabling, error } ) {
-	if ( !! error ) {
-		onClose();
-		return null;
-	}
-
+function ConfirmDisableApp( { onConfirm, onClose, disabling } ) {
 	return (
 		<Modal
 			title={ `Disable Two-Factor app` }

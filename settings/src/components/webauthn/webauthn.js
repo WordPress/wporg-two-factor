@@ -43,7 +43,21 @@ export default function WebAuthn() {
 	);
 
 	/**
-	 * Enable the WebAuthn provider.
+	 * Display the modal to confirm disabling the WebAuthn provider.
+	 */
+	const showConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( true );
+	}, [] );
+
+	/**
+	 * Hide te modal to confirm disabling the WebAuthn provider.
+	 */
+	const hideConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( false );
+	}, [] );
+
+	/**
+	 * Toggle enablement of the WebAuthn provider.
 	 */
 	const toggleProvider = useCallback( async () => {
 		const newStatus = webAuthnEnabled ? 'disable' : 'enable';
@@ -65,11 +79,12 @@ export default function WebAuthn() {
 			await refreshRecord( userRecord );
 			setGlobalNotice( `Successfully ${ newStatus }d Security Keys.` );
 		} catch ( error ) {
+			hideConfirmDisableModal();
 			setStatusError( error?.message || error?.responseJSON?.data || error );
 		} finally {
 			setStatusWaiting( false );
 		}
-	}, [ userId, setGlobalNotice, userRecord, webAuthnEnabled ] );
+	}, [ webAuthnEnabled, userId, userRecord, setGlobalNotice, hideConfirmDisableModal ] );
 
 	/**
 	 * Handle post-registration processing.
@@ -81,20 +96,6 @@ export default function WebAuthn() {
 
 		updateFlow( 'manage' );
 	}, [ webAuthnEnabled, toggleProvider, updateFlow ] );
-
-	/**
-	 * Display the modal to confirm disabling the WebAuthn provider.
-	 */
-	const showConfirmDisableModal = useCallback( () => {
-		setConfirmingDisable( true );
-	}, [] );
-
-	/**
-	 * Hide te modal to confirm disabling the WebAuthn provider.
-	 */
-	const hideConfirmDisableModal = useCallback( () => {
-		setConfirmingDisable( false );
-	}, [] );
 
 	if ( 'register' === flow ) {
 		return (
@@ -165,15 +166,9 @@ export default function WebAuthn() {
  * @param {Object}   props
  * @param {Function} props.onConfirm
  * @param {Function} props.onClose
- * @param {string}   props.error
  * @param {boolean}  props.disabling
  */
-function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
-	if ( !! error ) {
-		onClose();
-		return null;
-	}
-
+function ConfirmDisableKeys( { onConfirm, onClose, disabling } ) {
 	return (
 		<Modal
 			title={ `Disable security keys` }
