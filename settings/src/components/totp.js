@@ -29,12 +29,12 @@ export default function TOTP() {
 
 	if ( success ) {
 		return (
-			<div className="wporg-2fa__totp_success">
+			<Flex className="wporg-2fa__totp_success" direction="column">
 				<Success
 					message="Success! Your two-factor authentication app is set up."
 					afterTimeout={ afterTimeout }
 				/>
-			</div>
+			</Flex>
 		);
 	}
 

@@ -1,12 +1,13 @@
 .wporg-2fa__totp {
+	$min-container-height: 590px;
+
 	.wporg-2fa__totp_success {
-		display: flex;
-		min-height: 620px;
-		flex-direction: column;
+		min-height: $min-container-height;
 	}
 
 	.wporg-2fa__totp_setup-container {
 		position: relative;
+		min-height: $min-container-height;
 
 		> .components-button {
 			position: absolute;

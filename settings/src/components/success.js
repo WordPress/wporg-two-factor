@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Flex } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 
@@ -23,7 +24,7 @@ export default function Success( { message, afterTimeout } ) {
 	}
 
 	return (
-		<div className="wporg-2fa__success">
+		<Flex className="wporg-2fa__success" direction="column">
 			<p>{ message }</p>
 
 			<div className="wporg-2fa__status-icon" aria-hidden>
@@ -31,6 +32,6 @@ export default function Success( { message, afterTimeout } ) {
 					<Icon icon={ check } />
 				</div>
 			</div>
-		</div>
+		</Flex>
 	);
 }
