@@ -67,6 +67,11 @@ $alert-blue: #72aee6;
 	align-items: center;
 	margin: 40px 0;
 
+	.components-modal__content & {
+		height: 36px; // Matches the button height
+		margin-bottom: 0;
+	}
+
 	svg.components-spinner {
 		overflow: visible;
 	}
