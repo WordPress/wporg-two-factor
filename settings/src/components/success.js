@@ -27,7 +27,7 @@ export default function Success( { message, afterTimeout } ) {
 		<Flex className="wporg-2fa__success" direction="column">
 			<p>{ message }</p>
 
-			<div className="wporg-2fa__status-icon" aria-hidden>
+			<div className="wporg-2fa__process-status" aria-hidden>
 				<div className="wporg-2fa__success-animation">
 					<Icon icon={ check } />
 				</div>

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Notice, Spinner, Modal } from '@wordpress/components';
+import { Button, Flex, Notice, Spinner, Modal } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -102,12 +102,12 @@ export default function WebAuthn() {
 
 	if ( 'register' === flow ) {
 		return (
-			<div className="wporg-2fa__webauthn-register">
+			<Flex className="wporg-2fa__webauthn-register" direction="column">
 				<RegisterKey
 					onSuccess={ onRegisterSuccess }
 					onCancel={ () => updateFlow( 'manage' ) }
 				/>
-			</div>
+			</Flex>
 		);
 	}
 
@@ -139,7 +139,7 @@ export default function WebAuthn() {
 			</p>
 
 			{ statusWaiting && (
-				<div className="wporg-2fa__status-icon">
+				<div className="wporg-2fa__process-status">
 					<Spinner />
 				</div>
 			) }
@@ -189,7 +189,7 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
 			</p>
 
 			{ disabling ? (
-				<div className="wporg-2fa__status-icon">
+				<div className="wporg-2fa__process-status">
 					<Spinner />
 				</div>
 			) : (

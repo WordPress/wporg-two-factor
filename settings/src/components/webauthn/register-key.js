@@ -89,7 +89,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 		<>
 			<p>Connecting...</p>
 
-			<div className="wporg-2fa__status-icon">
+			<div className="wporg-2fa__process-status">
 				<Spinner />
 			</div>
 		</>
@@ -137,7 +137,7 @@ function WaitingForSecurityKey() {
 		<>
 			<p>Waiting for security key. Connect and touch your security key to register it.</p>
 
-			<div className="wporg-2fa__status-icon">
+			<div className="wporg-2fa__process-status">
 				<Spinner />
 			</div>
 		</>

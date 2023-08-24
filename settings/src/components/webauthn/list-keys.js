@@ -104,7 +104,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			</p>
 
 			{ deleting ? (
-				<div className="wporg-2fa__status-icon">
+				<div className="wporg-2fa__process-status">
 					<Spinner />
 				</div>
 			) : (
