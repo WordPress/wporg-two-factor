@@ -103,19 +103,19 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 				Are you sure you want to remove the <code>{ keyToRemove.name }</code> security key?
 			</p>
 
-			<div className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ onConfirm }>
-					Remove { keyToRemove.name }
-				</Button>
-
-				<Button variant="tertiary" onClick={ onClose }>
-					Cancel
-				</Button>
-			</div>
-
-			{ deleting && (
+			{ deleting ? (
 				<div className="wporg-2fa__status-icon">
 					<Spinner />
+				</div>
+			) : (
+				<div className="wporg-2fa__submit-actions">
+					<Button variant="primary" onClick={ onConfirm }>
+						Remove { keyToRemove.name }
+					</Button>
+
+					<Button variant="tertiary" onClick={ onClose }>
+						Cancel
+					</Button>
 				</div>
 			) }
 

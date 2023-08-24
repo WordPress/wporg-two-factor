@@ -188,19 +188,19 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
 				Are you sure you want to disable security keys?
 			</p>
 
-			<div className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ onConfirm }>
-					Disable
-				</Button>
-
-				<Button variant="tertiary" onClick={ onClose }>
-					Cancel
-				</Button>
-			</div>
-
-			{ disabling && (
+			{ disabling ? (
 				<div className="wporg-2fa__status-icon">
 					<Spinner />
+				</div>
+			) : (
+				<div className="wporg-2fa__submit-actions">
+					<Button variant="primary" onClick={ onConfirm }>
+						Disable
+					</Button>
+
+					<Button variant="tertiary" onClick={ onClose }>
+						Cancel
+					</Button>
 				</div>
 			) }
 		</Modal>
