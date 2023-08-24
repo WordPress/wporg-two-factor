@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Notice, Flex } from '@wordpress/components';
+import { Button, Modal, Notice, Flex, Spinner } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 
@@ -317,24 +317,46 @@ function Manage() {
 		setGlobalNotice,
 	} = useContext( GlobalContext );
 	const [ error, setError ] = useState( '' );
+	const [ disabling, setDisabling ] = useState( false );
+	const [ confirmingDisable, setConfirmingDisable ] = useState( false );
 
 	// Enable TOTP when button clicked.
-	const handleDisable = useCallback( async ( event ) => {
-		event.preventDefault();
+	const handleDisable = useCallback(
+		async ( event ) => {
+			event.preventDefault();
+			setDisabling( true );
 
-		try {
-			await apiFetch( {
-				path: '/two-factor/1.0/totp/',
-				method: 'DELETE',
-				data: { user_id: userRecord.record.id },
-			} );
+			try {
+				await apiFetch( {
+					path: '/two-factor/1.0/totp/',
+					method: 'DELETE',
+					data: { user_id: userRecord.record.id },
+				} );
 
-			await refreshRecord( userRecord );
-			setGlobalNotice( 'Successfully disabled One Time Passwords.' );
-		} catch ( handleDisableError ) {
-			setError( handleDisableError.message );
-		}
-	} );
+				await refreshRecord( userRecord );
+				setGlobalNotice( 'Successfully disabled One Time Passwords.' );
+			} catch ( handleDisableError ) {
+				setError( handleDisableError.message );
+			} finally {
+				setDisabling( false );
+			}
+		},
+		[ setGlobalNotice, userRecord ]
+	);
+
+	/**
+	 * Display the modal to confirm disabling the WebAuthn provider.
+	 */
+	const showConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( true );
+	}, [] );
+
+	/**
+	 * Hide te modal to confirm disabling the WebAuthn provider.
+	 */
+	const hideConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( false );
+	}, [] );
 
 	return (
 		<>
@@ -361,7 +383,7 @@ function Manage() {
 			</div>
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary onClick={ handleDisable }>
+				<Button isPrimary onClick={ showConfirmDisableModal }>
 					Disable Two-Factor app
 				</Button>
 			</p>
@@ -372,6 +394,59 @@ function Manage() {
 					{ error }
 				</Notice>
 			) }
+
+			{ confirmingDisable && (
+				<ConfirmDisableApp
+					error={ error }
+					disabling={ disabling }
+					onClose={ hideConfirmDisableModal }
+					onConfirm={ handleDisable }
+				/>
+			) }
 		</>
+	);
+}
+
+/**
+ * Prompt the user to confirm they want to disable their two-factor app.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onConfirm
+ * @param {Function} props.onClose
+ * @param {string}   props.error
+ * @param {boolean}  props.disabling
+ */
+function ConfirmDisableApp( { onConfirm, onClose, disabling, error } ) {
+	if ( !! error ) {
+		onClose();
+		return null;
+	}
+
+	return (
+		<Modal
+			title={ `Disable Two-Factor app` }
+			className="wporg-2fa__confirm-disable-app"
+			onRequestClose={ onClose }
+		>
+			<p className="wporg-2fa__screen-intro">
+				Are you sure you want to disable your two-factor app?
+			</p>
+
+			{ disabling ? (
+				<div className="wporg-2fa__process-status">
+					<Spinner />
+				</div>
+			) : (
+				<div className="wporg-2fa__submit-actions">
+					<Button variant="primary" onClick={ onConfirm }>
+						Disable
+					</Button>
+
+					<Button variant="tertiary" onClick={ onClose }>
+						Cancel
+					</Button>
+				</div>
+			) }
+		</Modal>
 	);
 }
