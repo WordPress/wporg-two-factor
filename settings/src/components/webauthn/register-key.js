@@ -102,6 +102,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 				onChange={ ( name ) => setKeyName( name ) }
 				value={ keyName }
 				required
+				data-1p-ignore // Prevent 1Password from showing up
 			/>
 
 			<p className="wporg-2fa__submit-actions">
