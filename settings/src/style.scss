@@ -60,6 +60,18 @@ $alert-blue: #72aee6;
 	letter-spacing: .3em;
 }
 
+.wporg-2fa__status-icon {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 40px 0;
+
+	svg.components-spinner {
+		overflow: visible;
+	}
+}
+
 .components-notice {
 	margin-left: 0;
 	margin-right: 0;

@@ -114,9 +114,9 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			</div>
 
 			{ deleting && (
-				<p className="wporg-2fa__webauthn-register-key-status">
+				<div className="wporg-2fa__status-icon">
 					<Spinner />
-				</p>
+				</div>
 			) }
 
 			{ error && (

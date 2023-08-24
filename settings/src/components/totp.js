@@ -29,10 +29,12 @@ export default function TOTP() {
 
 	if ( success ) {
 		return (
-			<Success
-				message="Success! Your two-factor authentication app is set up."
-				afterTimeout={ afterTimeout }
-			/>
+			<div className="wporg-2fa__totp_success">
+				<Success
+					message="Success! Your two-factor authentication app is set up."
+					afterTimeout={ afterTimeout }
+				/>
+			</div>
 		);
 	}
 

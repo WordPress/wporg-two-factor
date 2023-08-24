@@ -1,4 +1,10 @@
 .wporg-2fa__totp {
+	.wporg-2fa__totp_success {
+		display: flex;
+		min-height: 620px;
+		flex-direction: column;
+	}
+
 	.wporg-2fa__totp_setup-container {
 		position: relative;
 

@@ -28,7 +28,6 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 		user: { userRecord },
 	} = useContext( GlobalContext );
 	const record = userRecord.record;
-
 	const [ error, setError ] = useState( false );
 	const [ keyName, setKeyName ] = useState( '' );
 	const [ step, setStep ] = useState( 'input' );
@@ -88,10 +87,11 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 
 	return registerCeremonyActive ? (
 		<>
-			<p className="wporg-2fa__screen-intro">Connecting...</p>
-			<p className="wporg-2fa__webauthn-register-key-status">
+			<p>Connecting...</p>
+
+			<div className="wporg-2fa__status-icon">
 				<Spinner />
-			</p>
+			</div>
 		</>
 	) : (
 		<form onSubmit={ onRegister }>
@@ -134,13 +134,11 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 function WaitingForSecurityKey() {
 	return (
 		<>
-			<p className="wporg-2fa__screen-intro">
-				Waiting for security key. Connect and touch your security key to register it.
-			</p>
+			<p>Waiting for security key. Connect and touch your security key to register it.</p>
 
-			<p className="wporg-2fa__webauthn-register-key-status">
+			<div className="wporg-2fa__status-icon">
 				<Spinner />
-			</p>
+			</div>
 		</>
 	);
 }

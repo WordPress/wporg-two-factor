@@ -102,10 +102,12 @@ export default function WebAuthn() {
 
 	if ( 'register' === flow ) {
 		return (
-			<RegisterKey
-				onSuccess={ onRegisterSuccess }
-				onCancel={ () => updateFlow( 'manage' ) }
-			/>
+			<div className="wporg-2fa__webauthn-register">
+				<RegisterKey
+					onSuccess={ onRegisterSuccess }
+					onCancel={ () => updateFlow( 'manage' ) }
+				/>
+			</div>
 		);
 	}
 
@@ -137,9 +139,9 @@ export default function WebAuthn() {
 			</p>
 
 			{ statusWaiting && (
-				<p className="wporg-2fa__webauthn-register-key-status">
+				<div className="wporg-2fa__status-icon">
 					<Spinner />
-				</p>
+				</div>
 			) }
 
 			{ statusError && (
@@ -197,9 +199,9 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
 			</div>
 
 			{ disabling && (
-				<p className="wporg-2fa__webauthn-register-key-status">
+				<div className="wporg-2fa__status-icon">
 					<Spinner />
-				</p>
+				</div>
 			) }
 		</Modal>
 	);
