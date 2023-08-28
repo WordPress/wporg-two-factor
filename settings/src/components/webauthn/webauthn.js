@@ -43,14 +43,14 @@ export default function WebAuthn() {
 	);
 
 	/**
-	 * Display the modal to confirm disabling the WebAuthn provider.
+	 * Display the confirmation modal for disabling the WebAuthn provider.
 	 */
 	const showConfirmDisableModal = useCallback( () => {
 		setConfirmingDisable( true );
 	}, [] );
 
 	/**
-	 * Hide te modal to confirm disabling the WebAuthn provider.
+	 * Remove the confirmation modal for disabling the WebAuthn provider.
 	 */
 	const hideConfirmDisableModal = useCallback( () => {
 		setConfirmingDisable( false );

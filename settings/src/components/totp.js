@@ -341,14 +341,14 @@ function Manage() {
 	const [ confirmingDisable, setConfirmingDisable ] = useState( false );
 
 	/**
-	 * Display the modal to confirm disabling the WebAuthn provider.
+	 * Display the confirmation modal for disabling the TOTP provider.
 	 */
 	const showConfirmDisableModal = useCallback( () => {
 		setConfirmingDisable( true );
 	}, [] );
 
 	/**
-	 * Hide te modal to confirm disabling the WebAuthn provider.
+	 * Remove the confirmation modal for disabling the TOTP provider.
 	 */
 	const hideConfirmDisableModal = useCallback( () => {
 		setConfirmingDisable( false );
