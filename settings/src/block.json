@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "wporg-two-factor/settings",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"title": "wporg Two-Factor Settings",
 	"category": "widgets",
 	"icon": "lock",
