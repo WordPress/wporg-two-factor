@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Flex } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 
@@ -18,19 +19,19 @@ export default function Success( { message, afterTimeout } ) {
 
 	if ( ! hasTimer ) {
 		// Time matches the length of the CSS animation property on .wporg-2fa__success
-		setTimeout( afterTimeout, 4000 );
+		setTimeout( afterTimeout, 5000 );
 		setHasTimer( true );
 	}
 
 	return (
-		<>
-			<p className="wporg-2fa__screen-intro">{ message }</p>
+		<Flex className="wporg-2fa__success" direction="column">
+			<p>{ message }</p>
 
-			<p className="wporg-2fa__webauthn-register-key-status" aria-hidden>
-				<div className="wporg-2fa__success">
+			<div className="wporg-2fa__process-status" aria-hidden>
+				<div className="wporg-2fa__success-animation">
 					<Icon icon={ check } />
 				</div>
-			</p>
-		</>
+			</div>
+		</Flex>
 	);
 }

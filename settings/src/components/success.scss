@@ -1,11 +1,18 @@
+.wporg-2fa__success {
+	flex: 1;
+}
+
 @keyframes success {
 	0% {
 		transform: scale(0);
 	}
 	10% {
-		transform: scale(1.5);
+		transform: scale(0);
 	}
 	20% {
+		transform: scale(1.5);
+	}
+	30% {
 		transform: scale(1);
 	}
 	80% {
@@ -16,7 +23,7 @@
 	}
 }
 
-.wporg-2fa__success {
+.wporg-2fa__success-animation {
 	transform: scale(0);
 	background: #33F078;
 	border-radius: 50%;
@@ -25,5 +32,5 @@
 	justify-content: center;
 	width: 32px;
 	height: 32px;
-	animation: success 4s ease-in-out;
+	animation: success 5s ease-in-out;
 }

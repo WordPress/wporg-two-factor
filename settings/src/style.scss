@@ -60,6 +60,18 @@ $alert-blue: #72aee6;
 	letter-spacing: .3em;
 }
 
+.wporg-2fa__process-status {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 36px; // Matches the button height
+
+	svg.components-spinner {
+		overflow: visible;
+	}
+}
+
 .components-notice {
 	margin-left: 0;
 	margin-right: 0;

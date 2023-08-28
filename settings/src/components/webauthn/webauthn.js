@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Notice, Spinner, Modal } from '@wordpress/components';
+import { Button, Flex, Notice, Spinner, Modal } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -19,16 +19,12 @@ import RegisterKey from './register-key';
  */
 export default function WebAuthn() {
 	const {
-		user: {
-			userRecord,
-			userRecord: {
-				record: { id: userId },
-			},
-			webAuthnEnabled,
-		},
+		user: { userRecord, webAuthnEnabled },
 		setGlobalNotice,
 	} = useContext( GlobalContext );
-	const keys = userRecord.record[ '2fa_webauthn_keys' ];
+	const {
+		record: { id: userId, '2fa_webauthn_keys': keys },
+	} = userRecord;
 	const [ flow, setFlow ] = useState( 'manage' );
 	const [ statusError, setStatusError ] = useState( '' );
 	const [ statusWaiting, setStatusWaiting ] = useState( false );
@@ -47,7 +43,21 @@ export default function WebAuthn() {
 	);
 
 	/**
-	 * Enable the WebAuthn provider.
+	 * Display the confirmation modal for disabling the WebAuthn provider.
+	 */
+	const showConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( true );
+	}, [] );
+
+	/**
+	 * Remove the confirmation modal for disabling the WebAuthn provider.
+	 */
+	const hideConfirmDisableModal = useCallback( () => {
+		setConfirmingDisable( false );
+	}, [] );
+
+	/**
+	 * Toggle enablement of the WebAuthn provider.
 	 */
 	const toggleProvider = useCallback( async () => {
 		const newStatus = webAuthnEnabled ? 'disable' : 'enable';
@@ -69,11 +79,12 @@ export default function WebAuthn() {
 			await refreshRecord( userRecord );
 			setGlobalNotice( `Successfully ${ newStatus }d Security Keys.` );
 		} catch ( error ) {
+			hideConfirmDisableModal();
 			setStatusError( error?.message || error?.responseJSON?.data || error );
 		} finally {
 			setStatusWaiting( false );
 		}
-	}, [ userId, setGlobalNotice, userRecord, webAuthnEnabled ] );
+	}, [ webAuthnEnabled, userId, userRecord, setGlobalNotice, hideConfirmDisableModal ] );
 
 	/**
 	 * Handle post-registration processing.
@@ -86,26 +97,14 @@ export default function WebAuthn() {
 		updateFlow( 'manage' );
 	}, [ webAuthnEnabled, toggleProvider, updateFlow ] );
 
-	/**
-	 * Display the modal to confirm disabling the WebAuthn provider.
-	 */
-	const showConfirmDisableModal = useCallback( () => {
-		setConfirmingDisable( true );
-	}, [] );
-
-	/**
-	 * Hide te modal to confirm disabling the WebAuthn provider.
-	 */
-	const hideConfirmDisableModal = useCallback( () => {
-		setConfirmingDisable( false );
-	}, [] );
-
 	if ( 'register' === flow ) {
 		return (
-			<RegisterKey
-				onSuccess={ onRegisterSuccess }
-				onCancel={ () => updateFlow( 'manage' ) }
-			/>
+			<Flex className="wporg-2fa__webauthn-register" direction="column">
+				<RegisterKey
+					onSuccess={ onRegisterSuccess }
+					onCancel={ () => updateFlow( 'manage' ) }
+				/>
+			</Flex>
 		);
 	}
 
@@ -137,9 +136,9 @@ export default function WebAuthn() {
 			</p>
 
 			{ statusWaiting && (
-				<p className="wporg-2fa__webauthn-register-key-status">
+				<div className="wporg-2fa__process-status">
 					<Spinner />
-				</p>
+				</div>
 			) }
 
 			{ statusError && (
@@ -167,15 +166,9 @@ export default function WebAuthn() {
  * @param {Object}   props
  * @param {Function} props.onConfirm
  * @param {Function} props.onClose
- * @param {string}   props.error
  * @param {boolean}  props.disabling
  */
-function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
-	if ( !! error ) {
-		onClose();
-		return null;
-	}
-
+function ConfirmDisableKeys( { onConfirm, onClose, disabling } ) {
 	return (
 		<Modal
 			title={ `Disable security keys` }
@@ -186,20 +179,20 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling, error } ) {
 				Are you sure you want to disable security keys?
 			</p>
 
-			<div className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ onConfirm }>
-					Disable
-				</Button>
-
-				<Button variant="tertiary" onClick={ onClose }>
-					Cancel
-				</Button>
-			</div>
-
-			{ disabling && (
-				<p className="wporg-2fa__webauthn-register-key-status">
+			{ disabling ? (
+				<div className="wporg-2fa__process-status">
 					<Spinner />
-				</p>
+				</div>
+			) : (
+				<div className="wporg-2fa__submit-actions">
+					<Button variant="primary" onClick={ onConfirm }>
+						Disable
+					</Button>
+
+					<Button variant="tertiary" onClick={ onClose }>
+						Cancel
+					</Button>
+				</div>
 			) }
 		</Modal>
 	);
