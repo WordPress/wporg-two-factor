@@ -63,6 +63,7 @@ export default function WebAuthn() {
 		const newStatus = webAuthnEnabled ? 'disable' : 'enable';
 
 		try {
+			setGlobalNotice( '' );
 			setStatusError( '' );
 			setStatusWaiting( true );
 
@@ -79,9 +80,9 @@ export default function WebAuthn() {
 			await refreshRecord( userRecord );
 			setGlobalNotice( `Successfully ${ newStatus }d Security Keys.` );
 		} catch ( error ) {
-			hideConfirmDisableModal();
 			setStatusError( error?.message || error?.responseJSON?.data || error );
 		} finally {
+			hideConfirmDisableModal();
 			setStatusWaiting( false );
 		}
 	}, [ webAuthnEnabled, userId, userRecord, setGlobalNotice, hideConfirmDisableModal ] );
@@ -120,26 +121,30 @@ export default function WebAuthn() {
 			{ keys.length > 0 && <ListKeys /> }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ () => updateFlow( 'register' ) }>
-					Register new key
-				</Button>
+				{ statusWaiting ? (
+					<div className="wporg-2fa__process-status">
+						<Spinner />
+					</div>
+				) : (
+					<>
+						<Button variant="primary" onClick={ () => updateFlow( 'register' ) }>
+							Register new key
+						</Button>
 
-				{ keys.length > 0 && (
-					<Button
-						variant="tertiary"
-						onClick={ webAuthnEnabled ? showConfirmDisableModal : toggleProvider }
-						disabled={ statusWaiting }
-					>
-						{ `${ webAuthnEnabled ? 'Disable' : 'Enable' } security keys` }
-					</Button>
+						{ keys.length > 0 && (
+							<Button
+								variant="tertiary"
+								onClick={
+									webAuthnEnabled ? showConfirmDisableModal : toggleProvider
+								}
+								disabled={ statusWaiting }
+							>
+								{ `${ webAuthnEnabled ? 'Disable' : 'Enable' } security keys` }
+							</Button>
+						) }
+					</>
 				) }
 			</p>
-
-			{ statusWaiting && (
-				<div className="wporg-2fa__process-status">
-					<Spinner />
-				</div>
-			) }
 
 			{ statusError && (
 				<Notice status="error" isDismissible={ false }>
