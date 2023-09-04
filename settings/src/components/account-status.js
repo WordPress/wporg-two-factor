@@ -65,7 +65,7 @@ export default function AccountStatus() {
 					bodyText={
 						webAuthnEnabled
 							? 'You have two-factor authentication enabled using security keys.'
-							: 'You have not registered any security keys.'
+							: 'You have not enabled security keys for two-factor authentication.'
 					}
 					isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
 				/>
