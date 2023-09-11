@@ -109,8 +109,8 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 				</div>
 			) : (
 				<div className="wporg-2fa__submit-actions">
-					<Button variant="primary" onClick={ onConfirm }>
-						Remove { keyToRemove.name }
+					<Button variant="primary" isDestructive onClick={ onConfirm }>
+						Remove
 					</Button>
 
 					<Button variant="tertiary" onClick={ onClose }>
