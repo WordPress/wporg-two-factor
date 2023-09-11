@@ -85,6 +85,7 @@ function Main( { userId } ) {
 
 	if ( ! components[ initialScreen ] ) {
 		initialScreen = 'account-status';
+		setScreen( initialScreen );
 		currentUrl.searchParams.set( 'screen', initialScreen );
 		window.history.pushState( {}, '', currentUrl );
 	}
