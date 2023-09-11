@@ -63,7 +63,7 @@ function Main( { userId } ) {
 	const [ error, setError ] = useState( '' );
 
 	let currentUrl = new URL( document.location.href );
-	let initialScreen = currentUrl.searchParams.get( 'screen' );
+	const initialScreen = currentUrl.searchParams.get( 'screen' );
 	const [ screen, setScreen ] = useState( initialScreen );
 
 	// The index is the URL slug and the value is the React component.
@@ -83,11 +83,8 @@ function Main( { userId } ) {
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
 
-	if ( ! components[ initialScreen ] ) {
-		initialScreen = 'account-status';
-		setScreen( initialScreen );
-		currentUrl.searchParams.set( 'screen', initialScreen );
-		window.history.pushState( {}, '', currentUrl );
+	if ( ! components[ screen ] ) {
+		setScreen( 'account-status' );
 	}
 
 	// Listen for back/forward button clicks.
@@ -98,6 +95,11 @@ function Main( { userId } ) {
 			window.removeEventListener( 'popstate', handlePopState );
 		};
 	}, [] );
+
+	useEffect( () => {
+		currentUrl.searchParams.set( 'screen', screen );
+		window.history.pushState( {}, '', currentUrl );
+	}, [ screen ] );
 
 	// Trigger a re-render when the back/forward buttons are clicked.
 	const handlePopState = useCallback( () => {
