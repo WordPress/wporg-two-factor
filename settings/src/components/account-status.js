@@ -57,18 +57,6 @@ export default function AccountStatus() {
 			/>
 
 			<SettingStatusCard
-				screen="webauthn"
-				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-				headerText="Two-Factor Security Key"
-				bodyText={
-					webAuthnEnabled
-						? 'You have two-factor authentication enabled using security keys.'
-						: 'You have not enabled security keys for two-factor authentication.'
-				}
-				isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
-			/>
-
-			<SettingStatusCard
 				screen="totp"
 				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
 				headerText="Two-Factor App"
@@ -78,6 +66,18 @@ export default function AccountStatus() {
 						: 'You have not enabled an app for two-factor authentication.'
 				}
 				isPrimary={ 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled }
+			/>
+
+			<SettingStatusCard
+				screen="webauthn"
+				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
+				headerText="Two-Factor Security Key"
+				bodyText={
+					webAuthnEnabled
+						? 'You have two-factor authentication enabled using security keys.'
+						: 'You have not enabled security keys for two-factor authentication.'
+				}
+				isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
 			/>
 
 			<SettingStatusCard
