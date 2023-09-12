@@ -38,6 +38,10 @@ $alert-blue: #72aee6;
 			font-family: "Open Sans", sans-serif;
 		}
 	}
+
+	.components-card__body p:first-child {
+		margin-top: 0;
+	}
 }
 
 .wporg-2fa__screen-intro {
