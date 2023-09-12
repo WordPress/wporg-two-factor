@@ -138,7 +138,7 @@ function SettingStatusCard( {
 	}
 
 	return (
-		<Card className={ classes }>
+		<Card className={ classes } >
 			{ disabled ? cardContent : <ScreenLink screen={ screen } anchorText={ cardContent } /> }
 		</Card>
 	);
@@ -174,5 +174,5 @@ function StatusIcon( { status } ) {
 			icon = cancelCircleFilled;
 	}
 
-	return <Icon icon={ icon } size={ 32 } className={ 'wporg-2fa__status-icon is-' + status } />;
+	return <Icon icon={ icon } size={ 24 } className={ 'wporg-2fa__status-icon is-' + status } />;
 }
