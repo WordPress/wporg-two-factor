@@ -138,7 +138,7 @@ function SettingStatusCard( {
 	}
 
 	return (
-		<Card className={ classes } >
+		<Card className={ classes }>
 			{ disabled ? cardContent : <ScreenLink screen={ screen } anchorText={ cardContent } /> }
 		</Card>
 	);
