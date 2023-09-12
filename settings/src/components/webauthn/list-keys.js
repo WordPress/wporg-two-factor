@@ -95,7 +95,7 @@ export default function ListKeys() {
 function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } ) {
 	return (
 		<Modal
-			title={ `Delete security key` }
+			title="Delete security key"
 			className="wporg-2fa__confirm-delete-key"
 			onRequestClose={ onClose }
 		>
