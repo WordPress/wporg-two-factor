@@ -95,12 +95,15 @@ export default function ListKeys() {
 function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } ) {
 	return (
 		<Modal
-			title={ `Remove ${ keyToRemove.name }?` }
+			title={ `Delete security key` }
 			className="wporg-2fa__confirm-delete-key"
 			onRequestClose={ onClose }
 		>
 			<p className="wporg-2fa__screen-intro">
-				Are you sure you want to remove the <code>{ keyToRemove.name }</code> security key?
+				Are you sure you want to delete the following key?
+				<ul className="wporg-2fa__screen-list">
+					<li>{ keyToRemove.name }</li>
+				</ul>
 			</p>
 
 			{ deleting ? (
@@ -110,7 +113,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 			) : (
 				<div className="wporg-2fa__submit-actions">
 					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Remove
+						Delete
 					</Button>
 
 					<Button variant="tertiary" onClick={ onClose }>

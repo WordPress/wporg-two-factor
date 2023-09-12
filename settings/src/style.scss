@@ -40,6 +40,14 @@ $alert-blue: #72aee6;
 	}
 }
 
+.wporg-2fa__screen-list {
+	margin: 16px 0 0 16px;
+
+	li {
+		list-style-type: disc;
+	}
+}
+
 .wporg-2fa__screen-intro {
 	margin-bottom: 40px;
 }
