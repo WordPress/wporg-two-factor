@@ -29,8 +29,8 @@
 				"status header      primary open"
 				"status description primary open"
 			;
-			grid-column-gap: 10px;
-			padding: 18px 14px;
+			grid-column-gap: 18px;
+			padding: 18px;
 
 			.wporg-2fa__status-icon {
 				grid-area: status;
@@ -41,8 +41,9 @@
 				grid-area: header;
 				align-self: end;
 				margin: 0;
-				font-size: 1.1em;
+				font-size: 1em;
 				color: $gray-900;
+				font-weight: 600;
 			}
 
 			.wporg-2fa__status-card-body {
@@ -73,7 +74,7 @@
 	.wporg-2fa__status-icon {
 		&.is-enabled,
 		&.is-ok {
-			fill: $alert-green;
+			fill: $black;
 		}
 
 		&.is-pending {
