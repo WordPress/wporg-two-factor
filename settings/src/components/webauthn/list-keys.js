@@ -3,7 +3,7 @@
  */
 import { Button, Modal, Notice, Spinner } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, cancelCircleFilled, key } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -101,9 +101,10 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 		>
 			<p className="wporg-2fa__screen-intro">
 				Are you sure you want to delete the following key?
-				<ul className="wporg-2fa__screen-list">
-					<li>{ keyToRemove.name }</li>
-				</ul>
+				<span className="wporg-2fa__screen-key">
+					<Icon icon={ key } />
+					<span>{ keyToRemove.name }</span>
+				</span>
 			</p>
 
 			{ deleting ? (
