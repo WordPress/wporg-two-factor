@@ -34,6 +34,7 @@ export default function Password() {
 	} = useContext( GlobalContext );
 	const [ inputType, setInputType ] = useState( 'password' );
 	const [ hasAttemptedSave, setHasAttemptedSave ] = useState( false );
+	const [ saveError, setSaveError ] = useState( false );
 	let passwordStrong = true; // Saved passwords have already passed the test.
 
 	if ( hasEdits ) {
@@ -55,6 +56,7 @@ export default function Password() {
 	const handlePasswordGenerate = useCallback( async () => {
 		edit( { password: generatePassword( 24, true, true ) } );
 		setInputType( 'text' );
+		setSaveError( false );
 	}, [ edit ] );
 
 	// Handle form submission.
@@ -68,7 +70,12 @@ export default function Password() {
 				return;
 			}
 
-			await save();
+			try {
+				await save();
+			} catch ( error ) {
+				setSaveError( error?.data?.params?.password || error?.message );
+				return;
+			}
 
 			// Changing the password resets the nonce, which causes subsequent API requests to fail. `apiFetch()` will
 			// retry them automatically, but that results in an extra XHR request and a console error.
@@ -83,7 +90,13 @@ export default function Password() {
 		[ passwordStrong, isSaving, save, setGlobalNotice ]
 	);
 
-	const handlePasswordChange = useCallback( ( password ) => edit( { password } ), [ edit ] );
+	const handlePasswordChange = useCallback(
+		( password ) => {
+			edit( { password } );
+			setSaveError( false );
+		},
+		[ edit ]
+	);
 
 	const handlePasswordToggle = useCallback(
 		() => setInputType( inputType === 'password' ? 'text' : 'password' ),
@@ -132,7 +145,7 @@ export default function Password() {
 				</Button>
 			</Flex>
 
-			{ hasEdits && passwordStrong && (
+			{ hasEdits && passwordStrong && ! saveError && (
 				<Notice status="success" isDismissible={ false }>
 					<Icon icon={ check } />
 					Your password is strong enough to be saved.
@@ -144,6 +157,13 @@ export default function Password() {
 					<Icon icon={ cancelCircleFilled } />
 					That password is too easy to compromise. Please make it longer and/or add random
 					numbers/symbols.
+				</Notice>
+			) }
+
+			{ saveError && (
+				<Notice status="error" isDismissible={ false }>
+					<Icon icon={ cancelCircleFilled } />
+					{ saveError }
 				</Notice>
 			) }
 
