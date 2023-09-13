@@ -19,6 +19,7 @@ $alert-blue: #72aee6;
 
 .wp-block-wporg-two-factor-settings {
 	position: relative;
+	font-size: 13px;
 
 	h3,
 	h4 {
@@ -37,6 +38,10 @@ $alert-blue: #72aee6;
 			font-size: 14px;
 			font-family: "Open Sans", sans-serif;
 		}
+	}
+
+	.components-card__body p:first-child {
+		margin-top: 0;
 	}
 }
 
