@@ -47,7 +47,7 @@ export default function Password() {
 		}
 
 		setGlobalNotice( '' );
-	}, [ hasEdits ] );
+	}, [ hasEdits, setGlobalNotice ] );
 
 	/**
 	 * Handle clicking the `Generate Password` button.
@@ -55,7 +55,7 @@ export default function Password() {
 	const handlePasswordGenerate = useCallback( async () => {
 		edit( { password: generatePassword( 24, true, true ) } );
 		setInputType( 'text' );
-	}, [] );
+	}, [ edit ] );
 
 	// Handle form submission.
 	const handleFormSubmit = useCallback(
@@ -80,10 +80,10 @@ export default function Password() {
 
 			setGlobalNotice( 'New password saved.' );
 		},
-		[ passwordStrong, isSaving ]
+		[ passwordStrong, isSaving, save, setGlobalNotice ]
 	);
 
-	const handlePasswordChange = useCallback( ( password ) => edit( { password } ), [] );
+	const handlePasswordChange = useCallback( ( password ) => edit( { password } ), [ edit ] );
 
 	const handlePasswordToggle = useCallback(
 		() => setInputType( inputType === 'password' ? 'text' : 'password' ),
