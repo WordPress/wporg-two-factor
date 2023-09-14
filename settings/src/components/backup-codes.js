@@ -181,11 +181,8 @@ function CodeList( { codes } ) {
  */
 function Manage( { setRegenerating } ) {
 	const {
-		user: {
-			userRecord: { record },
-		},
+		user: { backupCodesRemaining },
 	} = useContext( GlobalContext );
-	const remaining = record[ '2fa_backup_codes_remaining' ];
 
 	return (
 		<>
@@ -196,18 +193,19 @@ function Manage( { setRegenerating } ) {
 					code can only be used once.
 				</p>
 
-				{ remaining > 5 && (
+				{ backupCodesRemaining > 5 && (
 					<p>
-						You have <strong>{ remaining }</strong> backup codes remaining.
+						You have <strong>{ backupCodesRemaining }</strong> backup codes remaining.
 					</p>
 				) }
 
-				{ remaining <= 5 && (
+				{ backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
-						You only have <strong>{ remaining }</strong> backup codes remaining. Please
-						regenerate and save new ones before you run out. If you don&apos;t, you
-						won&apos;t be able to log into your account if you lose your phone.
+						You only have <strong>{ backupCodesRemaining }</strong> backup codes
+						remaining. Please regenerate and save new ones before you run out. If you
+						don&apos;t, you won&apos;t be able to log into your account if you lose your
+						phone.
 					</Notice>
 				) }
 			</div>
