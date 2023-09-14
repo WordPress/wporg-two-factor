@@ -18,16 +18,9 @@ import ScreenLink from './screen-link';
  */
 export default function BackupCodes() {
 	const {
-		user: { backupCodesEnabled, hasPrimaryProvider },
+		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
-	// TODO: hasSetupCompleted and its related logic should be removed
-	// once https://github.com/WordPress/two-factor/issues/507 is fixed.
-	// This is a workaround that fixes the side effect brought up by #507.
-	// See more in https://github.com/WordPress/wporg-two-factor/issues/216 and its PR.
-	const [ hasSetupCompleted, setHasSetupCompleted ] = useState(
-		localStorage.getItem( 'WPORG_2FA_HAS_BACKUP_CODES_BEEN_SAVED' ) === 'true'
-	);
 
 	// Prevent users from accessing directly through the URL.
 	if ( ! hasPrimaryProvider ) {
@@ -44,13 +37,11 @@ export default function BackupCodes() {
 		);
 	}
 
-	if ( backupCodesEnabled && hasSetupCompleted && ! regenerating ) {
-		return <Manage setRegenerating={ setRegenerating } />;
+	if ( ! backupCodesEnabled || backupCodesRemaining === 0 || regenerating ) {
+		return <Setup setRegenerating={ setRegenerating } />;
 	}
 
-	return (
-		<Setup setRegenerating={ setRegenerating } setHasSetupCompleted={ setHasSetupCompleted } />
-	);
+	return <Manage setRegenerating={ setRegenerating } />;
 }
 
 /**
@@ -58,9 +49,8 @@ export default function BackupCodes() {
  *
  * @param props
  * @param props.setRegenerating
- * @param props.setHasSetupCompleted
  */
-function Setup( { setRegenerating, setHasSetupCompleted } ) {
+function Setup( { setRegenerating } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
@@ -104,8 +94,6 @@ function Setup( { setRegenerating, setHasSetupCompleted } ) {
 		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
-		setHasSetupCompleted( true );
-		localStorage.setItem( 'WPORG_2FA_HAS_BACKUP_CODES_BEEN_SAVED', true );
 	} );
 
 	return (
@@ -224,13 +212,7 @@ function Manage( { setRegenerating } ) {
 				) }
 			</div>
 
-			<Button
-				isSecondary
-				onClick={ () => {
-					setRegenerating( true );
-					localStorage.setItem( 'WPORG_2FA_HAS_BACKUP_CODES_BEEN_SAVED', false );
-				} }
-			>
+			<Button isSecondary onClick={ () => setRegenerating( true ) }>
 				Generate new backup codes
 			</Button>
 		</>
