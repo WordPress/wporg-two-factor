@@ -45,6 +45,14 @@ $alert-blue: #72aee6;
 	}
 }
 
+.wporg-2fa__screen-key {
+	display: flex;
+	align-items: center;
+	margin: 8px 0 0;
+	gap: 4px;
+	font-weight: 600;
+}
+
 .wporg-2fa__screen-intro {
 	margin-bottom: 40px;
 }
