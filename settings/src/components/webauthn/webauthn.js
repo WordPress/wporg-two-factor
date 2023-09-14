@@ -120,7 +120,7 @@ export default function WebAuthn() {
 
 			{ keys.length > 0 && <ListKeys /> }
 
-			<p className="wporg-2fa__submit-actions">
+			<div className="wporg-2fa__submit-actions">
 				{ statusWaiting ? (
 					<div className="wporg-2fa__process-status">
 						<Spinner />
@@ -144,7 +144,7 @@ export default function WebAuthn() {
 						) }
 					</>
 				) }
-			</p>
+			</div>
 
 			{ statusError && (
 				<Notice status="error" isDismissible={ false }>
