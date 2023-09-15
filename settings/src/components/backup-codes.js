@@ -17,8 +17,7 @@ import { refreshRecord } from '../utilities/common';
  */
 export default function BackupCodes() {
 	const {
-		user: { backupCodesEnabled, totpEnabled },
-		navigateToScreen,
+		user: { backupCodesEnabled, hasPrimaryProvider },
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 	// TODO: hasSetupCompleted and its related logic should be removed
@@ -29,9 +28,8 @@ export default function BackupCodes() {
 		localStorage.getItem( 'WPORG_2FA_HAS_BACKUP_CODES_BEEN_SAVED' ) === 'true'
 	);
 
-	// If TOTP hasn't been enabled, the user should not have access to BackupCodes component.
-	// This is primarily added to prevent users from accessing through the URL.
-	if ( ! totpEnabled ) {
+	// Prevent users from accessing directly through the URL.
+	if ( ! hasPrimaryProvider ) {
 		navigateToScreen( 'account-status' );
 		return;
 	}
