@@ -93,6 +93,10 @@ $alert-blue: #72aee6;
 		margin: 0;
 	}
 
+	&.is-error a {
+		color: $gray-900; // The default blue is hard to read on the red background.
+	}
+
 	.components-notice__content {
 		display: flex;
 		align-items: center;
