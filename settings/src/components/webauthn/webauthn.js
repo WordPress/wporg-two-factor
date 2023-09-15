@@ -190,7 +190,7 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling } ) {
 				</div>
 			) : (
 				<div className="wporg-2fa__submit-actions">
-					<Button variant="primary" onClick={ onConfirm }>
+					<Button variant="primary" isDestructive onClick={ onConfirm }>
 						Disable
 					</Button>
 
