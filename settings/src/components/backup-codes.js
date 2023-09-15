@@ -11,6 +11,7 @@ import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
  */
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities/common';
+import ScreenLink from './screen-link';
 
 /**
  * Setup and manage backup codes.
@@ -30,8 +31,17 @@ export default function BackupCodes() {
 
 	// Prevent users from accessing directly through the URL.
 	if ( ! hasPrimaryProvider ) {
-		navigateToScreen( 'account-status' );
-		return;
+		return (
+			<Notice status="error" isDismissible={ false }>
+				<Icon icon={ cancelCircleFilled } />
+				Please
+				<ScreenLink
+					screen="account-status"
+					anchorText="enable a Two-Factor security key or app"
+				/>
+				before enabling backup codes.
+			</Notice>
+		);
 	}
 
 	if ( backupCodesEnabled && hasSetupCompleted && ! regenerating ) {
