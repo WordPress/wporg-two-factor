@@ -50,6 +50,18 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 
 				const credential = await navigator.credentials.create( { publicKey } );
 
+				/**
+				 * The navigator.credentials.create returns null if a Credential cannot be created.
+				 *
+				 * Since this is an interface we won't be able to predict the reason for the failure.
+				 * For now, we'll just throw an error and let the user try again.
+				 *
+				 * See: https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer
+				 */
+				if ( null === credential ) {
+					throw new Error( 'Unable to create a security key.' );
+				}
+
 				await wp.ajax.post( 'webauthn_register', {
 					user_id: record.id,
 					_ajax_nonce: nonce,
