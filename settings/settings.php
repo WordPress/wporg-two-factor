@@ -9,6 +9,7 @@ require __DIR__ . '/rest-api.php';
 
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
+add_action( 'enqueue_block_assets', __NAMESPACE__ . '\maybe_dequeue_stylesheet', 40 );
 
 /**
  * Registers the block
@@ -144,4 +145,19 @@ function login_footer_revalidate_customizations() {
 		})();
 	</script>
 	<?php
+}
+
+/**
+ * Only load CSS when the block is actually used.
+ *
+ * Without this, the CSS will be loaded on every page, but it's only needed on the Account page.
+ *
+ * @todo this may not be necessary once https://github.com/WordPress/gutenberg/issues/54491 is resolved.
+ */
+function maybe_dequeue_stylesheet() {
+	if ( bbp_get_displayed_user_id() ) {
+		return;
+	}
+
+	wp_dequeue_style( 'wporg-two-factor-settings-style' );
 }
