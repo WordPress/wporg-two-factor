@@ -155,7 +155,7 @@ function login_footer_revalidate_customizations() {
  * @todo this may not be necessary once https://github.com/WordPress/gutenberg/issues/54491 is resolved.
  */
 function maybe_dequeue_stylesheet() {
-	if ( bbp_get_displayed_user_id() ) {
+	if ( ! function_exists( 'bbp_get_displayed_user_id' ) || bbp_get_displayed_user_id() ) {
 		return;
 	}
 
