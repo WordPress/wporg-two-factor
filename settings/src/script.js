@@ -73,8 +73,12 @@ function Main( { userId } ) {
 		password: <Password />,
 		totp: <TOTP />,
 		'backup-codes': <BackupCodes />,
-		webauthn: <WebAuthn />,
 	};
+
+	// TODO: Only enable WebAuthn UI in development, until it's finished.
+	if ( 'development' === process.env.NODE_ENV ) {
+		components.webauthn = <WebAuthn />;
+	}
 
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
