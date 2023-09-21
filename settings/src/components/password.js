@@ -198,6 +198,10 @@ function isPasswordStrong( password, userData ) {
 		return false; // Not loaded yet.
 	}
 
+	if ( ! password || password.length === 0 ) {
+		return false;
+	}
+
 	let blocklist = Object.values(
 		pick( userData, [
 			'email',
