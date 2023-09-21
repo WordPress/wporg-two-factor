@@ -61,6 +61,7 @@ function Main( { userId } ) {
 	} = user;
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	const [ error, setError ] = useState( '' );
+	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
 
 	let currentUrl = new URL( document.location.href );
 	const initialScreen = currentUrl.searchParams.get( 'screen' );
@@ -161,7 +162,15 @@ function Main( { userId } ) {
 
 	return (
 		<GlobalContext.Provider
-			value={ { navigateToScreen, user, setGlobalNotice, setError, error } }
+			value={ {
+				navigateToScreen,
+				user,
+				setGlobalNotice,
+				setError,
+				error,
+				backupCodesVerified,
+				setBackupCodesVerified,
+			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 			{ currentScreenComponent }

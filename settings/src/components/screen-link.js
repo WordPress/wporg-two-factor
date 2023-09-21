@@ -9,7 +9,7 @@ import { useCallback, useContext } from '@wordpress/element';
 import { GlobalContext } from '../script';
 
 export default function ScreenLink( { screen, anchorText, buttonStyle = false, ariaLabel } ) {
-	const { navigateToScreen } = useContext( GlobalContext );
+	const { navigateToScreen, setBackupCodesVerified } = useContext( GlobalContext );
 	const classes = [];
 	const screenUrl = new URL( document.location.href );
 
@@ -26,6 +26,12 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 	const onClick = useCallback(
 		( event ) => {
 			event.preventDefault();
+
+			// When generating Backup Codes, they're automatically saved to the database, so clicking `Back` is
+			// implicitly verifying them, or at least needs to be treated that way. This should be removed once
+			// `two-factor/#507` is fixed, though.
+			setBackupCodesVerified( true );
+
 			navigateToScreen( screen );
 		},
 		[ navigateToScreen ]

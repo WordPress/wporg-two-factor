@@ -19,6 +19,7 @@ import ScreenLink from './screen-link';
 export default function BackupCodes() {
 	const {
 		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
+		backupCodesVerified,
 	} = useContext( GlobalContext );
 	const [ regenerating, setRegenerating ] = useState( false );
 
@@ -37,7 +38,12 @@ export default function BackupCodes() {
 		);
 	}
 
-	if ( ! backupCodesEnabled || backupCodesRemaining === 0 || regenerating ) {
+	if (
+		! backupCodesEnabled ||
+		backupCodesRemaining === 0 ||
+		regenerating ||
+		! backupCodesVerified
+	) {
 		return <Setup setRegenerating={ setRegenerating } />;
 	}
 
@@ -56,6 +62,7 @@ function Setup( { setRegenerating } ) {
 		user: { userRecord },
 		setError,
 		error,
+		setBackupCodesVerified,
 	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ] = useState( false );
@@ -79,6 +86,12 @@ function Setup( { setRegenerating } ) {
 				} );
 
 				setBackupCodes( response.codes );
+
+				// Update the Account Status screen in case they click `Back` without verifying the codes, but
+				// don't redirect to the Manage screen yet. This is mainly due to the side-effects of
+				// `two-factor/#507`, so it will need to be modified or maybe removed when that is fixed upstream.
+				setBackupCodesVerified( false );
+				await refreshRecord( userRecord );
 			} catch ( apiFetchError ) {
 				setError( apiFetchError );
 			}
@@ -91,6 +104,7 @@ function Setup( { setRegenerating } ) {
 	const handleFinished = useCallback( async () => {
 		// TODO: Add try catch here after https://github.com/WordPress/wporg-two-factor/pull/187/files is merged.
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
+		setBackupCodesVerified( true );
 		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
