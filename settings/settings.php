@@ -90,6 +90,7 @@ function login_footer_revalidate_customizations() {
 	}
 
 	?>
+
 	<style>
 		.login-action-revalidate_2fa {
 			background: white;
@@ -133,6 +134,7 @@ function login_footer_revalidate_customizations() {
 			padding: 0;
 		}
 	</style>
+
 	<script>
 		(function() {
 			const loginFormExists  = !! document.querySelector( '#loginform' );
@@ -144,6 +146,7 @@ function login_footer_revalidate_customizations() {
 			}
 		})();
 	</script>
+
 	<?php
 }
 
@@ -155,7 +158,10 @@ function login_footer_revalidate_customizations() {
  * @todo this may not be necessary once https://github.com/WordPress/gutenberg/issues/54491 is resolved.
  */
 function maybe_dequeue_stylesheet() {
-	if ( ! function_exists( 'bbp_get_displayed_user_id' ) || bbp_get_displayed_user_id() ) {
+	global $wp;
+
+	// Match the URL since page/blog IDs etc aren't consistent across environments.
+	if ( 1 === preg_match( '#/users/.*/edit/account/#', $wp->request ) ) {
 		return;
 	}
 
