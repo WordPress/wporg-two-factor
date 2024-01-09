@@ -192,7 +192,7 @@ function remove_super_admins_until_2fa_enabled() : void {
  * perform privileged actions on the front end, via the REST API, etc.
  */
 function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, array $args, WP_User $user ) : array {
-	if ( 0 === $user->ID || ! user_requires_2fa( $user ) ) {
+	if ( 0 === $user->ID || $user->ID !== get_current_user_id() || ! user_requires_2fa( $user ) ) {
 		return $allcaps;
 	}
 
