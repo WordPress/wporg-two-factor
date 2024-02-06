@@ -11,7 +11,7 @@ import NumericControl from './numeric-control';
 const AutoTabbingInput = ( props ) => {
 	const { inputs, setInputs, error, setError } = props;
 
-	const handleChange = useCallback( ( value, event, index, inputRef ) => {
+	const handleChange = useCallback( ( value, event, index ) => {
 		setInputs( ( prevInputs ) => {
 			const newInputs = [ ...prevInputs ];
 
@@ -19,15 +19,42 @@ const AutoTabbingInput = ( props ) => {
 
 			return newInputs;
 		} );
+	}, [] );
 
-		if ( value && '' !== value.trim() && inputRef.current.nextElementSibling ) {
-			inputRef.current.nextElementSibling.focus();
+	const handleKeyDown = useCallback( ( value, event, index, inputElement ) => {
+		// Ignore keys associated with input navigation and paste events.
+		if ( [ 'Tab', 'Shift', 'Meta', 'Backspace' ].includes( event.key ) ) {
+			return;
+		}
+
+		if ( !! value && inputElement.nextElementSibling ) {
+			inputElement.nextElementSibling.focus();
 		}
 	}, [] );
 
-	const handleKeyDown = useCallback( ( value, event, index, inputRef ) => {
-		if ( event.key === 'Backspace' && ! value && inputRef.current.previousElementSibling ) {
-			inputRef.current.previousElementSibling.focus();
+	const handleKeyUp = useCallback( ( value, event, index, inputElement ) => {
+		if ( event.key === 'Backspace' && inputElement.previousElementSibling ) {
+			inputElement.previousElementSibling.focus();
+		}
+	}, [] );
+
+	const handleFocus = useCallback(
+		( value, event, index, inputElement ) => inputElement.select(),
+		[]
+	);
+
+	const handlePaste = useCallback( ( event ) => {
+		event.preventDefault();
+
+		const newInputs = event.clipboardData
+			.getData( 'Text' )
+			.replace( /[^0-9]/g, '' )
+			.split( '' );
+
+		if ( inputs.length === newInputs.length ) {
+			setInputs( newInputs );
+		} else {
+			setError( 'The code you pasted is not the correct length.' );
 		}
 	}, [] );
 
@@ -59,6 +86,8 @@ const AutoTabbingInput = ( props ) => {
 					index={ index }
 					onChange={ handleChange }
 					onKeyDown={ handleKeyDown }
+					onKeyUp={ handleKeyUp }
+					onFocus={ handleFocus }
 					maxLength="1"
 					required
 				/>
