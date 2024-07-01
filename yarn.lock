@@ -2887,11 +2887,6 @@
   resolved "https://registry.yarnpkg.com/@wordpress/base-styles/-/base-styles-4.49.0.tgz#b7aa24c0330924a9a30628ffbfbdbd114cbcd5fe"
   integrity sha512-yFRYqNtd26ULZ0oAHhCu/IcaA0XHI3E7kRCKajZqUvyRQj7YprXnpD3o0/pnwvF6ZFTXzCX8pXHjUc2TIv97ig==
 
-"@wordpress/base-styles@^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@wordpress/base-styles/-/base-styles-5.2.0.tgz#bbde5e15ac1dfcf509f5d5d0bcd2346f6f8dcad7"
-  integrity sha512-yBMVbn4gvNQimVfLAZ+/F7F/Tpl+femF9ojgv90c0A0o6IDEtdC+6vUvtAxvXVoruwmxsq8ncouoorZbYDb3yg==
-
 "@wordpress/blob@^3.58.0":
   version "3.58.0"
   resolved "https://registry.yarnpkg.com/@wordpress/blob/-/blob-3.58.0.tgz#bf55b931ac920b7a8491f7fa456a9c2e6665ebea"
@@ -3275,7 +3270,7 @@
     react "^18.3.0"
     react-dom "^18.3.0"
 
-"@wordpress/env@^10.2.0":
+"@wordpress/env@^10.1.0":
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/@wordpress/env/-/env-10.2.0.tgz#9ebb7b9d89a146ee8a27b29751d436c8b2324b81"
   integrity sha512-EToZYPGXpl42Asw3bxpX8aKmHfRUdGxKPjQ9CHZVQoTAL27Af4FyjyGnepsnDpnYdIeI8VPb2S3k2NL/1+fpIA==
