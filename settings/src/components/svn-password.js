@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, TextControl, Notice, Spinner } from '@wordpress/components';
-import { useCallback, useContext, useState } from '@wordpress/element';
+import { Button, Notice, Spinner } from '@wordpress/components';
+import { useCallback, useContext } from '@wordpress/element';
 import { Icon, check, copySmall } from '@wordpress/icons';
 
 /**
@@ -17,12 +17,13 @@ export default function SVNPassword() {
 	const {
 		user: {
 			userRecord: {
-				record: { svn_password },
+				record: { svn_password: svnPassword },
 				edit,
 				save
 			},
 			isSaving,
 		},
+		setGlobalNotice
 	} = useContext( GlobalContext );
 
 	const handleGenerate = useCallback( async () => {
@@ -30,30 +31,28 @@ export default function SVNPassword() {
 			await edit( { svn_password: 'regenerate' } );
 			await save();
 		} catch ( error ) {
-			let message = error.message;
-
-			console.log( error );
+			setGlobalNotice( error.message );
 		}
-	}, [] );
+	}, [ edit, save ] );
 
 	const handleCopy = useCallback( () => {
-		navigator.clipboard.writeText( svn_password );
-		alert( "Copied to clipboard" );
-	}, [ ] );
+		try {
+			navigator.clipboard.writeText( svnPassword );
+			setGlobalNotice( 'Copied to clipboard' );
+		} catch ( error ) {
+			setGlobalNotice( "Couldn't write to clipboard" );
+		}
+	}, [ svnPassword ] );
 
 	return (
 		<>
-			<p>
-				Your SVN password can be used to commit to WordPress.org SVN repositories, such as for a plugin or theme.
-			</p>
-			<p>
-				If you forget your SVN password, you can generate a new one here. Never share your SVN password with anyone.
-			</p>
+			<p>Your SVN password can be used to commit to WordPress.org SVN repositories, such as for a plugin or theme.</p>
+			<p>If you forget your SVN password, you can generate a new one here. Never share your SVN password with anyone.</p>
 
-			{ ( svn_password && 'string' == typeof svn_password ) && (
+			{ svnPassword && 'string' === typeof svnPassword && (
 				<Notice status="success" isDismissible={ true }>
 					<Icon icon={ check } />
-					New Password generated: <code>{ svn_password }</code>
+					New Password generated: <code>{ svnPassword }</code>
 					<Icon  icon={ copySmall } onClick={ handleCopy } className="wporg-2fa__svn-copy-password" label="Copy to clipboard" />
 				</Notice>
 			) }
@@ -70,7 +69,7 @@ export default function SVNPassword() {
 							Requesting..
 						</>
 					) : (
-						svn_password ? 'Regenerate password' : 'Request password'
+						svnPassword ? 'Regenerate password' : 'Request password'
 					) }
 				</Button>
 			</p>
