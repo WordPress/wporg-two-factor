@@ -18,7 +18,12 @@ export default function AccountStatus() {
 	const {
 		user: {
 			userRecord: {
-				record: { email, pending_email: pendingEmail },
+				record: { 
+					email,
+					pending_email: pendingEmail,
+					svn_password: svnPasswordSet,
+					svn_password_required: svnPasswordRequired,
+				},
 			},
 			hasPrimaryProvider,
 			primaryProvider,
@@ -87,6 +92,27 @@ export default function AccountStatus() {
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
+
+			{
+				( svnPasswordRequired || svnPasswordSet ) ?
+					<SettingStatusCard
+						screen="svn-password"
+						status={ ! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet }
+						headerText="SVN Password"
+						bodyText={
+							svnPasswordRequired ? (
+								svnPasswordSet ?
+									'You have an active SVN password set. You can request a new one at any time.' :
+									'You have not set up an SVN password. This is required for SVN access to WordPress.org.'
+							) : (
+								svnPasswordSet ?
+								'You have an active SVN password set. You can request a new one at any time.' :
+								'You do not currently require WordPress.org SVN access.'
+							)
+						}
+					/>
+				: ''
+			}
 		</div>
 	);
 }

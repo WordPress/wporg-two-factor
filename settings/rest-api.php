@@ -321,6 +321,104 @@ function register_user_fields(): void {
 		]
 	);
 
+	register_rest_field(
+		'user',
+		'svn_password_required',
+		[
+			'get_callback' => function( $user ) {
+				global $wpdb;
+
+				$user = get_userdata( $user['id'] );
+				if ( ! $user ) {
+					return false;
+				}
+
+				// Committers, supes, etc.
+				if ( function_exists( 'is_special_user' ) && is_special_user( $user->ID ) ) {
+					return true;
+				}
+
+				// TODO: These should be set as a user flag.
+
+				// Plugin committers.
+				$plugin_committer = (bool) $wpdb->get_var( $wpdb->prepare(
+					'SELECT 1 FROM `' . PLUGINS_TABLE_PREFIX . 'svn_access` WHERE user = %s',
+					$user->user_login
+				) );
+				if ( $plugin_committer ) {
+					return true;
+				}
+
+				// Theme Authors, don't _need_ SVN access.
+				$theme_author = (bool) $wpdb->get_var( $wpdb->prepare(
+					'SELECT 1 FROM `wporg_' . WPORG_THEME_DIRECTORY_BLOGID . '_posts` ' .
+					'WHERE post_type = "repopackage" AND post_status = "publish" AND post_author = %d',
+					$user->ID
+				) );
+				if ( $theme_author ) {
+					return true;
+				}
+
+				return false;
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
+	$regenerated_password = '';
+	register_rest_field(
+		'user',
+		'svn_password',
+		[
+			'get_callback' => function( $user ) use( &$regenerated_password ) {
+				global $wpdb;
+
+				// If the password was just generated, return it in response.
+				if ( $regenerated_password ) {
+					return $regenerated_password;
+				}
+
+				// TODO, cache
+				return (bool) $wpdb->get_var( $wpdb->prepare(
+					"SELECT ID FROM wporg_svn_auth WHERE ID = %d AND `type` = 'svn' LIMIT 1",
+					$user['id']
+				) );
+			},
+			'update_callback' => function( $value, $user ) use( &$regenerated_password ) {
+				global $wpdb;
+				if ( 'regenerate' !== $value ) {
+					return false;
+				}
+
+				$regenerated_password = wp_generate_password( 40, false );
+				$hashed_password      = wp_hash_password( $regenerated_password );
+
+				$row = [
+					'ID'         => $user->ID,
+					'user_login' => $user->user_login,
+					'svn_pass'   => $hashed_password,
+					'type'       => 'svn',
+					'active'     => 1,
+				];
+
+				// TODO, what else needs doing here.
+				$inserted = $wpdb->update( 'wporg_svn_auth', $row, [ 'ID' => $user->ID ] );
+				if ( ! $inserted ) {
+					$inserted = $wpdb->insert( 'wporg_svn_auth', $row );
+				}
+
+				return (bool) $inserted;
+			},
+			'schema' => [
+				'type'    => [ 'boolean', 'string' ],
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
 }
 
 /**

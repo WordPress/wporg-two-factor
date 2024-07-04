@@ -24,6 +24,7 @@ import WebAuthn from './components/webauthn/webauthn';
 import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
+import SVNPassword from './components/svn-password'
 
 export const GlobalContext = createContext( null );
 
@@ -75,6 +76,7 @@ function Main( { userId } ) {
 		totp: <TOTP />,
 		'backup-codes': <BackupCodes />,
 		webauthn: <WebAuthn />,
+		'svn-password': <SVNPassword />,
 	};
 
 	// The screens where a recent two factor challenge is required.
