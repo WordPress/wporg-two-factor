@@ -159,7 +159,7 @@ function maybe_dequeue_stylesheet() {
 	global $wp;
 
 	// Match the URL since page/blog IDs etc aren't consistent across environments.
-	if ( 1 === preg_match( '#/users/.*/edit/account/#', $wp->request ) ) {
+	if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
 		return;
 	}
 
