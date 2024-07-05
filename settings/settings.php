@@ -49,12 +49,13 @@ function replace_core_ui_with_custom() : void {
  * @codeCoverageIgnore
  */
 function render_custom_ui() : void {
-	if ( ! current_user_can( 'edit_user', bbp_get_displayed_user_id() ) ) {
+	$user_id = function_exists( 'bbp_get_displayed_user_id' ) ? bbp_get_displayed_user_id() : bp_displayed_user_id();
+
+	if ( ! current_user_can( 'edit_user', $user_id ) ) {
 		echo 'You cannot edit this user.';
 		return;
 	}
 
-	$user_id    = bbp_get_displayed_user_id();
 	$json_attrs = json_encode( [ 'userId' => $user_id ] );
 
 	$preload_paths = [
