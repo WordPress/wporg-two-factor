@@ -30,6 +30,7 @@ function is_2fa_beta_tester( $user = false ) : bool {
 
 require_once __DIR__ . '/settings/settings.php';
 require_once __DIR__ . '/stats.php';
+require_once __DIR__ . '/revalidate-modal.php';
 
 /**
  * Load the WebAuthn plugin.
