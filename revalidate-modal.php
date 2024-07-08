@@ -4,6 +4,21 @@ use Two_Factor_Core;
 
 defined( 'WPINC' ) || die();
 
+/**
+ * Get the revalidation status for the current user.
+ */
+function get_revalidation_status() {
+	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
+	$timeout        = apply_filters( 'two_factor_revalidate_time', 15 * MINUTE_IN_SECONDS, get_current_user_id(), '' );
+	$expires_at     = $last_validated + $timeout;
+
+	return [
+		'last_validated'   => $last_validated,
+		'expires_at'       => $expires_at,
+		'needs_revalidate' => ( ! $last_validated || $expires_at < time() ),
+	];
+}
+
 function get_revalidate_url( $redirect_to = '' ) {
 	$url = Two_Factor_Core::get_user_two_factor_revalidate_url();
 	if ( ! empty( $redirect_to ) ) {

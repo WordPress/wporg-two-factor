@@ -302,16 +302,15 @@ function register_user_fields(): void {
 				 *       when an admin is editing other users, they get prompted to update their 2FA as well.
 				 */
 
-				$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
-				if ( ! $last_validated ) {
+				$status = get_revalidation_status();
+				if ( ! $status['last_validated'] ) {
 					return false;
 				}
 
-				$revalidate_url = Two_Factor_Core::get_user_two_factor_revalidate_url( true );
-				$expiry         = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), '' );
-				$expires_at     = $last_validated + $expiry;
-
-				return compact( 'revalidate_url', 'expires_at' );
+				return [
+					'revalidate_url' => Two_Factor_Core::get_user_two_factor_revalidate_url( true ),
+					'expires_at'     => $status['expires_at'],
+				];
 			},
 			'schema' => [
 				'type'    => 'array',
