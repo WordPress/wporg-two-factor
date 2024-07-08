@@ -5,7 +5,13 @@ use Two_Factor_Core;
 defined( 'WPINC' ) || die();
 
 /**
- * Get the revalidation status for the current user.
+ * Get the revalidation status for the current user, aka "sudo mode".
+ *
+ * @return array {
+ *    @type int  $last_validated   The timestamp of the last time the user was validated.
+ *    @type int  $expires_at       The timestamp when the current validation expires.
+ *    @type bool $needs_revalidate Whether the user needs to revalidate.
+ * }
  */
 function get_revalidation_status() {
 	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
@@ -19,6 +25,12 @@ function get_revalidation_status() {
 	];
 }
 
+/**
+ * Get the URL for revalidating 2FA, with a redirect parameter.
+ *
+ * @param string $redirect_to The URL to redirect to after revalidating.
+ * @return string
+ */
 function get_revalidate_url( $redirect_to = '' ) {
 	$url = Two_Factor_Core::get_user_two_factor_revalidate_url();
 	if ( ! empty( $redirect_to ) ) {
@@ -32,6 +44,9 @@ function get_revalidate_url( $redirect_to = '' ) {
  * Get the URL for revalidating 2FA via JavaScript.
  *
  * The calling code should be listening for a 'reValidationComplete' event.
+ *
+ * @param string $redirect_to The URL to redirect to after revalidating.
+ * @return string
  */
 function get_js_revalidation_url( $redirect_to = '' ) {
 	$url = get_revalidate_url( $redirect_to );
@@ -97,9 +112,7 @@ function wp_footer_revalidate_modal() {
 			revalidateModal.close();
 			revalidateModal.remove();
 
-			if ( lastTarget ) {
-				lastTarget.dispatchEvent( new Event( 'reValidationComplete', { bubbles: false, cancelable: true } ) );
-			}
+			( lastTarget || window ).dispatchEvent( new Event( 'reValidationComplete' ) );
 		} );
 	})();</script>
 	<style>
