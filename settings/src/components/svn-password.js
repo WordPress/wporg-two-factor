@@ -44,13 +44,21 @@ export default function SVNPassword() {
 		}
 	}, [ svnPassword ] );
 
+	// TODO: Trigger this on navigate away.
+	const hidePassword = useCallback( () => {
+		// TODO use record[ 'svn_password' ] = true such that it doesn't attempt to save it.
+		edit( { svn_password: true } );
+	}, [] );
+
+	// TODO: This also requires 2FA verification prior to changing password.
+
 	return (
 		<>
 			<p>Your SVN password can be used to commit to WordPress.org SVN repositories, such as for a plugin or theme.</p>
 			<p>If you forget your SVN password, you can generate a new one here. Never share your SVN password with anyone.</p>
 
 			{ svnPassword && 'string' === typeof svnPassword && (
-				<Notice status="success" isDismissible={ true }>
+				<Notice status="success" isDismissible={ true } onRemove={ hidePassword }>
 					<Icon icon={ check } />
 					New Password generated: <code>{ svnPassword }</code>
 					<Icon  icon={ copySmall } onClick={ handleCopy } className="wporg-2fa__svn-copy-password" label="Copy to clipboard" />
