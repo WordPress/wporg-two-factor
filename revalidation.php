@@ -122,6 +122,7 @@ function wp_footer_revalidate_modal() {
 		}
 		dialog.wporg-2fa-revalidate-modal > h1 {
 			margin: unset;
+			margin-bottom: 1em;
 			text-align: center;
 		}
 		dialog.wporg-2fa-revalidate-modal > iframe {
