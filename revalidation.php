@@ -106,13 +106,14 @@ function wp_footer_revalidate_modal() {
 
 		// Listen for the revalidation to complete.
 		window.addEventListener( 'message', function( event ) {
-			if ( event.data.type !== 'reValidationComplete' ) {
+			if ( ! event.data || ! event.data.type || event.data.type !== 'reValidationComplete' ) {
 				return;
 			}
 			revalidateModal.close();
 			revalidateModal.remove();
 
-			( lastTarget || window ).dispatchEvent( new Event( 'reValidationComplete' ) );
+			// Notify others.
+			( lastTarget || window ).dispatchEvent( new Event( 'reValidationComplete', { bubbles: true } ) );
 		} );
 	})();</script>
 	<style>
