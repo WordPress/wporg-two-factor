@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
-import { Button, CheckboxControl, Notice, Spinner } from '@wordpress/components';
+import { Button, ButtonGroup, CheckboxControl, Flex, Notice, Spinner } from '@wordpress/components';
 import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
 
 /**
@@ -12,6 +12,9 @@ import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
 import { GlobalContext } from '../script';
 import { refreshRecord } from '../utilities/common';
 import ScreenLink from './screen-link';
+import CopyToClipboardButton from './copy-to-clipboard-button';
+import PrintButton from './print-button';
+import DownloadButton from './download-button';
 
 /**
  * Setup and manage backup codes.
@@ -147,7 +150,7 @@ function Setup( { setRegenerating } ) {
 				</>
 			) }
 
-			<p className="wporg-2fa__submit-actions">
+			<Flex align="center" className="wporg-2fa__submit-actions">
 				<Button
 					isPrimary={ hasPrinted }
 					isSecondary={ ! hasPrinted }
@@ -156,7 +159,13 @@ function Setup( { setRegenerating } ) {
 				>
 					All Finished
 				</Button>
-			</p>
+
+				<ButtonGroup>
+					<CopyToClipboardButton codes={ backupCodes } />
+					<PrintButton />
+					<DownloadButton codes={ backupCodes } />
+				</ButtonGroup>
+			</Flex>
 		</>
 	);
 }
