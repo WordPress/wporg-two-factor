@@ -150,6 +150,7 @@ function Setup( { setRegenerating } ) {
 				</>
 			) }
 
+<<<<<<< HEAD
 			<Flex align="center" className="wporg-2fa__submit-actions">
 				<Button
 					isPrimary={ hasPrinted }
@@ -157,6 +158,10 @@ function Setup( { setRegenerating } ) {
 					disabled={ ! hasPrinted }
 					onClick={ handleFinished }
 				>
+=======
+			<Flex justify="flex-start" align="center" className="wporg-2fa__submit-actions">
+				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
+>>>>>>> b65df39 (Update flex start.)
 					All Finished
 				</Button>
 
