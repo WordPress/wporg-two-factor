@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 export default function CopyToClipboardButton( { codes } ) {
 	const [ copied, setCopied ] = useState( false );
@@ -20,17 +16,7 @@ export default function CopyToClipboardButton( { codes } ) {
 
 	return (
 		<Button variant="secondary" onClick={ onClick }>
-			{ copied ? (
-				<>
-					<Dashicon icon="yes" />
-					<span>Copied!</span>
-				</>
-			) : (
-				<>
-					<Dashicon icon="clipboard" />
-					<span className="screen-reader-text">Print</span>
-				</>
-			) }
+			{ copied ? 'Copied!' : 'Copy' }
 		</Button>
 	);
 }

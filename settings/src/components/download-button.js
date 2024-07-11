@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 export default function DownloadTxtButton( { codes, fileName = 'backup-codes.txt' } ) {
 	const downloadTxtFile = useCallback( () => {
@@ -17,8 +17,7 @@ export default function DownloadTxtButton( { codes, fileName = 'backup-codes.txt
 
 	return (
 		<Button variant="secondary" onClick={ downloadTxtFile }>
-			<Dashicon icon="download" />
-			<span className="screen-reader-text">Download</span>
+			Download
 		</Button>
 	);
 }
