@@ -15,15 +15,10 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import { useUser } from './hooks/useUser';
-import ScreenNavigation from './components/screen-navigation';
-import AccountStatus from './components/account-status';
-import Password from './components/password';
-import EmailAddress from './components/email-address';
-import TOTP from './components/totp';
-import WebAuthn from './components/webauthn/webauthn';
-import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
+//import Settings from './components/settings';
+import FirstTime from './components/first-time';
 
 export const GlobalContext = createContext( null );
 
@@ -65,24 +60,10 @@ function Main( { userId } ) {
 
 	let currentUrl = new URL( document.location.href );
 	const initialScreen = currentUrl.searchParams.get( 'screen' );
-	const [ screen, setScreen ] = useState( initialScreen );
-
-	// The index is the URL slug and the value is the React component.
-	const components = {
-		'account-status': <AccountStatus />,
-		email: <EmailAddress />,
-		password: <Password />,
-		totp: <TOTP />,
-		'backup-codes': <BackupCodes />,
-		webauthn: <WebAuthn />,
-	};
+	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
 
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
-
-	if ( ! components[ screen ] ) {
-		setScreen( 'account-status' );
-	}
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -130,7 +111,6 @@ function Main( { userId } ) {
 			currentUrl = new URL( document.location.href );
 			currentUrl.searchParams.set( 'screen', nextScreen );
 			window.history.pushState( {}, '', currentUrl );
-
 			setError( '' );
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
@@ -141,13 +121,6 @@ function Main( { userId } ) {
 	if ( ! hasResolved ) {
 		return <Spinner />;
 	}
-
-	const currentScreenComponent =
-		'account-status' === screen ? (
-			components[ screen ]
-		) : (
-			<ScreenNavigation screen={ screen }>{ components[ screen ] }</ScreenNavigation>
-		);
 
 	const isRevalidationExpired =
 		twoFactorRequiredScreens.includes( screen ) &&
@@ -166,10 +139,12 @@ function Main( { userId } ) {
 				error,
 				backupCodesVerified,
 				setBackupCodesVerified,
+				setScreen,
+				screen,
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-			{ currentScreenComponent }
+			<FirstTime />
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);

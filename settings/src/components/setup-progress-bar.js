@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Icon, lock, reusableBlock } from '@wordpress/icons';
+import { Icon, lock, edit, reusableBlock } from '@wordpress/icons';
 
 export default function SetupProgressBar( { step } ) {
 	return (
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
+				<li className={ 'home' === step ? 'is-enabled' : 'is-disabled' }>
+					<Icon icon={ edit } />
+					<br />
+					Select type
+				</li>
+
 				<li className={ 'totp-setup' === step ? 'is-enabled' : 'is-disabled' }>
 					<Icon icon={ lock } />
 					<br />

@@ -12,6 +12,7 @@ import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@
 import ScreenLink from './screen-link';
 import AutoTabbingInput from './auto-tabbing-input';
 import { refreshRecord } from '../utilities/common';
+import SetupProgressBar from './setup-progress-bar';
 import { GlobalContext } from '../script';
 import Success from './success';
 
@@ -28,7 +29,7 @@ export default function TOTP() {
 		if ( ! backupCodesEnabled ) {
 			navigateToScreen( 'backup-codes' );
 		} else {
-			navigateToScreen( 'account-status' );
+			navigateToScreen( 'home' );
 		}
 	}, [ backupCodesEnabled, navigateToScreen ] );
 
@@ -79,7 +80,6 @@ function Setup( { setSuccess } ) {
 			} );
 
 			setSecretKey( response.secret_key );
-			setQrCodeUrl( response.qr_code_url );
 		};
 
 		fetchSetupData();

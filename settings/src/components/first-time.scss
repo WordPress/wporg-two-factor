@@ -1,0 +1,18 @@
+.wporg-2fa__first-time {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    background: #fff;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    padding-top: 100px;
+
+    .wporg-2fa__first-time__inner {
+        height: 50vh;
+        width: 60vw;
+        max-width: 800px;
+    }
+}

@@ -13,12 +13,13 @@ import ScreenLink from './screen-link';
  * @param props
  * @param props.children
  * @param props.screen
+ * @param props.title
  */
-const ScreenNavigation = ( { screen, children } ) => (
+const ScreenNavigation = ( { screen, children, title = '' } ) => (
 	<Card>
 		<CardHeader className="wporg-2fa__navigation" size="xSmall">
 			<ScreenLink
-				screen="account-status"
+				screen="home"
 				ariaLabel="Back to the account status page"
 				anchorText={
 					<>
@@ -29,10 +30,12 @@ const ScreenNavigation = ( { screen, children } ) => (
 			/>
 
 			<h3>
-				{ screen
-					.replace( '-', ' ' )
-					.replace( 'totp', 'Two-Factor Authentication' )
-					.replace( 'webauthn', 'Two-Factor Security Key' ) }
+				{ title.length
+					? title
+					: screen
+							.replace( '-', ' ' )
+							.replace( 'totp', 'Two-Factor Authentication' )
+							.replace( 'webauthn', 'Two-Factor Security Key' ) }
 			</h3>
 		</CardHeader>
 		<CardBody className={ 'wporg-2fa__' + screen }>{ children }</CardBody>
