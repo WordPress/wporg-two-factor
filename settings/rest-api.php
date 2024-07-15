@@ -411,20 +411,20 @@ function require_email_confirmation( $insert_data, $request ) {
  * Process the email change confirmation click.
  */
 function process_email_change_confirmation() {
-	global $current_user;
-	if ( empty( $_GET['newuseremail'] ) ) {
+	$user_id = bp_displayed_user_id();
+	if ( ! $user_id || empty( $_GET['newuseremail'] ) ) {
 		return;
 	}
 
 	// Logic lifted from wp-admin/profile.php
-	$new_email = get_user_meta( $current_user->ID, '_new_email', true );
+	$new_email = get_user_meta( $user_id, '_new_email', true );
 	if ( $new_email && hash_equals( $new_email['hash'], $_GET['newuseremail'] ) ) {
 		$user             = new \stdClass();
-		$user->ID         = $current_user->ID;
+		$user->ID         = $user_id;
 		$user->user_email = esc_html( trim( $new_email['newemail'] ) );
 
 		wp_update_user( $user );
-		delete_user_meta( $current_user->ID, '_new_email' );
+		delete_user_meta( $user_id, '_new_email' );
 	}
 }
 
