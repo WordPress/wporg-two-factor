@@ -15,6 +15,7 @@ import { GlobalContext } from '../script';
  */
 export default function EmailAddress() {
 	const {
+		setGlobalNotice,
 		user: {
 			userRecord: { record, edit, save, editedRecord, hasEdits },
 			isSaving,
@@ -22,6 +23,15 @@ export default function EmailAddress() {
 	} = useContext( GlobalContext );
 	const [ emailError, setEmailError ] = useState( '' );
 	const [ justChangedEmail, setJustChangedEmail ] = useState( false );
+
+	// If the email was just changed, inform the user.
+	if ( document.location.search.includes( 'newuseremail' ) && ! record.pending_email ) {
+		const currentUrl = new URL( document.location.href );
+		currentUrl.searchParams.delete( 'newuseremail' );
+		window.history.pushState( {}, '', currentUrl );
+
+		setGlobalNotice( 'Your email has been successfully changed.' );
+	}
 
 	const handleSave = useCallback( async () => {
 		try {
