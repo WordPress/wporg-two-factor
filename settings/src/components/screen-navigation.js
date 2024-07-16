@@ -15,19 +15,22 @@ import ScreenLink from './screen-link';
  * @param props.screen
  * @param props.title
  */
-const ScreenNavigation = ( { screen, children, title = '' } ) => (
+// eslint-disable-next-line no-unused-vars
+const ScreenNavigation = ( { screen, children, title = '', canNavigate = true } ) => (
 	<Card>
 		<CardHeader className="wporg-2fa__navigation" size="xSmall">
-			<ScreenLink
-				screen="home"
-				ariaLabel="Back to the account status page"
-				anchorText={
-					<>
-						<Icon icon={ chevronLeft } width={ 14 } />
-						Back
-					</>
-				}
-			/>
+			{ canNavigate && (
+				<ScreenLink
+					screen="home"
+					ariaLabel="Back to the account status page"
+					anchorText={
+						<>
+							<Icon icon={ chevronLeft } width={ 14 } />
+							Back
+						</>
+					}
+				/>
+			) }
 
 			<h3>
 				{ title.length

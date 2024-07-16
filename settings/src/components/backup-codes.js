@@ -19,7 +19,7 @@ import DownloadButton from './download-button';
 /**
  * Setup and manage backup codes.
  */
-export default function BackupCodes() {
+export default function BackupCodes( { onSuccess = () => {} } ) {
 	const {
 		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
 		backupCodesVerified,
@@ -47,7 +47,7 @@ export default function BackupCodes() {
 		regenerating ||
 		! backupCodesVerified
 	) {
-		return <Setup setRegenerating={ setRegenerating } />;
+		return <Setup setRegenerating={ setRegenerating } onSuccess={ onSuccess } />;
 	}
 
 	return <Manage setRegenerating={ setRegenerating } />;
@@ -59,7 +59,7 @@ export default function BackupCodes() {
  * @param props
  * @param props.setRegenerating
  */
-function Setup( { setRegenerating } ) {
+function Setup( { setRegenerating, onSuccess } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
@@ -150,7 +150,10 @@ function Setup( { setRegenerating } ) {
 					<CheckboxControl
 						label="I have printed or saved these codes"
 						checked={ hasPrinted }
-						onChange={ setHasPrinted }
+						onChange={ () => {
+							setHasPrinted( ! hasPrinted );
+							onSuccess();
+						} }
 						disabled={ error }
 					/>
 				</>

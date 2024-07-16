@@ -1,43 +1,49 @@
 /**
  * WordPress dependencies
  */
-import { Icon, lock, edit, reusableBlock } from '@wordpress/icons';
+import { useCallback } from '@wordpress/element';
+import { Icon, check } from '@wordpress/icons';
 
-export default function SetupProgressBar( { step } ) {
+export default function SetupProgressBar( { currentStep, steps } ) {
+	const currentIndex = steps.findIndex( ( step ) => step.id === currentStep );
+	const getCompletionPercentage = useCallback(
+		() => ( ( currentIndex + 1 ) / steps.length ) * 100,
+		[ currentIndex, steps.length ]
+	);
+
+	const getStepClass = ( index ) => {
+		if ( index === currentIndex ) {
+			return 'is-enabled';
+		}
+
+		if ( currentIndex > index ) {
+			return 'is-complete';
+		}
+
+		return 'is-disabled';
+	};
+
 	return (
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
-				<li className={ 'home' === step ? 'is-enabled' : 'is-disabled' }>
-					<Icon icon={ edit } />
-					<br />
-					Select type
-				</li>
-
-				<li className={ 'totp-setup' === step ? 'is-enabled' : 'is-disabled' }>
-					<Icon icon={ lock } />
-					<br />
-					Scan QR Code
-				</li>
-
-				<li className={ 'backup-codes' === step ? 'is-enabled' : 'is-disabled' }>
-					<Icon icon={ reusableBlock } />
-					<br />
-					Backup Codes
-				</li>
+				{ steps.map( ( step, index ) => (
+					<li key={ step.id } className={ getStepClass( index ) }>
+						<Icon
+							width="18px"
+							height="18px"
+							icon={ currentIndex > index ? check : step.icon }
+						/>
+						<span className="wporg-2fa__setup-label">{ step.title }</span>
+					</li>
+				) ) }
 			</ul>
 
-			<ul className="wporg-2fa__setup-step-separators">
-				<li className="wporg-2fa__step-separator is-enabled" />
-
-				<li
-					className={
-						'wporg-2fa__step-separator ' +
-						( 'backup-codes' === step ? 'is-enabled' : 'is-disabled' )
-					}
-				/>
-
-				<li className="wporg-2fa__step-separator is-disabled" />
-			</ul>
+			<div
+				style={ {
+					'--wporg-separator-width': getCompletionPercentage() + '%',
+				} }
+				className="wporg-2fa__setup-step-separator"
+			></div>
 		</div>
 	);
 }

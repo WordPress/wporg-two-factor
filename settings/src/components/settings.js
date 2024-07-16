@@ -20,14 +20,24 @@ import { GlobalContext } from '../script';
  * Render the correct component based on the URL.
  */
 export default function Settings() {
-	const { screen } = useContext( GlobalContext );
+	const { backupCodesEnabled, navigateToScreen, screen } = useContext( GlobalContext );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
 		home: <AccountStatus />,
 		email: <EmailAddress />,
 		password: <Password />,
-		totp: <TOTP />,
+		totp: (
+			<TOTP
+				onSuccess={ () => {
+					if ( ! backupCodesEnabled ) {
+						navigateToScreen( 'backup-codes' );
+					} else {
+						navigateToScreen( 'home' );
+					}
+				} }
+			/>
+		),
 		'backup-codes': <BackupCodes />,
 		webauthn: <WebAuthn />,
 	};

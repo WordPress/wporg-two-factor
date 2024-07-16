@@ -1,7 +1,7 @@
 .wporg-2fa__progress-bar,
 #bbpress-forums .wporg-2fa__progress-bar,
 #bbpress-forums.bbpress-wrapper .wporg-2fa__progress-bar {
-	--color-enabled: #0475c4;
+	--color-enabled: #1e1e1e;
 	--color-disabled: #{$gray-400};
 	--color-disabled-text: #{$gray-700}; // Darker than `color-disabled` to meet a11y contrast standards.
 
@@ -10,12 +10,20 @@
 
 	.wporg-2fa__setup-steps {
 		position: relative;
+		margin-bottom: 40px;
 		z-index: 2; /* On top of the separators. */
 		display: flex;
 		justify-content: space-evenly; /* Align the steps up with the separators. */
 
 		li {
 			text-align: center;
+			width: 125px;
+
+			.wporg-2fa__setup-label {
+				display: block;
+				margin-top: 8px;
+				font-size: 12px;
+			}
 		}
 
 		svg {
@@ -26,7 +34,6 @@
 		}
 
 		li.is-enabled {
-			font-weight: bold;
 			color: var(--color-enabled);
 
 			svg {
@@ -45,29 +52,38 @@
 				fill: var(--color-disabled);
 			}
 		}
-	}
 
-	.wporg-2fa__setup-step-separators {
-		display: flex;
-		justify-content: space-between; /* Align the separators up with the steps. */
-		position: absolute;
-		top: 27px;
-		z-index: 1; /* Under the steps. */
-		width: 100%;
+		li.is-complete {
+			color: var(--color-disabled-text);
 
-		li {
-			height: 3px;
-			flex-basis: 33%;
-			flex-grow: 1;
-			flex-shrink: 1;
-
-			&.is-enabled {
-				background-color: var(--color-enabled);
-			}
-
-			&.is-disabled {
-				background-color: var(--color-disabled);
+			svg {
+				background-color: var(--wp--preset--color--blueberry-1, #3858e9);
+				border-color: var(--wp--preset--color--blueberry-1, #3858e9);
+				fill: white;
 			}
 		}
 	}
+}
+
+.wporg-2fa__progress-bar {
+	margin: 0;
+}
+
+.wporg-2fa__progress-bar .wporg-2fa__setup-step-separator::before {
+	content: '';
+	position: absolute;
+	height: 2px;
+	width: var(--wporg-separator-width, 0%);
+	background:  var(--wp--preset--color--blueberry-1, #3858e9);
+	z-index: 1;
+}
+
+.wporg-2fa__progress-bar .wporg-2fa__setup-step-separator {
+	position: absolute;
+	height: 2px;
+	width: 100%;
+    top: 25px;
+    z-index: 0;
+	background: var(--color-disabled);
+	z-index: 0;
 }
