@@ -139,7 +139,6 @@ export default function FirstTime() {
 				<div className="wporg-2fa__first-time__inner-content">
 					<WordPressLogo />
 					{ currentScreenComponent }
-
 				</div>
 			</div>
 		</div>

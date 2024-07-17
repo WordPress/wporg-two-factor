@@ -100,7 +100,7 @@ export default function WebAuthn( { onKeyAdd = () => {} } ) {
 
 		updateFlow( 'manage' );
 		onKeyAdd();
-	}, [ webAuthnEnabled, toggleProvider, updateFlow ] );
+	}, [ webAuthnEnabled, toggleProvider, updateFlow, onKeyAdd ] );
 
 	if ( 'register' === flow ) {
 		return (

@@ -17,7 +17,7 @@ import { Spinner } from '@wordpress/components';
 import { useUser } from './hooks/useUser';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
-//import Settings from './components/settings';
+import Settings from './components/settings';
 import FirstTime from './components/first-time/first-time';
 
 export const GlobalContext = createContext( null );
@@ -144,7 +144,12 @@ function Main( { userId } ) {
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-			<FirstTime />
+
+			{ new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
+				<FirstTime />
+			) : (
+				<Settings />
+			) }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);

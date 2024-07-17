@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /**
  * WordPress dependencies
  */
@@ -23,7 +24,7 @@ export default function Select( { onSelect } ) {
 		<>
 			<p>Select a method to configure two-factor authentication for your account.</p>
 			<form className="wporg-2fa__first-time-default">
-				<label htmlFor="totp" className="wporg-2fa__first-time-default-item">
+				<label className="wporg-2fa__first-time-default-item">
 					<input
 						type="radio"
 						id="totp"
@@ -37,7 +38,7 @@ export default function Select( { onSelect } ) {
 						<p>Use an application to get two-factor authentication codes.</p>
 					</div>
 				</label>
-				<label htmlFor="webauthn" className="wporg-2fa__first-time-default-item">
+				<label className="wporg-2fa__first-time-default-item">
 					<input
 						type="radio"
 						id="webauthn"

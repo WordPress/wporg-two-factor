@@ -17,8 +17,7 @@ import Success from './success';
 
 export default function TOTP( { onSuccess } ) {
 	const {
-		user: { backupCodesEnabled, totpEnabled },
-		navigateToScreen,
+		user: { totpEnabled },
 	} = useContext( GlobalContext );
 	const [ success, setSuccess ] = useState( false );
 
@@ -26,7 +25,7 @@ export default function TOTP( { onSuccess } ) {
 		setSuccess( false );
 
 		onSuccess();
-	}, [ backupCodesEnabled, navigateToScreen ] );
+	}, [ onSuccess ] );
 
 	if ( success ) {
 		return (

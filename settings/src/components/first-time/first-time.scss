@@ -7,7 +7,6 @@
     height: 100%;
     z-index: 1000;
 
-
     .wporg-2fa__first-time__inner {
         padding: 80px 0;
         margin-top: 20px;
@@ -35,6 +34,10 @@
         // Preven cards from shrinking.
         .components-card {
             width: 100%;
+        }
+
+        .components-card__body {
+            padding: 32px;
         }
     }
 

@@ -14,6 +14,7 @@ import ScreenLink from './screen-link';
  * @param props.children
  * @param props.screen
  * @param props.title
+ * @param props.canNavigate
  */
 // eslint-disable-next-line no-unused-vars
 const ScreenNavigation = ( { screen, children, title = '', canNavigate = true } ) => (
