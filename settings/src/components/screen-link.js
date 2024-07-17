@@ -31,6 +31,7 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 			// implicitly verifying them, or at least needs to be treated that way. This should be removed once
 			// `two-factor/#507` is fixed, though.
 			setBackupCodesVerified( true );
+
 			navigateToScreen( screen );
 		},
 		[ navigateToScreen ]
