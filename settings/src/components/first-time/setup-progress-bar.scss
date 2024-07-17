@@ -6,29 +6,26 @@
 	--color-disabled-text: #{$gray-700}; // Darker than `color-disabled` to meet a11y contrast standards.
 
 	position: relative;
-	margin: 0 -24px; /* Separators need to stretch to edges of container. */
 
 	.wporg-2fa__setup-steps {
 		position: relative;
-		margin-bottom: 40px;
+		margin-bottom: 32px;
 		z-index: 2; /* On top of the separators. */
 		display: flex;
-		justify-content: space-evenly; /* Align the steps up with the separators. */
+		justify-content: space-between;
 
 		li {
 			text-align: center;
-			width: 125px;
 
 			.wporg-2fa__setup-label {
 				display: block;
-				margin-top: 8px;
 				font-size: 12px;
 			}
 		}
 
 		svg {
 			box-sizing: content-box;
-			padding: 15px;
+			padding: 8px;
 			border: 1px solid;
 			border-radius: 30px;
 		}
@@ -80,9 +77,10 @@
 
 .wporg-2fa__progress-bar .wporg-2fa__setup-step-separator {
 	position: absolute;
+	width: 96%;
 	height: 2px;
-	width: 100%;
-    top: 25px;
+    margin-left: 2%;
+    top: 16px;
     z-index: 0;
 	background: var(--color-disabled);
 	z-index: 0;

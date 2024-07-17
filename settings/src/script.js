@@ -18,7 +18,7 @@ import { useUser } from './hooks/useUser';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
 //import Settings from './components/settings';
-import FirstTime from './components/first-time';
+import FirstTime from './components/first-time/first-time';
 
 export const GlobalContext = createContext( null );
 

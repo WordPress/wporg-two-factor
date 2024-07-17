@@ -4,19 +4,18 @@
 import { useCallback } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 
-export default function SetupProgressBar( { currentStep, steps } ) {
-	const currentIndex = steps.findIndex( ( step ) => step.id === currentStep );
+export default function SetupProgressBar( { currentStepIndex, steps } ) {
 	const getCompletionPercentage = useCallback(
-		() => ( ( currentIndex + 1 ) / steps.length ) * 100,
-		[ currentIndex, steps.length ]
+		() => ( currentStepIndex / ( steps.length - 1 ) ) * 100,
+		[ currentStepIndex, steps.length ]
 	);
 
 	const getStepClass = ( index ) => {
-		if ( index === currentIndex ) {
+		if ( index === currentStepIndex ) {
 			return 'is-enabled';
 		}
 
-		if ( currentIndex > index ) {
+		if ( currentStepIndex > index ) {
 			return 'is-complete';
 		}
 
@@ -29,11 +28,11 @@ export default function SetupProgressBar( { currentStep, steps } ) {
 				{ steps.map( ( step, index ) => (
 					<li key={ step.id } className={ getStepClass( index ) }>
 						<Icon
-							width="18px"
-							height="18px"
-							icon={ currentIndex > index ? check : step.icon }
+							width="16px"
+							height="16px"
+							icon={ currentStepIndex > index ? check : step.icon }
 						/>
-						<span className="wporg-2fa__setup-label">{ step.title }</span>
+						<span className="wporg-2fa__setup-label">{ step.label }</span>
 					</li>
 				) ) }
 			</ul>

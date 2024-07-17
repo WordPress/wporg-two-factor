@@ -1,7 +1,4 @@
 .wporg-2fa__first-time {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     position: fixed;
     background: #fff;
     top: 0;
@@ -9,13 +6,36 @@
     width: 100%;
     height: 100%;
     z-index: 1000;
-    padding-top: 80px;
+
 
     .wporg-2fa__first-time__inner {
+        padding: 80px 0;
         margin-top: 20px;
-        height: 50vh;
-        width: 90vw;
-        max-width: 700px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+    }
+
+    .wporg-2fa__first-time__inner-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        @media (min-width: 600px) {
+            width: 600px;
+        }
+
+        > svg {
+            margin-bottom: 16px;
+        }
+
+        // Preven cards from shrinking.
+        .components-card {
+            width: 100%;
+        }
     }
 
     .wporg-2fa__first-time-default {
@@ -68,6 +88,8 @@
             }
         }
     }
-
 }
 
+.wporg-2fa__congratulations h3 {
+    margin-bottom: 14px;
+}
