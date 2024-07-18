@@ -249,6 +249,45 @@ function user_requires_2fa( $user ) : bool {
 }
 
 /**
+ * Check if the user *should* have 2FA enabled.
+ * This is not *required* yet, but highly encouraged.
+ *
+ * @param WP_User $user
+ */
+function user_should_2fa( $user ) : bool {
+	global $trusted_deputies, $wcorg_subroles;
+
+	// This shouldn't happen, but there've been a few times where it has inexplicably.
+	if ( ! $user instanceof WP_User ) {
+		return false;
+	}
+
+	// If they require it, they should have it.
+	// This duplicates the logic in `user_requires_2fa()`, due to the other uses of that function..
+	if ( is_special_user( $user->ID ) ) {
+		return true;
+	} elseif ( $trusted_deputies && in_array( $user->ID, $trusted_deputies, true ) ) {
+		return true;
+	} elseif ( $wcorg_subroles && array_key_exists( $user->ID, $wcorg_subroles ) ) {
+		return true;
+	}
+
+	// If a user ... they should have 2FA enabled.
+	if (
+		// Is (or was) a plugin committer
+		$user->has_plugins ||
+		// Has (or had) a live theme
+		$user->has_themes ||
+		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
+		$user->has_elevated_role
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Redirect a user to their 2FA settings if they need to enable it.
  *
  * This isn't usually necessary, since WordPress will prevent Subscribers from visiting other Core screens, but
