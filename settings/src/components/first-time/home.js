@@ -55,7 +55,7 @@ export default function Select( { onSelect } ) {
 			</form>
 			<Flex className="wporg-2fa__submit-actions" justify="flex-start">
 				<Button isPrimary onClick={ handleButtonClick }>
-					Configure two-factor
+					Configure Two-Factor
 				</Button>
 			</Flex>
 		</>

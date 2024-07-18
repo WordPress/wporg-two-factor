@@ -35,10 +35,7 @@ export default function BackupCodes( { onSuccess = () => {} } ) {
 			<Notice status="error" isDismissible={ false }>
 				<Icon icon={ cancelCircleFilled } />
 				Please
-				<ScreenLink
-					screen="account-status"
-					anchorText="enable a Two-Factor security key or app"
-				/>
+				<ScreenLink screen="home" anchorText="enable a Two-Factor security key or app" />
 				before enabling backup codes.
 			</Notice>
 		);
