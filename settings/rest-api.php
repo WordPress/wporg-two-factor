@@ -4,6 +4,7 @@ namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
+use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, has_svn_password };
 
 defined( 'WPINC' ) || die();
 
@@ -333,7 +334,7 @@ function register_user_fields(): void {
 					return false;
 				}
 
-				// Committers, supes, etc.
+				// Committers, supes, etc. It's likely these users will need a SVN password.
 				if ( function_exists( 'is_special_user' ) && is_special_user( $user->ID ) ) {
 					return true;
 				}
@@ -365,11 +366,7 @@ function register_user_fields(): void {
 					return $regenerated_password;
 				}
 
-				// TODO, cache
-				return (bool) $wpdb->get_var( $wpdb->prepare(
-					"SELECT ID FROM wporg_svn_auth WHERE ID = %d AND `type` = 'svn' LIMIT 1",
-					$user['id']
-				) );
+				return ( 'svn' === has_svn_password( $user['id'] ) );
 			},
 			'update_callback' => function( $value, $user ) use( &$regenerated_password ) {
 				global $wpdb;
@@ -377,24 +374,9 @@ function register_user_fields(): void {
 					return false;
 				}
 
-				$regenerated_password = wp_generate_password( 40, false );
-				$hashed_password      = wp_hash_password( $regenerated_password );
+				$regenerated_password = set_svn_password( $user->ID )
 
-				$row = [
-					'ID'         => $user->ID,
-					'user_login' => $user->user_login,
-					'svn_pass'   => $hashed_password,
-					'type'       => 'svn',
-					'active'     => 1,
-				];
-
-				// TODO, what else needs doing here.
-				$inserted = $wpdb->update( 'wporg_svn_auth', $row, [ 'ID' => $user->ID ] );
-				if ( ! $inserted ) {
-					$inserted = $wpdb->insert( 'wporg_svn_auth', $row );
-				}
-
-				return (bool) $inserted;
+				return (bool) $regenerated_password;
 			},
 			'schema' => [
 				'type'    => [ 'boolean', 'string' ],
