@@ -80,7 +80,7 @@ function Main( { userId } ) {
 	};
 
 	// The screens where a recent two factor challenge is required.
-	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes' ];
+	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes', 'svn-password' ];
 
 	if ( ! components[ screen ] ) {
 		setScreen( 'account-status' );
