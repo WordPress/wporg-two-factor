@@ -376,7 +376,7 @@ function register_user_fields(): void {
 					return false;
 				}
 
-				$regenerated_password = set_svn_password( $user->ID )
+				$regenerated_password = set_svn_password( $user->ID );
 
 				return (bool) $regenerated_password;
 			},
