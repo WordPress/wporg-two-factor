@@ -1,5 +1,6 @@
 .wporg-2fa__auto-tabbing-input {
 	display: flex;
+	margin-top: 8px;
 
 	input {
 		width: 40px !important; /* Override bbPress styles */
@@ -14,7 +15,7 @@
 		}
 		
 		&:not(:last-child) {
-			margin-right: 24px;
+			margin-right: 16px;
 		}
 
 		@media screen and (max-width: 767px) {

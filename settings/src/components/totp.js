@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Modal, Notice, Flex, Spinner } from '@wordpress/components';
+import { Button, Flex, Modal, Notice, Spinner } from '@wordpress/components';
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
 import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 
@@ -17,15 +17,20 @@ import Success from './success';
 
 export default function TOTP() {
 	const {
-		user: { totpEnabled },
+		user: { backupCodesEnabled, totpEnabled },
 		navigateToScreen,
 	} = useContext( GlobalContext );
 	const [ success, setSuccess ] = useState( false );
 
 	const afterTimeout = useCallback( () => {
 		setSuccess( false );
-		navigateToScreen( 'backup-codes' );
-	}, [ navigateToScreen ] );
+
+		if ( ! backupCodesEnabled ) {
+			navigateToScreen( 'backup-codes' );
+		} else {
+			navigateToScreen( 'account-status' );
+		}
+	}, [ backupCodesEnabled, navigateToScreen ] );
 
 	if ( success ) {
 		return (
@@ -114,55 +119,39 @@ function Setup( { setSuccess } ) {
 	);
 
 	return (
-		<Flex
-			expanded={ false }
-			direction="column"
-			align="top"
-			justify="top"
-			gap="14px"
-			className="wporg-2fa__totp_setup-container"
-		>
+		<div className="wporg-2fa__totp_setup-container">
 			<p className="wporg-2fa__screen-intro">
 				Two-Factor Authentication adds an extra layer of security to your account. Use a
-				phone app like <a href="https://authy.com/">Authy</a> or{ ' ' }
+				phone app like{ ' ' }
 				<a href="https://support.google.com/accounts/answer/1066447">
 					Google Authenticator
+				</a>{ ' ' }
+				or{ ' ' }
+				<a href="https://www.microsoft.com/ko-kr/security/mobile-authenticator-app">
+					Microsoft Authenticator
 				</a>{ ' ' }
 				when logging in to WordPress.org.
 			</p>
 
-			{ statusWaiting ? (
-				<div className="wporg-2fa__process-status">
-					<Spinner />
-				</div>
-			) : (
-				<>
-					{ 'qr-code' === setupMethod && (
-						<SetupMethodQRCode
-							setSetupMethod={ setSetupMethod }
-							qrCodeUrl={ qrCodeUrl }
-						/>
-					) }
-
-					{ 'manual' === setupMethod && (
-						<SetupMethodManual
-							setSetupMethod={ setSetupMethod }
-							secretKey={ secretKey }
-						/>
-					) }
-
-					<SetupForm
-						handleEnable={ handleEnable }
-						qrCodeUrl={ qrCodeUrl }
-						secretKey={ secretKey }
-						inputs={ inputs }
-						setInputs={ setInputs }
-						error={ error }
-						setError={ setError }
-					/>
-				</>
+			{ 'qr-code' === setupMethod && (
+				<SetupMethodQRCode setSetupMethod={ setSetupMethod } qrCodeUrl={ qrCodeUrl } />
 			) }
-		</Flex>
+
+			{ 'manual' === setupMethod && (
+				<SetupMethodManual setSetupMethod={ setSetupMethod } secretKey={ secretKey } />
+			) }
+
+			<SetupForm
+				handleEnable={ handleEnable }
+				qrCodeUrl={ qrCodeUrl }
+				secretKey={ secretKey }
+				inputs={ inputs }
+				setInputs={ setInputs }
+				error={ error }
+				setError={ setError }
+				isBusy={ statusWaiting }
+			/>
+		</div>
 	);
 }
 
@@ -177,12 +166,7 @@ function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
 	const handleClick = useCallback( () => setSetupMethod( 'manual' ) );
 
 	return (
-		<Flex
-			expanded={ false }
-			direction="column"
-			gap="16px"
-			className="wporg-2fa__totp_setup-method-container"
-		>
+		<div className="wporg-2fa__totp_setup-method-container">
 			<p>
 				<strong>Scan the QR code with your authentication app&nbsp;</strong>
 			</p>
@@ -200,7 +184,7 @@ function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
 					</a>
 				) }
 			</div>
-		</Flex>
+		</div>
 	);
 }
 
@@ -263,8 +247,18 @@ function createQrCode( data ) {
  * @param props.setInputs
  * @param props.error
  * @param props.setError
+ * @param props.isBusy
  */
-function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, error, setError } ) {
+function SetupForm( {
+	handleEnable,
+	qrCodeUrl,
+	secretKey,
+	inputs,
+	setInputs,
+	error,
+	setError,
+	isBusy,
+} ) {
 	const inputsRef = useRef( inputs );
 
 	useEffect( () => {
@@ -284,17 +278,12 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 	const canSubmit = qrCodeUrl && secretKey && inputs.every( ( input ) => !! input );
 
 	return (
-		<Flex
-			expanded={ false }
-			direction="column"
-			align="center"
-			gap="16px"
-			className="wporg-2fa__setup-form-container"
-		>
-			<Notice status="error" isDismissible={ false } className={ error ? 'is-shown' : '' }>
-				<Icon icon={ cancelCircleFilled } />
-				{ error }
-			</Notice>
+		<div className="wporg-2fa__setup-form-container">
+			{ error && (
+				<Notice status="error" isDismissible={ false } className="is-shown">
+					<Icon icon={ cancelCircleFilled } /> { error }
+				</Notice>
+			) }
 
 			<form className="wporg-2fa__setup-form" onSubmit={ handleEnable }>
 				<p>Enter the six digit code provided by the app:</p>
@@ -308,23 +297,24 @@ function SetupForm( { handleEnable, qrCodeUrl, secretKey, inputs, setInputs, err
 
 				<div className="wporg-2fa__submit-actions">
 					<Button
+						type="submit"
+						variant="primary"
+						disabled={ ! canSubmit }
+						isBusy={ isBusy }
+						aria-label="Submit input digits"
+					>
+						{ isBusy ? 'Verifying' : 'Enable' }
+					</Button>
+					<Button
 						variant="secondary"
 						onClick={ handleClearClick }
 						aria-label="Clear all inputs"
 					>
 						Clear
 					</Button>
-					<Button
-						type="submit"
-						variant="primary"
-						disabled={ ! canSubmit }
-						aria-label="Submit input digits"
-					>
-						Enable
-					</Button>
 				</div>
 			</form>
-		</Flex>
+		</div>
 	);
 }
 
@@ -405,7 +395,7 @@ function Manage() {
 			</div>
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary onClick={ showConfirmDisableModal }>
+				<Button variant="secondary" onClick={ showConfirmDisableModal }>
 					Disable Two-Factor app
 				</Button>
 			</p>
@@ -455,7 +445,7 @@ function ConfirmDisableApp( { onConfirm, onClose, disabling } ) {
 			) : (
 				<div className="wporg-2fa__submit-actions">
 					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Disable
+						Disable Two-Factor app
 					</Button>
 
 					<Button variant="tertiary" onClick={ onClose }>

@@ -2,12 +2,13 @@
 .bbp-single-user .wporg-2fa__webauthn {
 	.wporg-2fa__webauthn-keys-header {
 		margin-bottom: 0;
+		font-weight: 600;
 	}
 	
 	.wporg-2fa__webauthn-keys-list {
 		li {
 			display: flex;
-			padding: 20px 0;
+			padding: 16px 0;
 			border-bottom: 1px solid $gray-300;
 	
 			&:last-of-type {
@@ -19,10 +20,6 @@
 			flex: 1;
 			font-size: 13px;
 		}
-	}
-
-	.wporg-2fa__webauthn-register {
-		min-height: 300px;
 	}
 }
 

@@ -19,18 +19,17 @@ export default function Success( { message, afterTimeout } ) {
 
 	if ( ! hasTimer ) {
 		// Time matches the length of the CSS animation property on .wporg-2fa__success
-		setTimeout( afterTimeout, 5000 );
+		setTimeout( afterTimeout, 3000 );
 		setHasTimer( true );
 	}
 
 	return (
 		<Flex className="wporg-2fa__success" direction="column">
-			<p>{ message }</p>
-
 			<div className="wporg-2fa__process-status" aria-hidden>
 				<div className="wporg-2fa__success-animation">
 					<Icon icon={ check } />
 				</div>
+				<div>{ message }</div>
 			</div>
 		</Flex>
 	);

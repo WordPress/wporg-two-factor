@@ -87,7 +87,7 @@ export default function AccountStatus() {
 
 			<SettingStatusCard
 				screen="backup-codes"
-				status={ backupCodesEnabled }
+				status={ ! hasPrimaryProvider ? 'pending' : backupCodesEnabled }
 				headerText="Two-Factor Backup Codes"
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }

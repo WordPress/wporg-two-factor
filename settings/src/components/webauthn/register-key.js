@@ -98,13 +98,9 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 	}
 
 	return registerCeremonyActive ? (
-		<>
-			<p>Connecting...</p>
-
-			<div className="wporg-2fa__process-status">
-				<Spinner />
-			</div>
-		</>
+		<div className="wporg-2fa__process-status">
+			<Spinner /> Connecting...
+		</div>
 	) : (
 		<form onSubmit={ onRegister }>
 			<p className="wporg-2fa__screen-intro">Give the security key a name.</p>
@@ -146,12 +142,9 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
  */
 function WaitingForSecurityKey() {
 	return (
-		<>
-			<p>Waiting for security key. Connect and touch your security key to register it.</p>
-
-			<div className="wporg-2fa__process-status">
-				<Spinner />
-			</div>
-		</>
+		<div className="wporg-2fa__process-status">
+			<Spinner /> Waiting for security key. Connect and touch your security key to register
+			it.
+		</div>
 	);
 }

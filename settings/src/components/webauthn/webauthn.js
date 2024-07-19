@@ -121,28 +121,22 @@ export default function WebAuthn() {
 			{ keys.length > 0 && <ListKeys /> }
 
 			<div className="wporg-2fa__submit-actions">
-				{ statusWaiting ? (
-					<div className="wporg-2fa__process-status">
-						<Spinner />
-					</div>
-				) : (
-					<>
-						<Button variant="primary" onClick={ () => updateFlow( 'register' ) }>
-							Register new key
-						</Button>
+				<Button variant="primary" onClick={ () => updateFlow( 'register' ) }>
+					Register new key
+				</Button>
 
-						{ keys.length > 0 && (
-							<Button
-								variant="tertiary"
-								onClick={
-									webAuthnEnabled ? showConfirmDisableModal : toggleProvider
-								}
-								disabled={ statusWaiting }
-							>
-								{ `${ webAuthnEnabled ? 'Disable' : 'Enable' } security keys` }
-							</Button>
-						) }
-					</>
+				{ keys.length > 0 && (
+					<Button
+						variant="secondary"
+						onClick={ webAuthnEnabled ? showConfirmDisableModal : toggleProvider }
+						disabled={ statusWaiting }
+						isBusy={ statusWaiting && ! webAuthnEnabled }
+					>
+						{ `${
+							// eslint-disable-next-line no-nested-ternary
+							statusWaiting ? 'Enabling' : webAuthnEnabled ? 'Disable' : 'Enable'
+						} security keys` }
+					</Button>
 				) }
 			</div>
 
@@ -191,10 +185,10 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling } ) {
 			) : (
 				<div className="wporg-2fa__submit-actions">
 					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Disable
+						Disable security keys
 					</Button>
 
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button variant="secondary" onClick={ onClose }>
 						Cancel
 					</Button>
 				</div>

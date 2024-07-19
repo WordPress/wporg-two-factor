@@ -131,7 +131,6 @@ export default function Password() {
 					label="New Password"
 					size="62"
 					value={ editedRecord.password ?? '' }
-					placeholder="Enter New Password..."
 					onChange={ handlePasswordChange }
 				/>
 				<Button
@@ -168,7 +167,13 @@ export default function Password() {
 			) }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary disabled={ ! editedRecord.password } type="submit">
+				<Button
+					isPrimary={ editedRecord.password }
+					isSecondary={ ! editedRecord.password }
+					disabled={ ! editedRecord.password }
+					type="submit"
+					isBusy={ isSaving }
+				>
 					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 

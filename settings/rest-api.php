@@ -11,6 +11,8 @@ defined( 'WPINC' ) || die();
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_rest_routes' );
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_fields' );
 add_filter( 'rest_pre_insert_user', __NAMESPACE__ . '\require_email_confirmation', 10, 2 );
+add_filter( 'bp_before_profile_edit_content', __NAMESPACE__ . '\process_email_change_confirmation' );
+add_filter( 'admin_page_access_denied', __NAMESPACE__ . '\redirect_wpadmin_profile' );
 
 /**
  * Register/Output some REST-API calls to be pre-loaded.
@@ -391,9 +393,7 @@ function register_user_fields(): void {
  * Implement the "Require email confirmation" functionality for the REST API.
  *
  * TODO: This is a core bug. This should be handled by core.
- * TODO: This should be moved to a WordPress.org mu-plugin.
- * TODO: This generates urls to /support/wp-admin/profile.php?newuseremail=%s
- *       bbPress also implements this functionality, through bbp_edit_user_email_send_notification()
+ * TODO: This could be moved to a WordPress.org mu-plugin.
  *
  * @codeCoverageIgnore
  *
@@ -426,6 +426,33 @@ function require_email_confirmation( $insert_data, $request ) {
 
 				return $email_text;
 			} );
+		} elseif ( function_exists( 'bp_members_get_user_url' ) ) {
+			// profiles.wordpress.org
+			add_filter( 'new_user_email_content', function( $email_text ) {
+				$user_hash   = get_user_meta( $_POST['user_id'], '_new_email', true );
+				$confirm_url = add_query_arg(
+					[
+						'screen' => 'email',
+						'newuseremail' => $user_hash['hash'],
+					],
+					bp_members_get_user_url(
+						$_POST['user_id'],
+						bp_members_get_path_chunks( [
+							bp_get_profile_slug(),
+							'edit',
+							[ 'group', 3 /* account & security */ ],
+						] )
+					)
+				);
+
+				$email_text = str_replace(
+					'###ADMIN_URL###',
+					esc_url_raw( $confirm_url ),
+					$email_text
+				);
+
+				return $email_text;
+			} );
 		}
 
 		// The POST fields needed by send_confirmation_on_profile_email().
@@ -442,4 +469,46 @@ function require_email_confirmation( $insert_data, $request ) {
 	}
 
 	return $insert_data;
+}
+
+/**
+ * Process the email change confirmation click.
+ */
+function process_email_change_confirmation() {
+	$user_id = bp_displayed_user_id();
+	if ( ! $user_id || empty( $_GET['newuseremail'] ) ) {
+		return;
+	}
+
+	// Logic lifted from wp-admin/profile.php
+	$new_email = get_user_meta( $user_id, '_new_email', true );
+	if ( $new_email && hash_equals( $new_email['hash'], $_GET['newuseremail'] ) ) {
+		$user             = new \stdClass();
+		$user->ID         = $user_id;
+		$user->user_email = esc_html( trim( $new_email['newemail'] ) );
+
+		wp_update_user( $user );
+		delete_user_meta( $user_id, '_new_email' );
+	}
+}
+
+/**
+ * Redirect accessing wp-admin/profile.php to their profile.
+ */
+function redirect_wpadmin_profile() {
+	global $pagenow;
+
+	if ( 'profile.php' !== $pagenow || ! is_user_logged_in() ) {
+		return;
+	}
+
+	$redirect_to = 'https://profiles.wordpress.org/' . wp_get_current_user()->user_nicename . '/';
+
+	// TODO: This is temporary, and only needed for a few days in July 2024.
+	if ( isset( $_GET['newuseremail'] ) ) {
+		$redirect_to .= 'profile/edit/group/3/?screen=email&newuseremail=' . $_GET['newuseremail'];
+	}
+
+	wp_safe_redirect( $redirect_to );
+	die();
 }

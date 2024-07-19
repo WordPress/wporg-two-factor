@@ -10,6 +10,7 @@ require __DIR__ . '/rest-api.php';
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\maybe_dequeue_stylesheet', 40 );
+add_action( 'wp_head', __NAMESPACE__ . '\maybe_add_custom_print_css' );
 
 /**
  * Registers the block
@@ -49,12 +50,13 @@ function replace_core_ui_with_custom() : void {
  * @codeCoverageIgnore
  */
 function render_custom_ui() : void {
-	if ( ! current_user_can( 'edit_user', bbp_get_displayed_user_id() ) ) {
+	$user_id = function_exists( 'bbp_get_displayed_user_id' ) ? bbp_get_displayed_user_id() : bp_displayed_user_id();
+
+	if ( ! current_user_can( 'edit_user', $user_id ) ) {
 		echo 'You cannot edit this user.';
 		return;
 	}
 
-	$user_id    = bbp_get_displayed_user_id();
 	$json_attrs = json_encode( [ 'userId' => $user_id ] );
 
 	$preload_paths = [
@@ -109,6 +111,8 @@ function login_footer_revalidate_customizations() {
 		.login-action-revalidate_2fa #login_error {
 			box-shadow: none;
 			background-color: #f4a2a2;
+			padding: 16px;
+			margin-bottom: 16px;
 		}
 
 		.login-action-revalidate_2fa #loginform {
@@ -159,9 +163,32 @@ function maybe_dequeue_stylesheet() {
 	global $wp;
 
 	// Match the URL since page/blog IDs etc aren't consistent across environments.
-	if ( 1 === preg_match( '#/users/.*/edit/account/#', $wp->request ) ) {
+	if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
 		return;
 	}
 
 	wp_dequeue_style( 'wporg-two-factor-settings-style' );
+}
+
+/**
+ * Add custom CSS for print styles.
+ */
+function maybe_add_custom_print_css() {
+    global $wp;
+
+    // Check if the current URL matches the specific condition
+    if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
+        ?>
+        <style>
+        @media print {
+            #item-header,
+            #headline,
+            footer,
+            .button-nav {
+                display: none !important;
+            }
+        }
+        </style>
+        <?php
+    }
 }

@@ -1,7 +1,13 @@
 .wporg-2fa__email {
+	.components-notice.actions-on-right {
+		margin-bottom: 16px;
+	}
+
 	/* Align the actions in a <Notice /> to the right */
 	.components-notice.actions-on-right > div {
 		display: flex;
+		margin-right: 0;
+
 		&> p {
 			flex-grow: 1;
 			margin: initial; /* wporg-support adds top padding to <p> causing button alignment issues. */

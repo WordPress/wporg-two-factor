@@ -29,6 +29,13 @@ jobs:
                   rm -rf settings/node_modules
                   rm -rf vendor
 
+            - name: Append build number to version
+              run: |
+                VER=$( jq -r .version ./settings/build/block.json )
+                VER="${VER%%-*}"
+                new_file="$(jq --arg ver "$VER-${GITHUB_SHA::7}" '.version = $ver' ./settings/build/block.json)"
+                echo -E "$new_file" > ./settings/build/block.json
+
             - name: Add all the plugin files
               run: |
                   git add * --force
