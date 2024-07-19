@@ -338,24 +338,8 @@ function register_user_fields(): void {
 					return true;
 				}
 
-				// TODO: These should be set as a user flag.
-
-				// Plugin committers.
-				$plugin_committer = (bool) $wpdb->get_var( $wpdb->prepare(
-					'SELECT 1 FROM `' . PLUGINS_TABLE_PREFIX . 'svn_access` WHERE user = %s',
-					$user->user_login
-				) );
-				if ( $plugin_committer ) {
-					return true;
-				}
-
-				// Theme Authors, don't _need_ SVN access.
-				$theme_author = (bool) $wpdb->get_var( $wpdb->prepare(
-					'SELECT 1 FROM `wporg_' . WPORG_THEME_DIRECTORY_BLOGID . '_posts` ' .
-					'WHERE post_type = "repopackage" AND post_status = "publish" AND post_author = %d',
-					$user->ID
-				) );
-				if ( $theme_author ) {
+				// Plugin committers & Theme authors have this user meta set.
+				if ( $user->has_plugins || $user->has_themes ) {
 					return true;
 				}
 
