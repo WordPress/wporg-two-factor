@@ -41,6 +41,19 @@ export default function AccountStatus() {
 				${ backupCodesEnabled ? '' : 'not' }
 				verified your backup codes for two-factor authentication.`;
 
+	let svnBodyText = '';
+	if ( svnPasswordRequired || svnPasswordSet ) {
+		if ( svnPasswordRequired ) {
+			svnBodyText = svnPasswordSet
+				? 'You have an active SVN password set. You can request a new one at any time.'
+				: 'You have not set up an SVN password. This is required for SVN access to WordPress.org.';
+		} else {
+			svnBodyText = svnPasswordSet
+				? 'You have an active SVN password set. You can request a new one at any time.'
+				: 'You do not currently require WordPress.org SVN access.';
+		}
+	}
+
 	return (
 		<div className={ 'wporg-2fa__account-status' }>
 			<SettingStatusCard
@@ -100,15 +113,7 @@ export default function AccountStatus() {
 						! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet
 					}
 					headerText="SVN Password"
-					bodyText={
-						svnPasswordRequired
-							? svnPasswordSet
-								? 'You have an active SVN password set. You can request a new one at any time.'
-								: 'You have not set up an SVN password. This is required for SVN access to WordPress.org.'
-							: svnPasswordSet
-							? 'You have an active SVN password set. You can request a new one at any time.'
-							: 'You do not currently require WordPress.org SVN access.'
-					}
+					bodyText={ svnBodyText }
 				/>
 			) : (
 				''

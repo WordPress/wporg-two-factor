@@ -52,6 +52,8 @@ export default function SVNPassword() {
 
 	// TODO: This also requires 2FA verification prior to changing password.
 
+	const regenerateButtonText = svnPassword ? 'Regenerate password' : 'Request password';
+
 	return (
 		<>
 			<p>
@@ -83,10 +85,8 @@ export default function SVNPassword() {
 							<Spinner />
 							Requesting..
 						</>
-					) : svnPassword ? (
-						'Regenerate password'
 					) : (
-						'Request password'
+						regenerateButtonText
 					) }
 				</Button>
 			</p>
