@@ -17,9 +17,7 @@ import { GlobalContext } from '../script';
  */
 export default function SVNPassword() {
 	const {
-		user: {
-			userRecord,
-		},
+		user: { userRecord },
 		setGlobalNotice,
 		setError,
 	} = useContext( GlobalContext );
@@ -40,7 +38,7 @@ export default function SVNPassword() {
 				},
 			} );
 
-			setGeneratedPassword( response['svn_password'] );
+			setGeneratedPassword( response.svn_password );
 			setGenerating( false );
 
 			await refreshRecord( userRecord );
@@ -58,7 +56,9 @@ export default function SVNPassword() {
 		}
 	}, [ generatedPassword ] );
 
-	const regenerateButtonText = userRecord.record.svn_password ? 'Regenerate password' : 'Request password';
+	const regenerateButtonText = userRecord.record.svn_password
+		? 'Regenerate password'
+		: 'Request password';
 
 	return (
 		<>
@@ -72,9 +72,14 @@ export default function SVNPassword() {
 			</p>
 
 			{ generatedPassword && (
-				<Notice status="success" isDismissible={ true } onRemove={ () => setGeneratedPassword( false ) }>
+				<Notice
+					status="success"
+					isDismissible={ true }
+					onRemove={ () => setGeneratedPassword( false ) }
+				>
 					<Icon icon={ check } />
-					Your new SVN Password: <code>{ isGenerating ? <Spinner /> : generatedPassword }</code>
+					Your new SVN Password:{ ' ' }
+					<code>{ isGenerating ? <Spinner /> : generatedPassword }</code>
 					<Icon
 						icon={ copySmall }
 						onClick={ handleCopy }
