@@ -132,6 +132,33 @@ function register_rest_routes() : void {
 			),
 		),
 	);
+
+	register_rest_route(
+		'wporg-two-factor/1.0',
+		'/generate-svn-password',
+		array(
+			'methods'  => WP_REST_Server::EDITABLE,
+			'callback' => function( $request ) {
+				$user = get_userdata( $request['user_id'] );
+				return [
+					'svn_password' => set_svn_password( $user->ID )
+				];
+			},
+			'permission_callback' => function( $request ) {
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( $request['user_id'] );
+			},
+			'args' => array(
+				'user_id' => array(
+					'required' => true,
+					'type'     => 'number',
+					'sanitize_callback' => 'absint',
+					'validate_callback' => function( $user_id ) {
+						return get_userdata( $user_id ) instanceof WP_User;
+					},
+				),
+			),
+		),
+	);
 }
 
 /**
@@ -355,33 +382,15 @@ function register_user_fields(): void {
 		]
 	);
 
-	$regenerated_password = '';
 	register_rest_field(
 		'user',
 		'svn_password',
 		[
-			'get_callback' => function( $user ) use( &$regenerated_password ) {
-				global $wpdb;
-
-				// If the password was just generated, return it in response.
-				if ( $regenerated_password ) {
-					return $regenerated_password;
-				}
-
+			'get_callback' => function( $user ) {
 				return ( 'svn' === has_svn_password( $user['id'] ) );
 			},
-			'update_callback' => function( $value, $user ) use( &$regenerated_password ) {
-				global $wpdb;
-				if ( 'regenerate' !== $value ) {
-					return false;
-				}
-
-				$regenerated_password = set_svn_password( $user->ID );
-
-				return (bool) $regenerated_password;
-			},
 			'schema' => [
-				'type'    => [ 'boolean', 'string' ],
+				'type'    => [ 'boolean' ],
 				'context' => [ 'edit' ],
 			]
 		]

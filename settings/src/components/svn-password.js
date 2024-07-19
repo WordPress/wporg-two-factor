@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, Spinner } from '@wordpress/components';
-import { useCallback, useContext } from '@wordpress/element';
+import { useCallback, useContext, useState } from '@wordpress/element';
 import { Icon, check, copySmall } from '@wordpress/icons';
+import { refreshRecord } from '../utilities/common';
 
 /**
  * Internal dependencies
@@ -16,43 +18,47 @@ import { GlobalContext } from '../script';
 export default function SVNPassword() {
 	const {
 		user: {
-			userRecord: {
-				record: { svn_password: svnPassword },
-				edit,
-				save,
-			},
-			isSaving,
+			userRecord,
 		},
 		setGlobalNotice,
+		setError,
 	} = useContext( GlobalContext );
 
+	const [ isGenerating, setGenerating ] = useState( false );
+	const [ generatedPassword, setGeneratedPassword ] = useState( '' );
+
+	// Generate a new SVN Password.
 	const handleGenerate = useCallback( async () => {
 		try {
-			await edit( { svn_password: 'regenerate' } );
-			await save();
-		} catch ( error ) {
-			setGlobalNotice( error.message );
+			setGenerating( true );
+
+			const response = await apiFetch( {
+				path: '/wporg-two-factor/1.0/generate-svn-password',
+				method: 'POST',
+				data: {
+					user_id: userRecord.record.id,
+				},
+			} );
+
+			setGeneratedPassword( response['svn_password'] );
+			setGenerating( false );
+
+			await refreshRecord( userRecord );
+		} catch ( apiFetchError ) {
+			setError( apiFetchError );
 		}
-	}, [ edit, save ] );
+	} );
 
 	const handleCopy = useCallback( () => {
 		try {
-			navigator.clipboard.writeText( svnPassword );
+			navigator.clipboard.writeText( generatedPassword );
 			setGlobalNotice( 'Copied to clipboard' );
 		} catch ( error ) {
 			setGlobalNotice( "Couldn't write to clipboard" );
 		}
-	}, [ svnPassword ] );
+	}, [ generatedPassword ] );
 
-	// TODO: Trigger this on navigate away.
-	const hidePassword = useCallback( () => {
-		// TODO use record[ 'svn_password' ] = true such that it doesn't attempt to save it.
-		edit( { svn_password: true } );
-	}, [] );
-
-	// TODO: This also requires 2FA verification prior to changing password.
-
-	const regenerateButtonText = svnPassword ? 'Regenerate password' : 'Request password';
+	const regenerateButtonText = userRecord.record.svn_password ? 'Regenerate password' : 'Request password';
 
 	return (
 		<>
@@ -61,14 +67,14 @@ export default function SVNPassword() {
 				for a plugin or theme.
 			</p>
 			<p>
-				If you forget your SVN password, you can generate a new one here. Never share your
-				SVN password with anyone.
+				If you forget your SVN password, you can generate a new one here. All previous SVN
+				passwords will be invalidated.
 			</p>
 
-			{ svnPassword && 'string' === typeof svnPassword && (
-				<Notice status="success" isDismissible={ true } onRemove={ hidePassword }>
+			{ generatedPassword && (
+				<Notice status="success" isDismissible={ true } onRemove={ () => setGeneratedPassword( false ) }>
 					<Icon icon={ check } />
-					New Password generated: <code>{ svnPassword }</code>
+					Your new SVN Password: <code>{ isGenerating ? <Spinner /> : generatedPassword }</code>
 					<Icon
 						icon={ copySmall }
 						onClick={ handleCopy }
@@ -79,8 +85,8 @@ export default function SVNPassword() {
 			) }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button variant="primary" onClick={ handleGenerate } disabled={ isSaving }>
-					{ isSaving ? (
+				<Button variant="primary" onClick={ handleGenerate } disabled={ isGenerating }>
+					{ isGenerating ? (
 						<>
 							<Spinner />
 							Requesting..
