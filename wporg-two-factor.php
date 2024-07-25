@@ -272,6 +272,7 @@ function user_should_2fa( $user ) : bool {
 		return true;
 	}
 
+	/*
 	// If a user ... they should have 2FA enabled.
 	if (
 		// Is (or was) a plugin committer
@@ -283,6 +284,7 @@ function user_should_2fa( $user ) : bool {
 	) {
 		return true;
 	}
+ 	*/
 
 	return false;
 }
