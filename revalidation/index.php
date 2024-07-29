@@ -75,10 +75,11 @@ function enqueue_assets() {
 	wp_enqueue_script( 'wporg-2fa-revalidation', plugins_url( 'script.js', __FILE__ ), [], filemtime( __DIR__ . '/script.js' ), true );
 
 	wp_localize_script( 'wporg-2fa-revalidation', 'wporgTwoFactorRevalidation', [
-		'l10n' => [
-			'title' => __( 'Two Factor Authentication', 'wporg' ),
+		'cookieName' => COOKIE_NAME,
+		'l10n'       => [
+			'title' => __( 'Two-Factor Authentication', 'wporg' ),
 		],
-		'status' => get_revalidation_status()
+		'url'        => get_revalidate_url(),
 	] );
 }
 
