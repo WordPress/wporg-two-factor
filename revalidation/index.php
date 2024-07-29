@@ -118,3 +118,24 @@ function clear_cookie() {
 
 	setcookie( COOKIE_NAME, '', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
 }
+
+/**
+ * Temporarily abuse a filter to patch in an action.
+ *
+ * This filter is run just before the login form is output.
+ *
+ * @see https://github.com/WordPress/two-factor/pull/620
+ */
+add_filter( 'login_title', static function( $title ) {
+	if (
+		is_user_logged_in() &&
+		isset( $_REQUEST['action'] ) &&
+		'revalidate_2fa' == $_REQUEST['action'] &&
+		! get_revalidation_status()['needs_revalidate'] &&
+		! did_action( 'two_factor_user_revalidated' )
+	) {
+		do_action( 'two_factor_user_revalidated', wp_get_current_user(), false );
+	}
+
+	return $title;
+} );
