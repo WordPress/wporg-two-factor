@@ -2,6 +2,8 @@
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
 
+const COOKIE_NAME = 'wporg_2fa_validation';
+
 defined( 'WPINC' ) || die();
 
 /**
@@ -78,4 +80,41 @@ function enqueue_assets() {
 		],
 		'status' => get_revalidation_status()
 	] );
+}
+
+add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\set_cookie' );
+add_action( 'two_factor_user_revalidated', __NAMESPACE__ . '\set_cookie' );
+function set_cookie() {
+	if ( ! apply_filters( 'send_auth_cookies', true, 0, 0, 0, '', '' ) ) {
+		return;
+	}
+
+	$status                  = get_revalidation_status();
+	$revalidation_expires_at = $status['expires_save'];
+	$last_validated          = $status['last_validated'];
+
+	/*
+	 * Set a cookie to let JS know when the user was last validated.
+	 *
+	 * The value is "wporg_2fa_validated=TIMESTAMP", where TIMESTAMP is the last time the user was validated.
+	 * The cookie will expire a minute before the server would cease to accept the save action.
+	 */
+	setcookie(
+		COOKIE_NAME,
+		$last_validated,
+		$revalidation_expires_at - MINUTE_IN_SECONDS, // The cookie will cease to exist to JS at this time.
+		COOKIEPATH,
+		COOKIE_DOMAIN,
+		is_ssl(),
+		false // NOT HTTP only, this needs to be JS accessible.
+	);
+}
+
+add_action( 'clear_auth_cookie', __NAMESPACE__ . '\clear_cookie' );
+function clear_cookie() {
+	if ( ! apply_filters( 'send_auth_cookies', true, 0, 0, 0, '', '' ) ) {
+		return;
+	}
+
+	setcookie( COOKIE_NAME, '', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
 }
