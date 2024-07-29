@@ -10,7 +10,11 @@
 		return ! sudoCookieValue;
 	};
 
-	const modalTrigger = function(e, revalidateUrl = false) {
+	const urlLooksLikeRevalidationURL = function( url ) {
+		return url.includes( 'wp-login.php' ) && url.includes( 'action=revalidate_2fa' );
+	}
+
+	const modalTrigger = function(e) {
 		e.preventDefault();
 		lastTarget = e.target;
 
@@ -23,8 +27,11 @@
 		revalidateModal.className = 'wporg-2fa-revalidate-modal';
 		revalidateModal.innerHTML = '<h1>' + settings.l10n.title + '</h1>';
 
-		const iframe = document.createElement( 'iframe' );
-		iframe.src = ( revalidateUrl || e.target.href ) + '&interim-login=1';
+		const iframe    = document.createElement( 'iframe' );
+		const linkHref  = e.currentTarget.href || e.target.href;
+		const iframeSrc = urlLooksLikeRevalidationURL( linkHref ) ? linkHref : settings.url;
+
+		iframe.src = iframeSrc + '&interim-login=1';
 
 		const closeButton = document.createElement( 'button' );
 		closeButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
@@ -40,7 +47,7 @@
 		revalidateModal.showModal();
 	};
 
-	const maybeSkipRevalidateURL = function( element ) {
+	const maybeRemoveRevalidateURL = function( element ) {
 		// If we're on a element within a link, run back up the DOM to the proper parent.
 		while ( element && element.tagName !== 'A' && element.parentElement ) {
 			element = element.parentElement;
@@ -50,7 +57,7 @@
 		if (
 			! element ||
 			! element.href ||
-			! element.href.includes( 'action=revalidate_2fa' ) ||
+			! urlLooksLikeRevalidationURL( element.href ) ||
 			! element.href.includes( 'redirect_to=' )
 		) {
 			return false;
@@ -72,20 +79,15 @@
 	const maybeRevalidateOnLinkNavigate = function( e ) {
 		// Check to see if revalidation is required, otherwise we're in Sudo mode.
 		if ( ! revalidateRequired() ) {
-			maybeSkipRevalidateURL( e.currentTarget );
+			maybeRemoveRevalidateURL( e.currentTarget );
 			return;
 		}
 
-		// If we're here, we need to revalidate the session.
-
-		// Trigger the modal
-		modalTrigger( e, settings.url );
+		// If we're here, we need to revalidate the session, trigger the modal.
+		modalTrigger( e );
 
 		// Wait for the revalidation complete event, and re-trigger this navigation.
 		e.target.addEventListener( 'reValidationComplete', function() {
-			// If the target url is a revalidation url, and contains a redirect to, swap over to that..
-			maybeSkipRevalidateURL( e.target );
-
 			e.target.dispatchEvent( e ); // Just throw the exact same event again.
 		} );
 	};
@@ -95,14 +97,12 @@
 		el.addEventListener( 'click', modalTrigger );
 	} );
 
-	let revalidationRequired = revalidateRequired();
-
 	// Attach event listeners to any links that require a valid 2FA session.
 	document.querySelectorAll( 'a[data-2fa-required]' ).forEach( function( el ) {
 		el.addEventListener( 'click', maybeRevalidateOnLinkNavigate );
 
 		// If we need to revalidate, attach a class to said elements.
-		if ( revalidationRequired ) {
+		if ( revalidateRequired() ) {
 			el.classList.add( 'revalidate-required' );
 		}
 	} );
@@ -120,6 +120,11 @@
 		document.querySelectorAll( '.revalidate-required' ).forEach( function( el ) {
 			el.classList.remove( 'revalidate-required' );
 		} );
+
+		// Maybe remove the revalidate URL from the last target.
+		if ( lastTarget ) {
+			maybeRemoveRevalidateURL( lastTarget );
+		}
 
 		// Finally, notify others.
 		( lastTarget || window ).dispatchEvent( new Event( 'reValidationComplete', { bubbles: true } ) );
