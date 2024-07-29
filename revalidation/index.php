@@ -72,7 +72,7 @@ function get_js_revalidation_url( $redirect_to = '' ) {
  */
 function enqueue_assets() {
 	wp_enqueue_style( 'wporg-2fa-revalidation', plugins_url( 'style.css', __FILE__ ), [], filemtime( __DIR__ . '/style.css' ) );
-	wp_enqueue_script( 'wporg-2fa-revalidation', plugins_url( 'style.js', __FILE__ ), [], filemtime( __DIR__ . '/style.js' ) );
+	wp_enqueue_script( 'wporg-2fa-revalidation', plugins_url( 'script.js', __FILE__ ), [], filemtime( __DIR__ . '/script.js' ), true );
 
 	wp_localize_script( 'wporg-2fa-revalidation', 'wporgTwoFactorRevalidation', [
 		'l10n' => [
