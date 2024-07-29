@@ -15,13 +15,17 @@ defined( 'WPINC' ) || die();
  */
 function get_revalidation_status() {
 	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
-	$timeout        = apply_filters( 'two_factor_revalidate_time', 15 * MINUTE_IN_SECONDS, get_current_user_id(), '' );
+	$timeout        = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'display' );
+	$save_timeout   = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'save' );
 	$expires_at     = $last_validated + $timeout;
+	$expires_save   = $last_validated + ( 2 * $save_timeout );
 
 	return [
 		'last_validated'   => $last_validated,
 		'expires_at'       => $expires_at,
+		'expires_save'     => $expires_save,
 		'needs_revalidate' => ( ! $last_validated || $expires_at < time() ),
+		'can_save'         => ( $expires_save > time() ),
 	];
 }
 
