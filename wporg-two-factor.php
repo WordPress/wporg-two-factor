@@ -433,8 +433,9 @@ function two_factor_user_authenticated( $user_id, $provider ) {
 	}
 
 	$provider = str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider->get_key() );
+	$provider = str_replace( '_', ' ', $provider );
 
-	bump_stats_extra( 'wporg-two-factor', 'auth-' . $provider );
+	bump_stats_extra( 'two-factor-auth', $provider );
 }
 
 /*
