@@ -18,9 +18,9 @@ defined( 'WPINC' ) || die();
 function get_revalidation_status() {
 	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
 	$timeout        = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'display' );
-	$save_timeout   = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'save' );
+	$save_timeout   = 2 * apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'save' );
 	$expires_at     = $last_validated + $timeout;
-	$expires_save   = $last_validated + ( 2 * $save_timeout );
+	$expires_save   = $last_validated + $save_timeout;
 
 	return [
 		'last_validated'   => $last_validated,
@@ -92,17 +92,16 @@ function set_cookie() {
 
 	$status                  = get_revalidation_status();
 	$revalidation_expires_at = $status['expires_save'];
-	$last_validated          = $status['last_validated'];
 
 	/*
-	 * Set a cookie to let JS know when the user was last validated.
+	 * Set a cookie to let JS know when the validation expires.
 	 *
-	 * The value is "wporg_2fa_validated=TIMESTAMP", where TIMESTAMP is the last time the user was validated.
+	 * The value is "wporg_2fa_validated=TIMESTAMP", where TIMESTAMP is when the validation will expire.
 	 * The cookie will expire a minute before the server would cease to accept the save action.
 	 */
 	setcookie(
 		COOKIE_NAME,
-		$last_validated,
+		$revalidation_expires_at,
 		$revalidation_expires_at - MINUTE_IN_SECONDS, // The cookie will cease to exist to JS at this time.
 		COOKIEPATH,
 		COOKIE_DOMAIN,
