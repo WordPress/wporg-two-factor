@@ -63,8 +63,8 @@ export default function SVNPassword() {
 				for a plugin or theme.
 			</p>
 			<p>
-				If you forget your SVN password, you can generate a new one here. All previous SVN
-				passwords will be invalidated.
+				If you lose your SVN password, you can generate a new one here. All previous SVN
+				passwords will be invalidated immediately.
 			</p>
 
 			{ generatedPassword && (
@@ -93,9 +93,7 @@ export default function SVNPassword() {
 							Generating..
 						</>
 					) : (
-						<>
-							Generate password
-						</>
+						<>Generate password</>
 					) }
 				</Button>
 			</p>
