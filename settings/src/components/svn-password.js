@@ -93,7 +93,9 @@ export default function SVNPassword() {
 							Generating..
 						</>
 					) : (
-						Generate password
+						<>
+							Generate password
+						</>
 					) }
 				</Button>
 			</p>
