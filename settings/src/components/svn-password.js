@@ -56,10 +56,6 @@ export default function SVNPassword() {
 		}
 	}, [ generatedPassword ] );
 
-	const regenerateButtonText = userRecord.record.svn_password
-		? 'Regenerate password'
-		: 'Request password';
-
 	return (
 		<>
 			<p>
@@ -94,10 +90,10 @@ export default function SVNPassword() {
 					{ isGenerating ? (
 						<>
 							<Spinner />
-							Requesting..
+							Generating..
 						</>
 					) : (
-						regenerateButtonText
+						Generate password
 					) }
 				</Button>
 			</p>
