@@ -59,7 +59,7 @@ export default function SVNPassword() {
 	return (
 		<>
 			<p>
-				Your SVN password can be used to commit to WordPress.org SVN repositories, such as
+				Your SVN password is required to commit to WordPress.org SVN repositories, such as
 				for a plugin or theme.
 			</p>
 			<p>
