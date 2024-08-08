@@ -90,7 +90,7 @@ export default function FirstTime() {
 					<h3>Two-factor authentication setup is now complete! 🎉</h3>
 					<p>
 						To ensure the highest level of security for your account, please remember to
-						keep your authentication methods up to date. We recommend configuring
+						keep your authentication methods up-to-date. We recommend configuring
 						multiple authentication methods to guarantee you always have access to your
 						account.
 					</p>
