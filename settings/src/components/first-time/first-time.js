@@ -18,6 +18,20 @@ import WordPressLogo from './wordpress-logo';
 import { GlobalContext } from '../../script';
 
 /**
+ * Check if the URL is valid. Make sure it stays on wordpress.org.
+ * @param  url
+ * @return {boolean} Whether it's a valid URL.
+ */
+const isValidUrl = ( url ) => {
+	try {
+		const { hostname } = new URL( url );
+		return hostname.endsWith( 'wordpress.org' );
+	} catch ( exception ) {
+		return false;
+	}
+};
+
+/**
  * Render the correct component based on the URL.
  *
  */
@@ -95,7 +109,23 @@ export default function FirstTime() {
 						account.
 					</p>
 					<div className="wporg-2fa__submit-actions">
-						<Button isPrimary>Continue</Button>
+						<Button
+							onClick={ () => {
+								const redirectTo = new URLSearchParams(
+									window.location.search
+								).get( 'redirect_to' );
+
+								if ( redirectTo && isValidUrl( redirectTo ) ) {
+									window.location.href = redirectTo;
+								} else {
+									window.location.href =
+										'//profiles.wordpress.org/me/profile/edit/group/1';
+								}
+							} }
+							isPrimary
+						>
+							Continue
+						</Button>
 					</div>
 				</div>
 			),
