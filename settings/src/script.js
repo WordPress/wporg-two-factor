@@ -54,7 +54,6 @@ function Main( { userId } ) {
 		userRecord: { record, edit, hasEdits, hasResolved },
 		hasPrimaryProvider,
 	} = user;
-
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	const [ error, setError ] = useState( '' );
 	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
