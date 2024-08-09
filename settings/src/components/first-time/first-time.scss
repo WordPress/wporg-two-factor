@@ -42,18 +42,18 @@
     }
 
     .wporg-2fa__first-time-default {
-        padding: 16px 0 0;
         display: flex;
         flex-direction: column;
         gap: 24px;
     }
 
     .wporg-2fa__first-time-default-item {
-        margin: 6px;
+        margin: 6px !important;
         position: relative;
         display: flex;
         gap: 10px;
         align-items: flex-start;
+        cursor: pointer;
 
         span {
             font-weight: 600;
@@ -64,7 +64,7 @@
             position: relative;
             z-index: 1;
             margin-top: 4px;
-            margin-left: 4px;
+            margin-left: 6px;
         }
 
         input:checked + div::before {

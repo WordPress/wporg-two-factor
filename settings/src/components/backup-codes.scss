@@ -13,6 +13,12 @@
 			margin: 0;
 		}
 
+		@media (max-width: 600px) {
+			ol {
+				column-count: 1;
+			}
+		}
+
 		li::marker {
 			/* todo: a11y issues w/ contrast here? mockup calls for this to be lighter than the backup code
 			     -- presumably so that users don't mistakenly think it's part of the code --
