@@ -54,6 +54,7 @@ function Main( { userId } ) {
 		userRecord: { record, edit, hasEdits, hasResolved },
 		hasPrimaryProvider,
 	} = user;
+
 	const [ globalNotice, setGlobalNotice ] = useState( '' );
 	const [ error, setError ] = useState( '' );
 	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
@@ -146,7 +147,8 @@ function Main( { userId } ) {
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 
-			{ new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
+			{ ! hasPrimaryProvider &&
+			new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
 				<FirstTime />
 			) : (
 				<Settings />
