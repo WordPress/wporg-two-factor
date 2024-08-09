@@ -16,7 +16,6 @@ import ScreenLink from './screen-link';
  * @param props.title
  * @param props.canNavigate
  */
-// eslint-disable-next-line no-unused-vars
 const ScreenNavigation = ( { screen, children, title = '', canNavigate = true } ) => (
 	<Card>
 		<CardHeader className="wporg-2fa__navigation" size="xSmall">
