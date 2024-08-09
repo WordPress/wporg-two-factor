@@ -147,8 +147,7 @@ function Main( { userId } ) {
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 
-			{ ! hasPrimaryProvider &&
-			new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
+			{ new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
 				<FirstTime />
 			) : (
 				<Settings />
