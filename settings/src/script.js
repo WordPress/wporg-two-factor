@@ -129,7 +129,7 @@ function Main( { userId } ) {
 		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000;
 
 	const shouldRevalidate = 'revalidation_required' === error.code || isRevalidationExpired;
-debugger;
+
 	return (
 		<GlobalContext.Provider
 			value={ {

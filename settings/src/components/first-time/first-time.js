@@ -19,7 +19,6 @@ import { GlobalContext } from '../../script';
 
 /**
  * Check if the URL is valid. Make sure it stays on wordpress.org.
- *
  * @param  url
  * @return {boolean} Whether it's a valid URL.
  */
@@ -34,6 +33,7 @@ const isValidUrl = ( url ) => {
 
 /**
  * Render the correct component based on the URL.
+ *
  */
 export default function FirstTime() {
 	const { navigateToScreen, screen } = useContext( GlobalContext );
