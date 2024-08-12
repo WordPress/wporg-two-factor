@@ -28,7 +28,8 @@
         }
 
         > svg {
-            margin-bottom: 16px;
+            margin-bottom: 32px;
+            width: 250px;
         }
 
         // Preven cards from shrinking.
@@ -38,6 +39,7 @@
 
         .components-card__body {
             padding: 32px;
+            padding-top: 16px;
         }
     }
 

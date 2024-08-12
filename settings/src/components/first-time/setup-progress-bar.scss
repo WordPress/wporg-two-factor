@@ -1,7 +1,7 @@
 .wporg-2fa__progress-bar,
 #bbpress-forums .wporg-2fa__progress-bar,
 #bbpress-forums.bbpress-wrapper .wporg-2fa__progress-bar {
-	--color-enabled: #1e1e1e;
+	--color-enabled: var(--wp--preset--color--blueberry-1, #3858e9);
 	--color-disabled: #{$gray-400};
 	--color-disabled-text: #{$gray-700}; // Darker than `color-disabled` to meet a11y contrast standards.
 
@@ -31,7 +31,7 @@
 		}
 
 		li.is-enabled {
-			color: var(--color-enabled);
+			color: var(--wp--preset--color--charcoal-1 #1e1e1e);
 
 			svg {
 				background-color: var(--color-enabled);
@@ -54,8 +54,8 @@
 			color: var(--color-disabled-text);
 
 			svg {
-				background-color: var(--wp--preset--color--blueberry-1, #3858e9);
-				border-color: var(--wp--preset--color--blueberry-1, #3858e9);
+				background-color: var(--color-enabled);
+				border-color: var(--color-enabled);
 				fill: white;
 			}
 		}
@@ -64,6 +64,8 @@
 
 .wporg-2fa__progress-bar {
 	margin: 0;
+	width: 100%;
+	max-width: 350px;
 }
 
 .wporg-2fa__progress-bar .wporg-2fa__setup-step-separator::before {
