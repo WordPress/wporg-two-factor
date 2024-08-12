@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext } from '@wordpress/element';
+import { useEffect, useContext, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { lock, edit, reusableBlock } from '@wordpress/icons';
 
@@ -36,6 +36,7 @@ const isValidUrl = ( url ) => {
  * Render the correct component based on the URL.
  */
 export default function FirstTime() {
+	const modalRef = useRef( null );
 	const { navigateToScreen, screen } = useContext( GlobalContext );
 	const steps = [
 		{
@@ -134,12 +135,47 @@ export default function FirstTime() {
 
 	// Lock the scroll when the modal is open.
 	useEffect( () => {
+		const modal = modalRef.current;
+		const focusableElements = modal.querySelectorAll(
+			'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+		);
+		const firstFocusableElement = focusableElements[ 0 ];
+		const lastFocusableElement = focusableElements[ focusableElements.length - 1 ];
+
+		const trapFocus = ( event ) => {
+			const isTabPressed = event.key === 'Tab' || event.keyCode === 9;
+			if ( ! isTabPressed ) {
+				return;
+			}
+
+			if ( event.shiftKey ) {
+				// eslint-disable-next-line @wordpress/no-global-active-element
+				if ( document.activeElement === firstFocusableElement ) {
+					lastFocusableElement.focus();
+					event.preventDefault();
+				}
+				return;
+			}
+
+			// eslint-disable-next-line @wordpress/no-global-active-element
+			if ( document.activeElement === lastFocusableElement ) {
+				firstFocusableElement.focus();
+				event.preventDefault();
+			}
+		};
+
+		modal.addEventListener( 'keydown', trapFocus );
+
 		document.querySelector( 'html' ).style.overflow = 'hidden';
 
+		// Focus the first focusable element in the modal when it opens
+		firstFocusableElement.focus();
+
 		return () => {
+			modal.removeEventListener( 'keydown', trapFocus );
 			document.querySelector( 'html' ).style.overflow = 'initial';
 		};
-	}, [] );
+	}, [ screen ] );
 
 	const currentStepIndex = screens[ screen ].stepIndex;
 	let currentScreenComponent = null;
@@ -164,7 +200,7 @@ export default function FirstTime() {
 	}
 
 	return (
-		<div className="wporg-2fa__first-time">
+		<div className="wporg-2fa__first-time" ref={ modalRef }>
 			<div className="wporg-2fa__first-time__inner">
 				<div className="wporg-2fa__first-time__inner-content">
 					<WordPressLogo />
