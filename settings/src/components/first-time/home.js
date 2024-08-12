@@ -34,7 +34,7 @@ export default function Select( { onSelect } ) {
 						onChange={ handleOptionChange }
 					/>
 					<div>
-						<span>Setup One Time Password</span>
+						<span>Setup one time password</span>
 						<p>Use an application to get two-factor authentication codes.</p>
 					</div>
 				</label>
@@ -48,7 +48,7 @@ export default function Select( { onSelect } ) {
 						onChange={ handleOptionChange }
 					/>
 					<div>
-						<span>Setup Security Key</span>
+						<span>Setup security key</span>
 						<p>Use biometrics, digital cryptography, or hardware keys.</p>
 					</div>
 				</label>
