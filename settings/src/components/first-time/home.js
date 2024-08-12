@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import { Button, Flex } from '@wordpress/components';
 
 export default function Home( { onSelect } ) {
-	const [ selectedOption, setSelectedOption ] = useState( 'totp' );
+	const [ selectedOption, setSelectedOption ] = useState( 'webauthn' );
 
 	const handleOptionChange = ( event ) => {
 		setSelectedOption( event.target.value );
