@@ -46,11 +46,12 @@
     .wporg-2fa__first-time-default {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 18px;
+        padding-top: 8px;
     }
 
     .wporg-2fa__first-time-default-item {
-        margin: 6px !important;
+        margin: 0;
         position: relative;
         display: flex;
         gap: 10px;
@@ -67,18 +68,6 @@
             z-index: 1;
             margin-top: 4px;
             margin-left: 6px;
-        }
-
-        input:checked + div::before {
-            position: absolute;
-            content: '';
-            border: 1px solid var(--wp--preset--color--charcoal-3, #40464d);
-            border-radius: 4px;
-            height: 140%;
-            width: 102%;
-            left: -1%;
-            top: -20%;
-            z-index: 0;
         }
 
         > div {
