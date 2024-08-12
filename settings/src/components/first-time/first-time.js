@@ -120,7 +120,7 @@ export default function FirstTime() {
 									window.location.href = redirectTo;
 								} else {
 									window.location.href =
-										'//profiles.wordpress.org/me/profile/edit/group/1';
+										'//profiles.wordpress.org/me/profile/edit/group/3';
 								}
 							} }
 							isPrimary
