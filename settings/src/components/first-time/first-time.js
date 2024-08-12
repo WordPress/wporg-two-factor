@@ -188,14 +188,16 @@ export default function FirstTime() {
 		);
 	} else {
 		currentScreenComponent = (
-			<ScreenNavigation
-				screen={ screen }
-				title={ steps[ currentStepIndex ].title }
-				canNavigate={ currentStepIndex !== 0 }
-			>
+			<>
 				<SetupProgressBar currentStepIndex={ currentStepIndex } steps={ steps } />
-				{ screens[ screen ].component }
-			</ScreenNavigation>
+				<ScreenNavigation
+					screen={ screen }
+					title={ steps[ currentStepIndex ].title }
+					canNavigate={ currentStepIndex !== 0 }
+				>
+					{ screens[ screen ].component }
+				</ScreenNavigation>
+			</>
 		);
 	}
 
