@@ -133,7 +133,7 @@ export default function FirstTime() {
 		},
 	};
 
-	// Lock the scroll when the modal is open.
+	// Lock the scroll when the modal is open, and trap tab navigation.
 	useEffect( () => {
 		const modal = modalRef.current;
 		const focusableElements = modal.querySelectorAll(
