@@ -26,7 +26,7 @@ export default function SetupProgressBar( { currentStepIndex, steps } ) {
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
 				{ steps.map( ( step, index ) => (
-					<li key={ step.id } className={ getStepClass( index ) }>
+					<li key={ step.title } className={ getStepClass( index ) }>
 						<Icon
 							width="16px"
 							height="16px"
