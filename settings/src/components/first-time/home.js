@@ -27,20 +27,6 @@ export default function Home( { onSelect } ) {
 				<label className="wporg-2fa__first-time-default-item">
 					<input
 						type="radio"
-						id="totp"
-						name="toggle"
-						value="totp"
-						checked={ selectedOption === 'totp' }
-						onChange={ handleOptionChange }
-					/>
-					<div>
-						<span>Setup one time password</span>
-						<p>Use an application to get two-factor authentication codes.</p>
-					</div>
-				</label>
-				<label className="wporg-2fa__first-time-default-item">
-					<input
-						type="radio"
 						id="webauthn"
 						name="toggle"
 						value="webauthn"
@@ -50,6 +36,20 @@ export default function Home( { onSelect } ) {
 					<div>
 						<span>Setup security key</span>
 						<p>Use biometrics, digital cryptography, or hardware keys.</p>
+					</div>
+				</label>
+				<label className="wporg-2fa__first-time-default-item">
+					<input
+						type="radio"
+						id="totp"
+						name="toggle"
+						value="totp"
+						checked={ selectedOption === 'totp' }
+						onChange={ handleOptionChange }
+					/>
+					<div>
+						<span>Setup one time password</span>
+						<p>Use an application to get two-factor authentication codes.</p>
 					</div>
 				</label>
 			</form>
