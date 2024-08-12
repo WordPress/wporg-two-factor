@@ -5,7 +5,7 @@
 import { useState } from '@wordpress/element';
 import { Button, Flex } from '@wordpress/components';
 
-export default function Select( { onSelect } ) {
+export default function Home( { onSelect } ) {
 	const [ selectedOption, setSelectedOption ] = useState( 'totp' );
 
 	const handleOptionChange = ( event ) => {
