@@ -14,6 +14,18 @@
 		display: flex;
 		justify-content: space-between;
 
+		.wporg-2fa__setup-count {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: white;
+			width: 32px;
+			height: 32px;
+			border-radius: 32px;
+			color: var(--color-disabled-text);
+			border: 1.5px solid var(--color-disabled);
+		}
+
 		li {
 			text-align: center;
 
@@ -23,40 +35,32 @@
 			}
 		}
 
-		svg {
-			box-sizing: content-box;
-			padding: 8px;
-			border: 1px solid;
-			border-radius: 30px;
-		}
-
 		li.is-enabled {
 			color: var(--wp--preset--color--charcoal-1 #1e1e1e);
 
-			svg {
+			.wporg-2fa__setup-count {
 				background-color: var(--color-enabled);
 				border-color: var(--color-enabled);
-				fill: $white;
+				color: white;
 			}
 		}
 
 		li.is-disabled {
 			color: var(--color-disabled-text);
 
-			svg {
+			.wporg-2fa__setup-count {
 				background-color: white;
 				border-color: var(--color-disabled);
-				fill: var(--color-disabled);
 			}
 		}
 
 		li.is-complete {
 			color: var(--color-disabled-text);
 
-			svg {
+			.wporg-2fa__setup-count {
 				background-color: var(--color-enabled);
 				border-color: var(--color-enabled);
-				fill: white;
+				color: white;
 			}
 		}
 	}
@@ -65,13 +69,13 @@
 .wporg-2fa__progress-bar {
 	margin: 0;
 	width: 100%;
-	max-width: 350px;
+	max-width: 300px;
 }
 
 .wporg-2fa__progress-bar .wporg-2fa__setup-step-separator::before {
 	content: '';
 	position: absolute;
-	height: 2px;
+	height: 1.5px;
 	width: var(--wporg-separator-width, 0%);
 	background:  var(--wp--preset--color--blueberry-1, #3858e9);
 	z-index: 1;
@@ -82,7 +86,7 @@
 	margin-left: 2%;
 	background: var(--color-disabled);
 	width: 96%;
-	height: 2px;
+	height: 1.5px;
 	top: 16px;
 	z-index: 0;
 }

@@ -2,12 +2,11 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { Icon, check } from '@wordpress/icons';
 
-export default function SetupProgressBar( { currentStepIndex, steps } ) {
+export default function SetupProgressBar( { currentStepIndex, stepCount } ) {
 	const getCompletionPercentage = useCallback(
-		() => ( currentStepIndex / ( steps.length - 1 ) ) * 100,
-		[ currentStepIndex, steps.length ]
+		() => ( currentStepIndex / ( stepCount - 1 ) ) * 100,
+		[ currentStepIndex, stepCount ]
 	);
 
 	const getStepClass = ( index ) => {
@@ -25,14 +24,9 @@ export default function SetupProgressBar( { currentStepIndex, steps } ) {
 	return (
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
-				{ steps.map( ( step, index ) => (
-					<li key={ step.title } className={ getStepClass( index ) }>
-						<Icon
-							width="16px"
-							height="16px"
-							icon={ currentStepIndex > index ? check : step.icon }
-						/>
-						<span className="wporg-2fa__setup-label">{ step.label }</span>
+				{ Array.from( { length: stepCount } ).map( ( step, index ) => (
+					<li key={ index } className={ getStepClass( index ) }>
+						<span className="wporg-2fa__setup-count">{ index + 1 }</span>
 					</li>
 				) ) }
 			</ul>

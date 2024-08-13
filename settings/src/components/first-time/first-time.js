@@ -3,7 +3,6 @@
  */
 import { useEffect, useContext, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { lock, edit, reusableBlock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,28 +37,12 @@ const isValidUrl = ( url ) => {
 export default function FirstTime() {
 	const modalRef = useRef( null );
 	const { navigateToScreen, screen } = useContext( GlobalContext );
-	const steps = [
-		{
-			title: 'Choose an authentication method',
-			label: 'Select',
-			icon: edit,
-		},
-		{
-			title: 'Set up your authentication method',
-			label: 'Configure',
-			icon: lock,
-		},
-		{
-			title: 'Print Backup Codes',
-			label: 'Print',
-			icon: reusableBlock,
-		},
-	];
 
 	// The index is the URL slug and the value is the React component.
 	const screens = {
 		home: {
 			stepIndex: 0,
+			title: 'Set up two-factor authentication',
 			component: (
 				<Home
 					onSelect={ ( val ) => {
@@ -70,6 +53,7 @@ export default function FirstTime() {
 		},
 		totp: {
 			stepIndex: 1,
+			title: 'Set up one-time password',
 			component: (
 				<TOTP
 					onSuccess={ () => {
@@ -80,6 +64,7 @@ export default function FirstTime() {
 		},
 		webauthn: {
 			stepIndex: 1,
+			title: 'Set up security key',
 			component: (
 				<WebAuthn
 					onKeyAdd={ () => {
@@ -90,6 +75,7 @@ export default function FirstTime() {
 		},
 		'backup-codes': {
 			stepIndex: 2,
+			title: 'Print backup codes',
 			component: (
 				<BackupCodes
 					onSuccess={ () => {
@@ -189,10 +175,10 @@ export default function FirstTime() {
 	} else {
 		currentScreenComponent = (
 			<>
-				<SetupProgressBar currentStepIndex={ currentStepIndex } steps={ steps } />
+				<SetupProgressBar currentStepIndex={ currentStepIndex } stepCount={ 3 } />
 				<ScreenNavigation
 					screen={ screen }
-					title={ steps[ currentStepIndex ].title }
+					title={ screens[ screen ].title }
 					canNavigate={ currentStepIndex !== 0 }
 				>
 					{ screens[ screen ].component }
