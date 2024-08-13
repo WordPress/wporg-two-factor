@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { useContext, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,7 +13,6 @@ import BackupCodes from '../backup-codes';
 import SetupProgressBar from './setup-progress-bar';
 import Home from './home';
 import Congratulations from './congratulations';
-import WordPressLogo from './wordpress-logo';
 import { GlobalContext } from '../../script';
 
 /**
@@ -75,50 +74,6 @@ export default function FirstTime() {
 		},
 	};
 
-	// Lock the scroll when the modal is open, and trap tab navigation.
-	useEffect( () => {
-		const modal = modalRef.current;
-		const focusableElements = modal.querySelectorAll(
-			'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
-		);
-		const firstFocusableElement = focusableElements[ 0 ];
-		const lastFocusableElement = focusableElements[ focusableElements.length - 1 ];
-
-		const trapFocus = ( event ) => {
-			const isTabPressed = event.key === 'Tab' || event.keyCode === 9;
-			if ( ! isTabPressed ) {
-				return;
-			}
-
-			if ( event.shiftKey ) {
-				// eslint-disable-next-line @wordpress/no-global-active-element
-				if ( document.activeElement === firstFocusableElement ) {
-					lastFocusableElement.focus();
-					event.preventDefault();
-				}
-				return;
-			}
-
-			// eslint-disable-next-line @wordpress/no-global-active-element
-			if ( document.activeElement === lastFocusableElement ) {
-				firstFocusableElement.focus();
-				event.preventDefault();
-			}
-		};
-
-		modal.addEventListener( 'keydown', trapFocus );
-
-		document.querySelector( 'html' ).style.overflow = 'hidden';
-
-		// Focus the first focusable element in the modal when it opens
-		firstFocusableElement.focus();
-
-		return () => {
-			modal.removeEventListener( 'keydown', trapFocus );
-			document.querySelector( 'html' ).style.overflow = 'initial';
-		};
-	}, [ screen ] );
-
 	const currentStepIndex = screens[ screen ].stepIndex;
 	let currentScreenComponent = null;
 
@@ -131,7 +86,10 @@ export default function FirstTime() {
 	} else {
 		currentScreenComponent = (
 			<>
-				<SetupProgressBar currentStepIndex={ currentStepIndex } stepCount={ 3 } />
+				<SetupProgressBar
+					currentStepIndex={ currentStepIndex }
+					steps={ [ 'Select', 'Configure', 'Print' ] }
+				/>
 				<ScreenNavigation
 					screen={ screen }
 					title={ screens[ screen ].title }
@@ -147,7 +105,6 @@ export default function FirstTime() {
 		<div className="wporg-2fa__first-time" ref={ modalRef }>
 			<div className="wporg-2fa__first-time__inner">
 				<div className="wporg-2fa__first-time__inner-content">
-					<WordPressLogo />
 					{ currentScreenComponent }
 				</div>
 			</div>

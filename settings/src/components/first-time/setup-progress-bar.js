@@ -3,10 +3,10 @@
  */
 import { useCallback } from '@wordpress/element';
 
-export default function SetupProgressBar( { currentStepIndex, stepCount } ) {
+export default function SetupProgressBar( { currentStepIndex, steps } ) {
 	const getCompletionPercentage = useCallback(
-		() => ( currentStepIndex / ( stepCount - 1 ) ) * 100,
-		[ currentStepIndex, stepCount ]
+		() => ( currentStepIndex / ( steps.length - 1 ) ) * 100,
+		[ currentStepIndex, steps ]
 	);
 
 	const getStepClass = ( index ) => {
@@ -24,9 +24,10 @@ export default function SetupProgressBar( { currentStepIndex, stepCount } ) {
 	return (
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
-				{ Array.from( { length: stepCount } ).map( ( step, index ) => (
-					<li key={ index } className={ getStepClass( index ) }>
+				{ steps.map( ( step, index ) => (
+					<li key={ step } className={ getStepClass( index ) }>
 						<span className="wporg-2fa__setup-count">{ index + 1 }</span>
+						<span className="wporg-2fa__setup-label">{ step }</span>
 					</li>
 				) ) }
 			</ul>

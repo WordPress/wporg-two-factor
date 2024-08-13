@@ -1,24 +1,16 @@
 .wporg-2fa__first-time {
-    position: fixed;
-    background: #fff;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
+    padding: 0 16px;
+    min-height: 600px;
 
     .wporg-2fa__first-time__inner {
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 100%;
-        height: 100%;
-        overflow: scroll;
     }
 
     .wporg-2fa__first-time__inner-content {
-        padding: 8vh 16px;
+        padding: 0 0 100px;
         display: flex;
         flex-direction: column;
         align-items: center;
