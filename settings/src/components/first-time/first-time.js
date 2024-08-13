@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useEffect, useContext, useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
