@@ -1,7 +1,10 @@
 .wporg-2fa__backup-codes {
+	> * {
+		margin-bottom: 1em;
+	}
+
 	.wporg-2fa__backup-codes-list {
 		background-color: $gray-300;
-		margin: 1em 0;
 		padding: 15px 20px;
 
 		ol {
@@ -17,10 +20,6 @@
 		    */
 			color: $gray-700;
 		}
-	}
-
-	.components-notice {
-		margin: 0 0 1em;
 	}
 }
 

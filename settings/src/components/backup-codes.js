@@ -134,6 +134,12 @@ function Setup( { setRegenerating } ) {
 				<>
 					<CodeList codes={ backupCodes } />
 
+					<ButtonGroup>
+						<CopyToClipboardButton codes={ backupCodes } />
+						<PrintButton />
+						<DownloadButton codes={ backupCodes } />
+					</ButtonGroup>
+
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
 						Without access to the one-time password app or a backup code, you will lose
@@ -159,12 +165,6 @@ function Setup( { setRegenerating } ) {
 				>
 					All Finished
 				</Button>
-
-				<ButtonGroup>
-					<CopyToClipboardButton codes={ backupCodes } />
-					<PrintButton />
-					<DownloadButton codes={ backupCodes } />
-				</ButtonGroup>
 			</Flex>
 		</>
 	);
