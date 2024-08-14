@@ -1,13 +1,8 @@
 .wporg-2fa__first-time {
     padding: 0 16px;
     min-height: 600px;
-
-    .wporg-2fa__first-time__inner {
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+    display: flex;
+    justify-content: center;
 
     .wporg-2fa__first-time__inner-content {
         padding: 0 0 100px;
@@ -19,11 +14,6 @@
             width: 600px;
         }
 
-        > svg {
-            margin-bottom: 32px;
-            width: 250px;
-        }
-
         // Preven cards from shrinking.
         .components-card {
             width: 100%;
@@ -33,6 +23,10 @@
             padding: 32px;
             padding-top: 16px;
         }
+    }
+
+    .wporg-2fa__first-time__inner-content.congratulations {
+        justify-content: center;
     }
 
     .wporg-2fa__first-time-default {

@@ -207,7 +207,7 @@ function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, arr
 		}
 
 		add_action( 'admin_notices', __NAMESPACE__ . '\render_2fa_admin_notice' );
-		add_filter( 'wporg_global_header_alert_markup', __NAMESPACE__ . '\get_enable_2fa_notice' );
+		//add_filter( 'wporg_global_header_alert_markup', __NAMESPACE__ . '\get_enable_2fa_notice' );
 	}
 
 	return $allcaps;
@@ -370,7 +370,7 @@ function block_webauthn_settings_page() {
  * @codeCoverageIgnore
  */
 function get_edit_account_url() : string {
-	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
+	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/security?first-time=1';
 }
 
 /**

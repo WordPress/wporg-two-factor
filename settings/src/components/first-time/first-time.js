@@ -19,7 +19,6 @@ import { GlobalContext } from '../../script';
  * Render the correct component based on the URL.
  */
 export default function FirstTime() {
-	const modalRef = useRef( null );
 	const { navigateToScreen, screen } = useContext( GlobalContext );
 
 	// The index is the URL slug and the value is the React component.
@@ -102,11 +101,9 @@ export default function FirstTime() {
 	}
 
 	return (
-		<div className="wporg-2fa__first-time" ref={ modalRef }>
-			<div className="wporg-2fa__first-time__inner">
-				<div className="wporg-2fa__first-time__inner-content">
-					{ currentScreenComponent }
-				</div>
+		<div className="wporg-2fa__first-time">
+			<div className={ `wporg-2fa__first-time__inner-content ${ screen }` }>
+				{ currentScreenComponent }
 			</div>
 		</div>
 	);

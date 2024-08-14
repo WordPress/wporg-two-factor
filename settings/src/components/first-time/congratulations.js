@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { GlobalContext } from '../../script';
 
 /**
  * Check if the URL is valid. Make sure it stays on wordpress.org.
@@ -19,13 +25,51 @@ const isValidUrl = ( url ) => {
 };
 
 export default function Congratulations() {
+	const {
+		user: { webAuthnEnabled, totpEnabled },
+	} = useContext( GlobalContext );
+
+	const getAuthenticationMethod = () => {
+		if ( webAuthnEnabled && totpEnabled ) {
+			return null;
+		}
+
+		return (
+			<ul>
+				<li>
+					{ totpEnabled && (
+						<a href="https://profiles.wordpress.org/me/profile/edit/group/3/?screen=webauthn">
+							Set up a security key
+						</a>
+					) }
+
+					{ webAuthnEnabled && (
+						<a href="https://profiles.wordpress.org/me/profile/edit/group/3/?screen=totp">
+							Set up one time password
+						</a>
+					) }
+				</li>
+			</ul>
+		);
+	};
+
 	return (
 		<>
 			<p>
 				To ensure the highest level of security for your account, please remember to keep
-				your authentication methods up-to-date. We recommend configuring multiple
-				authentication methods to guarantee you always have access to your account.
+				your authentication methods up-to-date, and consult{ ' ' }
+				<a href="//make.wordpress.org/meta/handbook/tutorials-guides/configuring-two-factor-authentication/">
+					our documentation
+				</a>{ ' ' }
+				if you need help or have any questions.
 			</p>
+			<p>
+				We recommend configuring multiple authentication methods to guarantee you always
+				have access to your account.
+			</p>
+
+			{ getAuthenticationMethod() }
+
 			<div className="wporg-2fa__submit-actions">
 				<Button
 					onClick={ () => {
@@ -44,6 +88,7 @@ export default function Congratulations() {
 				>
 					Continue
 				</Button>
+				<Button variant="link">View security settings</Button>
 			</div>
 		</>
 	);

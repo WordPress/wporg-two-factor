@@ -49,5 +49,5 @@ export default function Settings() {
 			<ScreenNavigation screen={ screen }>{ components[ screen ] }</ScreenNavigation>
 		);
 
-	return <>{ currentScreenComponent }</>;
+	return currentScreenComponent;
 }
