@@ -132,12 +132,6 @@ function Setup( { setGenerating, onSuccess } ) {
 				<>
 					<CodeList codes={ backupCodes } />
 
-					<ButtonGroup>
-						<CopyToClipboardButton contents={ backupCodes } />
-						<PrintButton />
-						<DownloadButton codes={ backupCodes } />
-					</ButtonGroup>
-
 					<CheckboxControl
 						label="I have printed or saved these codes"
 						checked={ hasPrinted }
@@ -162,33 +156,41 @@ function Setup( { setGenerating, onSuccess } ) {
 }
 
 /**
- * Display a list of backup codes
+ * Display a list of backup codes and actions
  *
  * @param props
  * @param props.codes
  */
 function CodeList( { codes } ) {
-	return (
-		<div className="wporg-2fa__backup-codes-list">
-			{ ! codes.length && (
-				<p>
-					Generating backup codes...
-					<Spinner />
-				</p>
-			) }
+	const hasCodes = !! codes.length;
 
-			{ codes.length > 0 && (
-				<ol>
-					{ codes.map( ( code ) => {
-						return (
-							<li key={ code } className="wporg-2fa__token">
-								{ code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
-							</li>
-						);
-					} ) }
-				</ol>
+	return (
+		<>
+			<div className="wporg-2fa__backup-codes-list">
+				{ hasCodes ? (
+					<ol>
+						{ codes.map( ( code ) => {
+							return (
+								<li key={ code } className="wporg-2fa__token">
+									{ code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
+								</li>
+							);
+						} ) }
+					</ol>
+				) : (
+					<p>
+						<Spinner /> Generating backup codes...
+					</p>
+				) }
+			</div>
+			{ hasCodes && (
+				<ButtonGroup>
+					<CopyToClipboardButton contents={ codes } />
+					<PrintButton />
+					<DownloadButton codes={ codes } />
+				</ButtonGroup>
 			) }
-		</div>
+		</>
 	);
 }
 
