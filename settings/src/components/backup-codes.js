@@ -24,10 +24,9 @@ import DownloadButton from './download-button';
  */
 export default function BackupCodes( { onSuccess = () => {} } ) {
 	const {
-		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
-		backupCodesVerified,
+		user: { hasPrimaryProvider },
 	} = useContext( GlobalContext );
-	const [ regenerating, setRegenerating ] = useState( false );
+	const [ generating, setGenerating ] = useState( false );
 
 	// Prevent users from accessing directly through the URL.
 	if ( ! hasPrimaryProvider ) {
@@ -41,26 +40,21 @@ export default function BackupCodes( { onSuccess = () => {} } ) {
 		);
 	}
 
-	if (
-		! backupCodesEnabled ||
-		backupCodesRemaining === 0 ||
-		regenerating ||
-		! backupCodesVerified
-	) {
-		return <Setup setRegenerating={ setRegenerating } onSuccess={ onSuccess } />;
-	}
-
-	return <Manage setRegenerating={ setRegenerating } />;
+	return generating ? (
+		<Setup setGenerating={ setGenerating } onSuccess={ onSuccess } />
+	) : (
+		<Manage setGenerating={ setGenerating } />
+	);
 }
 
 /**
  * Setup the Backup Codes provider.
  *
  * @param props
- * @param props.setRegenerating
+ * @param props.setGenerating
  * @param props.onSuccess
  */
-function Setup( { setRegenerating, onSuccess } ) {
+function Setup( { setGenerating, onSuccess } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
@@ -110,18 +104,14 @@ function Setup( { setRegenerating, onSuccess } ) {
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
 		setBackupCodesVerified( true );
 		setGlobalNotice( 'Backup codes have been enabled.' );
-		setRegenerating( false );
+		setGenerating( false );
 		onSuccess();
 	} );
 
 	return (
 		<>
 			<div className="wporg-2fa__screen-intro">
-				<p>
-					Backup codes let you access your account if your primary two-factor
-					authentication method is unavailable, like if your phone is lost or stolen. Each
-					code can only be used once.
-				</p>
+				<IntroText />
 
 				<p>Please print the codes and keep them in a safe place.</p>
 
@@ -202,33 +192,36 @@ function CodeList( { codes } ) {
 	);
 }
 
+const IntroText = () => (
+	<p>
+		Backup codes let you access your account if your primary two-factor authentication method is
+		unavailable, like if your phone is lost or stolen. Each code can only be used once.
+	</p>
+);
+
 /**
  * Render the screen where users can manage Backup Codes.
  *
  * @param props
- * @param props.setRegenerating
+ * @param props.setGenerating
  */
-function Manage( { setRegenerating } ) {
+function Manage( { setGenerating } ) {
 	const {
-		user: { backupCodesRemaining },
+		user: { backupCodesEnabled, backupCodesRemaining },
 	} = useContext( GlobalContext );
 
 	return (
 		<>
 			<div className="wporg-2fa__screen-intro">
-				<p>
-					Backup codes let you access your account if your primary two-factor
-					authentication method is unavailable, like if your phone is lost or stolen. Each
-					code can only be used once.
-				</p>
+				<IntroText />
 
-				{ backupCodesRemaining > 5 && (
+				{ backupCodesEnabled && backupCodesRemaining > 5 && (
 					<p>
 						You have <strong>{ backupCodesRemaining }</strong> backup codes remaining.
 					</p>
 				) }
 
-				{ backupCodesRemaining <= 5 && (
+				{ backupCodesEnabled && backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
 						<div>
@@ -241,8 +234,8 @@ function Manage( { setRegenerating } ) {
 				) }
 			</div>
 
-			<Button isSecondary onClick={ () => setRegenerating( true ) }>
-				Generate new backup codes
+			<Button isSecondary onClick={ () => setGenerating( true ) }>
+				{ backupCodesEnabled ? 'Regenerate backup codes' : 'Generate backup codes' }
 			</Button>
 		</>
 	);
