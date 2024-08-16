@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useRef } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
