@@ -21,11 +21,17 @@ export default function SetupProgressBar( { currentStepIndex, steps } ) {
 		return 'is-disabled';
 	};
 
+	const flexWidth = 100 / steps.length;
+
 	return (
 		<div className="wporg-2fa__progress-bar">
 			<ul className="wporg-2fa__setup-steps">
 				{ steps.map( ( step, index ) => (
-					<li key={ step } className={ getStepClass( index ) }>
+					<li
+						key={ step }
+						className={ getStepClass( index ) }
+						style={ { flexBasis: flexWidth + '%' } }
+					>
 						<span className="wporg-2fa__setup-count">{ index + 1 }</span>
 						<span className="wporg-2fa__setup-label">{ step }</span>
 					</li>
@@ -35,6 +41,8 @@ export default function SetupProgressBar( { currentStepIndex, steps } ) {
 			<div
 				style={ {
 					'--wporg-separator-width': getCompletionPercentage() + '%',
+					width: 100 - flexWidth + '%',
+					left: flexWidth / 2 + '%',
 				} }
 				className="wporg-2fa__setup-step-separator"
 			></div>

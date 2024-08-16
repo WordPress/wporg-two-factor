@@ -48,7 +48,7 @@ export default function Home( { onSelect } ) {
 						onChange={ handleOptionChange }
 					/>
 					<div>
-						<span>Set up one time password</span>
+						<span>Set up an authenticator app</span>
 						<p>Use an application to get two-factor authentication codes.</p>
 					</div>
 				</label>

@@ -71,7 +71,7 @@
 .wporg-2fa__progress-bar {
 	margin: 0;
 	width: 100%;
-	max-width: 300px;
+	max-width: 350px;
 }
 
 .wporg-2fa__progress-bar .wporg-2fa__setup-step-separator::before {
@@ -85,9 +85,7 @@
 
 .wporg-2fa__progress-bar .wporg-2fa__setup-step-separator {
 	position: absolute;
-	margin-left: 2%;
 	background: var(--color-disabled);
-	width: 96%;
 	height: 1.5px;
 	top: 16px;
 	z-index: 0;

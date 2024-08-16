@@ -36,7 +36,7 @@ export default function FirstTime() {
 		},
 		totp: {
 			stepIndex: 1,
-			title: 'Set up one-time password',
+			title: 'Set up an authenticator app',
 			component: (
 				<TOTP
 					onSuccess={ () => {
@@ -58,7 +58,7 @@ export default function FirstTime() {
 		},
 		'backup-codes': {
 			stepIndex: 2,
-			title: 'Print backup codes',
+			title: 'Generate backup codes',
 			component: (
 				<BackupCodes
 					onSuccess={ () => {
@@ -87,7 +87,7 @@ export default function FirstTime() {
 			<>
 				<SetupProgressBar
 					currentStepIndex={ currentStepIndex }
-					steps={ [ 'Select', 'Configure', 'Print' ] }
+					steps={ [ 'Select', 'Configure', 'Generate codes' ] }
 				/>
 				<ScreenNavigation
 					screen={ screen }

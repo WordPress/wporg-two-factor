@@ -45,7 +45,7 @@ export default function Congratulations() {
 
 					{ webAuthnEnabled && (
 						<a href="https://profiles.wordpress.org/me/profile/edit/group/3/?screen=totp">
-							Set up one time password
+							Set up an authenticator app
 						</a>
 					) }
 				</li>
@@ -64,8 +64,8 @@ export default function Congratulations() {
 				if you need help or have any questions.
 			</p>
 			<p>
-				We recommend configuring multiple authentication methods to guarantee you always
-				have access to your account.
+				We recommend configuring multiple authentication methods and generating backup codes
+				to guarantee you always have access to your account.
 			</p>
 
 			{ getAuthenticationMethod() }
@@ -88,7 +88,6 @@ export default function Congratulations() {
 				>
 					Continue
 				</Button>
-				<Button variant="link">View security settings</Button>
 			</div>
 		</>
 	);
