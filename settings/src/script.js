@@ -37,7 +37,10 @@ function renderSettings() {
 
 	root.render(
 		<StrictMode>
-			<Main userId={ parseInt( wrapper.dataset.userId ) } />
+			<Main
+				userId={ parseInt( wrapper.dataset.userId ) }
+				onboarding={ wrapper.dataset.onboarding === 'true' }
+			/>
 		</StrictMode>
 	);
 }

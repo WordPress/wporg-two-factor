@@ -20,14 +20,17 @@ $alert-blue: #72aee6;
 .wp-block-wporg-two-factor-settings {
 	position: relative;
 	font-size: 13px;
-	min-height: 600px;
 
 	> div.initial-load {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		min-height: 400px;
-		// box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+		box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+	}
+
+	&[data-onboarding="true"] > div.initial-load {
+		box-shadow: none;
 	}
 
 	h3,

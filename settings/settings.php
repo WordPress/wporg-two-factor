@@ -11,6 +11,7 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); 
 add_action( 'init', __NAMESPACE__ . '\register_block' );
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\maybe_dequeue_stylesheet', 40 );
 add_action( 'wp_head', __NAMESPACE__ . '\maybe_add_custom_print_css' );
+add_action( 'template_redirect', __NAMESPACE__ . '\onboarding_template_page' );
 
 /**
  * Registers the block
@@ -50,6 +51,8 @@ function replace_core_ui_with_custom() : void {
  * @codeCoverageIgnore
  */
 function render_custom_ui() : void {
+	global $wp;
+
 	$user_id = function_exists( 'bbp_get_displayed_user_id' ) ? bbp_get_displayed_user_id() : bp_displayed_user_id();
 
 	if ( ! current_user_can( 'edit_user', $user_id ) ) {
@@ -59,7 +62,7 @@ function render_custom_ui() : void {
 
 	$block_attributes = [ 'userId' => $user_id ];
 
-	if ( true ) {
+	if ( 1 === preg_match( '#profile/security#', $wp->request )  ) {
 		$block_attributes['onboarding'] = true;
 	}
 
@@ -197,4 +200,18 @@ function maybe_add_custom_print_css() {
         </style>
         <?php
     }
+}
+
+/**
+ * Load the custom onboarding template for the security page.
+ */
+function onboarding_template_page() {
+	global $wp;
+
+    // Check if the current URL matches the specific condition
+    if ( 1 === preg_match( '#/profile/security#', $wp->request ) ) {
+		status_header( 200 );
+		locate_template( array( "members/single/security.php" ), true );
+		die;
+	}
 }
