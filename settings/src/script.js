@@ -47,8 +47,9 @@ function renderSettings() {
  *
  * @param props
  * @param props.userId
+ * @param props.onboarding
  */
-function Main( { userId } ) {
+function Main( { userId, onboarding } ) {
 	const user = useUser( userId );
 	const {
 		userRecord: { record, edit, hasEdits, hasResolved },
@@ -146,11 +147,7 @@ function Main( { userId } ) {
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
 
-			{ new URLSearchParams( window.location.search ).get( 'first-time' ) ? (
-				<FirstTime />
-			) : (
-				<Settings />
-			) }
+			{ onboarding ? <FirstTime /> : <Settings /> }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);

@@ -57,7 +57,13 @@ function render_custom_ui() : void {
 		return;
 	}
 
-	$json_attrs = json_encode( [ 'userId' => $user_id ] );
+	$block_attributes = [ 'userId' => $user_id ];
+
+	if ( true ) {
+		$block_attributes['onboarding'] = true;
+	}
+
+	$json_attrs = json_encode( $block_attributes  );
 
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
