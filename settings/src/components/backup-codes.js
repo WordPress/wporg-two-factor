@@ -230,10 +230,12 @@ function Manage( { setRegenerating } ) {
 				{ backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
-						You only have <strong>{ backupCodesRemaining }</strong> backup codes
-						remaining. Please regenerate and save new ones before you run out. If you
-						don&apos;t, you won&apos;t be able to log into your account if you lose your
-						phone.
+						<div>
+							You only have <strong>{ backupCodesRemaining }</strong> backup codes
+							remaining. Please regenerate and save new ones before you run out.
+							If you don&apos;t, you won&apos;t be able to log into your account if
+							you lose your phone.
+						</div>
 					</Notice>
 				) }
 			</div>
