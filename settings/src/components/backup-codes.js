@@ -233,8 +233,8 @@ function Manage( { setRegenerating } ) {
 						<div>
 							You only have <strong>{ backupCodesRemaining }</strong> backup codes
 							remaining. Please regenerate and save new ones before you run out. If
-							you don&apos;t, you won&apos;t be able to log into your account if
-							you lose your phone.
+							you don&apos;t, you won&apos;t be able to log into your account if you
+							lose your phone.
 						</div>
 					</Notice>
 				) }
