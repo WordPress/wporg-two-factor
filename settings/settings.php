@@ -229,8 +229,18 @@ function maybe_add_custom_print_css() {
 function onboarding_template_page() {
     // Check if the current URL matches the specific condition
     if ( is_onboarding_page() ) {
+
+		$user = wp_get_current_user();
+
+		if ( Two_Factor_Core::is_user_using_two_factor( $user->ID ) ) {
+			wp_safe_redirect( get_edit_account_url() );
+			exit;
+		}
+
 		status_header( 200 );
-		locate_template( array( "members/single/security.php" ), true );
-		die;
+
+		// Template lives in the theme.
+		locate_template( array( 'members/single/security.php' ), true );
+		exit;
 	}
 }
