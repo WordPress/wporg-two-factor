@@ -38,7 +38,7 @@ export default function Settings() {
 				} }
 			/>
 		),
-		'backup-codes': <BackupCodes />,
+		'backup-codes': <BackupCodes onSuccess={ () => navigateToScreen( 'home' ) } />,
 		webauthn: <WebAuthn />,
 	};
 
