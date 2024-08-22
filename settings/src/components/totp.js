@@ -123,11 +123,19 @@ function Setup( { setSuccess } ) {
 			<p className="wporg-2fa__screen-intro">
 				Two-Factor Authentication adds an extra layer of security to your account. Use a
 				phone app like{ ' ' }
-				<a href="https://support.google.com/accounts/answer/1066447">
+				<a
+					href="https://support.google.com/accounts/answer/1066447"
+					target="_blank"
+					rel="noreferrer"
+				>
 					Google Authenticator
 				</a>{ ' ' }
 				or{ ' ' }
-				<a href="https://www.microsoft.com/ko-kr/security/mobile-authenticator-app">
+				<a
+					href="https://www.microsoft.com/ko-kr/security/mobile-authenticator-app"
+					target="_blank"
+					rel="noreferrer"
+				>
 					Microsoft Authenticator
 				</a>{ ' ' }
 				when logging in to WordPress.org.

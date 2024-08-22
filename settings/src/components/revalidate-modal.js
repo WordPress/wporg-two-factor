@@ -36,19 +36,16 @@ export default function RevalidateModal() {
 
 function RevalidateIframe() {
 	const {
-		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
 	const { record } = userRecord;
 	const ref = useRef();
 
 	useEffect( () => {
-		async function maybeRefreshUser( { data: { type, message } = {} } ) {
+		async function maybeRefreshUser( { data: { type } = {} } ) {
 			if ( type !== 'reValidationComplete' ) {
 				return;
 			}
-
-			setGlobalNotice( message || 'Two-Factor confirmed' );
 
 			// Pretend that the expires_at is in the future (+1hr), this provides a 'faster' UI.
 			// This intentionally doesn't use `edit()` to prevent it attempting to update it on the server.

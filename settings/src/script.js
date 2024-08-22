@@ -141,7 +141,11 @@ function Main( { userId } ) {
 	);
 
 	if ( ! hasResolved ) {
-		return <Spinner />;
+		return (
+			<div className="initial-load">
+				<Spinner />
+			</div>
+		);
 	}
 
 	const currentScreenComponent =

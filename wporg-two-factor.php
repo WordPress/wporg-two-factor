@@ -76,6 +76,7 @@ add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
 add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
+add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\two_factor_user_authenticated', 10, 2 );
 
 /**
  * Determine which providers should be available to users.
@@ -249,6 +250,47 @@ function user_requires_2fa( $user ) : bool {
 }
 
 /**
+ * Check if the user *should* have 2FA enabled.
+ * This is not *required* yet, but highly encouraged.
+ *
+ * @param WP_User $user
+ */
+function user_should_2fa( $user ) : bool {
+	global $trusted_deputies, $wcorg_subroles;
+
+	// This shouldn't happen, but there've been a few times where it has inexplicably.
+	if ( ! $user instanceof WP_User ) {
+		return false;
+	}
+
+	// If they require it, they should have it.
+	// This duplicates the logic in `user_requires_2fa()`, due to the other uses of that function..
+	if ( is_special_user( $user->ID ) ) {
+		return true;
+	} elseif ( $trusted_deputies && in_array( $user->ID, $trusted_deputies, true ) ) {
+		return true;
+	} elseif ( $wcorg_subroles && array_key_exists( $user->ID, $wcorg_subroles ) ) {
+		return true;
+	}
+
+	/*
+	// If a user ... they should have 2FA enabled.
+	if (
+		// Is (or was) a plugin committer
+		$user->has_plugins ||
+		// Has (or had) a live theme
+		$user->has_themes ||
+		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
+		$user->has_elevated_role
+	) {
+		return true;
+	}
+ 	*/
+
+	return false;
+}
+
+/**
  * Redirect a user to their 2FA settings if they need to enable it.
  *
  * This isn't usually necessary, since WordPress will prevent Subscribers from visiting other Core screens, but
@@ -380,6 +422,20 @@ function after_provider_deactivated( $user_id, $provider = null ) {
 			'two-factor-login'    => null,
 		] );
 	}
+}
+
+/**
+ * Record stats for number of authentications per provider per day.
+ */
+function two_factor_user_authenticated( $user_id, $provider ) {
+	if ( ! function_exists( 'bump_stats_extra' ) || ! $provider ) {
+		return;
+	}
+
+	$provider = str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider->get_key() );
+	$provider = str_replace( '_', ' ', $provider );
+
+	bump_stats_extra( 'two-factor-auth', $provider );
 }
 
 /*

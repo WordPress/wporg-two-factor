@@ -134,6 +134,12 @@ function Setup( { setRegenerating } ) {
 				<>
 					<CodeList codes={ backupCodes } />
 
+					<ButtonGroup>
+						<CopyToClipboardButton codes={ backupCodes } />
+						<PrintButton />
+						<DownloadButton codes={ backupCodes } />
+					</ButtonGroup>
+
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
 						Without access to the one-time password app or a backup code, you will lose
@@ -159,12 +165,6 @@ function Setup( { setRegenerating } ) {
 				>
 					All Finished
 				</Button>
-
-				<ButtonGroup>
-					<CopyToClipboardButton codes={ backupCodes } />
-					<PrintButton />
-					<DownloadButton codes={ backupCodes } />
-				</ButtonGroup>
 			</Flex>
 		</>
 	);
@@ -230,10 +230,12 @@ function Manage( { setRegenerating } ) {
 				{ backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
-						You only have <strong>{ backupCodesRemaining }</strong> backup codes
-						remaining. Please regenerate and save new ones before you run out. If you
-						don&apos;t, you won&apos;t be able to log into your account if you lose your
-						phone.
+						<div>
+							You only have <strong>{ backupCodesRemaining }</strong> backup codes
+							remaining. Please regenerate and save new ones before you run out. If
+							you don&apos;t, you won&apos;t be able to log into your account if you
+							lose your phone.
+						</div>
 					</Notice>
 				) }
 			</div>

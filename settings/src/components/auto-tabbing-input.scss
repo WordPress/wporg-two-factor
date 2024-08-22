@@ -18,9 +18,15 @@
 			margin-right: 16px;
 		}
 
-		@media screen and (max-width: 767px) {
+		@media screen and (max-width: 500px) {
 			&:not(:last-child) {
-				margin-right: auto;
+				margin-right: 8px;
+			}
+		}
+
+		@media screen and (max-width: 400px) {
+			&:not(:last-child) {
+				margin-right: 4px;
 			}
 		}
 	}
