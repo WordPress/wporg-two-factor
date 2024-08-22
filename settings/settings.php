@@ -227,9 +227,7 @@ function maybe_add_custom_print_css() {
  * Load the custom onboarding template for the security page.
  */
 function onboarding_template_page() {
-
 	if ( is_onboarding_page() ) {
-
 		$user = wp_get_current_user();
 
 		if ( Two_Factor_Core::is_user_using_two_factor( $user->ID ) ) {
@@ -238,7 +236,6 @@ function onboarding_template_page() {
 		}
 
 		status_header( 200 );
-
 		// Template lives in the theme.
 		locate_template( array( 'members/single/security.php' ), true );
 		exit;
