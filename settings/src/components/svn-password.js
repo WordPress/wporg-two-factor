@@ -19,7 +19,6 @@ import { GlobalContext } from '../script';
 export default function SVNPassword() {
 	const {
 		user: { userRecord },
-		setGlobalNotice,
 		setError,
 	} = useContext( GlobalContext );
 
