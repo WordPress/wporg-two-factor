@@ -227,8 +227,8 @@ function maybe_add_custom_print_css() {
  * Load the custom onboarding template for the security page.
  */
 function onboarding_template_page() {
-    // Check if the current URL matches the specific condition
-    if ( is_onboarding_page() ) {
+
+	if ( is_onboarding_page() ) {
 
 		$user = wp_get_current_user();
 
