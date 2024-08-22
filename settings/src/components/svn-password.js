@@ -50,12 +50,24 @@ export default function SVNPassword() {
 	return (
 		<>
 			<p>
-				Your SVN password is required to commit to WordPress.org SVN repositories, such as
-				for a plugin or theme.
+				WordPress.org uses Subversion (SVN) for version control, every Plugin and Theme
+				hosted by WordPress.org automatically has a access to a SVN repository that the
+				authors/committers can commit to.
 			</p>
 			<p>
-				If you lose your SVN password, you can generate a new one here. All previous SVN
-				passwords will be invalidated immediately.
+				For information on how to use SVN with your plugin, please see the{ ' ' }
+				<a href="https://developer.wordpress.org/plugins/wordpress-org/how-to-use-subversion/">
+					WordPress.org Plugin Developer Handbook
+				</a>
+				.
+			</p>
+			<p>
+				For security, your WordPress.org account password cannot be used to commit to SVN,
+				you must use a separate SVN password, which you can generate here.
+			</p>
+			<p>
+				If you lose your SVN password, you can replace it by generating a new one at any
+				time. All previous SVN passwords will be invalidated immediately.
 			</p>
 
 			{ generatedPassword && (
