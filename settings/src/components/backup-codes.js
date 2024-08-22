@@ -123,6 +123,13 @@ function Setup( { setRegenerating } ) {
 				</p>
 
 				<p>Please print the codes and keep them in a safe place.</p>
+
+				<Notice status="warning" isDismissible={ false }>
+					<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+					Without access to the one-time password app or a backup code, you will lose
+					access to your account. Once you navigate away from this page, you will not be
+					be able to view these codes again.
+				</Notice>
 			</div>
 
 			{ error ? (
@@ -139,13 +146,6 @@ function Setup( { setRegenerating } ) {
 						<PrintButton />
 						<DownloadButton codes={ backupCodes } />
 					</ButtonGroup>
-
-					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-						Without access to the one-time password app or a backup code, you will lose
-						access to your account. Once you navigate away from this page, you will not
-						be able to view these codes again.
-					</Notice>
 
 					<CheckboxControl
 						label="I have printed or saved these codes"
