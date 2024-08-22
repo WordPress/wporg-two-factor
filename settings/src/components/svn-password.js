@@ -4,8 +4,9 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Notice, Spinner } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, check, copySmall } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
 import { refreshRecord } from '../utilities/common';
+import CopyToClipboardButton from './copy-to-clipboard-button';
 
 /**
  * Internal dependencies
@@ -47,15 +48,6 @@ export default function SVNPassword() {
 		}
 	} );
 
-	const handleCopy = useCallback( () => {
-		try {
-			navigator.clipboard.writeText( generatedPassword );
-			setGlobalNotice( 'Copied to clipboard' );
-		} catch ( error ) {
-			setGlobalNotice( "Couldn't write to clipboard" );
-		}
-	}, [ generatedPassword ] );
-
 	return (
 		<>
 			<p>
@@ -76,12 +68,7 @@ export default function SVNPassword() {
 					<Icon icon={ check } />
 					Your new SVN Password:{ ' ' }
 					<code>{ isGenerating ? <Spinner /> : generatedPassword }</code>
-					<Icon
-						icon={ copySmall }
-						onClick={ handleCopy }
-						className="wporg-2fa__svn-copy-password"
-						label="Copy to clipboard"
-					/>
+					<CopyToClipboardButton codes={ generatedPassword } />
 				</Notice>
 			) }
 
