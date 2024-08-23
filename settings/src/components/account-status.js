@@ -102,7 +102,11 @@ export default function AccountStatus() {
 						! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet
 					}
 					headerText="SVN Password"
-					bodyText="Your SVN password is required for committing to WordPress.org SVN repositories."
+					bodyText={
+						! svnPasswordSet
+							? 'You have not configured a SVN password for your account.'
+							: "You've got a SVN password configured for your account."
+					}
 				/>
 			) : (
 				''
