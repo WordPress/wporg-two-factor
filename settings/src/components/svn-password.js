@@ -65,7 +65,8 @@ export default function SVNPassword() {
 
 			<h3>Details</h3>
 			<p>
-				Username: <code>{ userRecord.record.username }</code>
+				Username: <code>{ userRecord.record.username }</code>{ ' ' }
+				{ userRecord.record.username.match( /[^a-z0-9]/ ) && <>(case-sensitive)</> }
 				<br />
 				Password:{ ' ' }
 				{ generatedPassword || userRecord.record.svn_password ? (
