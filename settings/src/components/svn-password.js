@@ -77,8 +77,9 @@ export default function SVNPassword() {
 								{ generatedPassword ||
 									'svn_****************************************' }
 							</code>
+							&nbsp;
 							{ generatedPassword && (
-								<CopyToClipboardButton codes={ generatedPassword } />
+								<CopyToClipboardButton variant="link" codes={ generatedPassword } />
 							) }
 						</>
 					) : (
