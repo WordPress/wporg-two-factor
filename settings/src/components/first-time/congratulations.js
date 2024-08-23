@@ -26,8 +26,13 @@ const isValidUrl = ( url ) => {
 
 export default function Congratulations() {
 	const {
-		user: { webAuthnEnabled, totpEnabled },
+		user: { webAuthnEnabled, totpEnabled, userRecord },
 	} = useContext( GlobalContext );
+	const {
+		record: { username },
+	} = userRecord;
+
+	const profileURL = `https://profiles.wordpress.org/${ username }/profile/edit/group/3/`;
 
 	const getAuthSuggestion = () => {
 		if ( webAuthnEnabled && totpEnabled ) {
@@ -36,19 +41,17 @@ export default function Congratulations() {
 
 		return (
 			<ul>
-				<li>
-					{ totpEnabled && (
-						<a href="https://profiles.wordpress.org/me/profile/edit/group/3/?screen=webauthn">
-							Set up a security key
-						</a>
-					) }
+				{ totpEnabled && (
+					<li>
+						<a href={ `${ profileURL }?screen=webauthn` }>Set up a security key</a>
+					</li>
+				) }
 
-					{ webAuthnEnabled && (
-						<a href="https://profiles.wordpress.org/me/profile/edit/group/3/?screen=totp">
-							Set up an authenticator app
-						</a>
-					) }
-				</li>
+				{ webAuthnEnabled && (
+					<li>
+						<a href={ `${ profileURL }?screen=totp` }>Set up an authenticator app</a>
+					</li>
+				) }
 			</ul>
 		);
 	};
@@ -80,8 +83,7 @@ export default function Congratulations() {
 						if ( redirectTo && isValidUrl( redirectTo ) ) {
 							window.location.href = redirectTo;
 						} else {
-							window.location.href =
-								'//profiles.wordpress.org/me/profile/edit/group/3';
+							window.location.href = profileURL;
 						}
 					} }
 					isPrimary
