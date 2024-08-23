@@ -29,7 +29,7 @@ export default function Congratulations() {
 		user: { webAuthnEnabled, totpEnabled },
 	} = useContext( GlobalContext );
 
-	const getAuthenticationMethod = () => {
+	const getAuthSuggestion = () => {
 		if ( webAuthnEnabled && totpEnabled ) {
 			return null;
 		}
@@ -68,7 +68,7 @@ export default function Congratulations() {
 				to guarantee you always have access to your account.
 			</p>
 
-			{ getAuthenticationMethod() }
+			{ getAuthSuggestion() }
 
 			<div className="wporg-2fa__submit-actions">
 				<Button
