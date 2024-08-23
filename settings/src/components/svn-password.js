@@ -37,6 +37,9 @@ export default function SVNPassword() {
 				},
 			} );
 
+			// Fill in the creation date in the user record, we'll refresh it for the actual data below.
+			userRecord.record.svn_password_created = new Date().toISOString();
+
 			setGeneratedPassword( response.svn_password );
 			setGenerating( false );
 
