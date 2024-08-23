@@ -149,7 +149,6 @@ function Main( { userId, onboarding } ) {
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-
 			{ onboarding ? <FirstTime /> : <Settings /> }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
