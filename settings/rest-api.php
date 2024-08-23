@@ -140,6 +140,12 @@ function register_rest_routes() : void {
 			'methods'  => WP_REST_Server::EDITABLE,
 			'callback' => function( $request ) {
 				$user = get_userdata( $request['user_id'] );
+
+				// Local environment doesn't have the SVN password system, just mock it.
+				if ( ! function_exists( 'WordPressdotorg\Security\SVNPasswords\set_svn_password' ) ) {
+					return 'Local Development: SVN Password system unavailable.';
+				}
+
 				return [
 					'svn_password' => set_svn_password( $user->ID )
 				];
@@ -392,7 +398,11 @@ function register_user_fields(): void {
 		'svn_password',
 		[
 			'get_callback' => function( $user ) {
-				return ( 'svn' === has_svn_password( $user['id'] ) );
+				return (
+					// Local environment doesn't have the SVN password system, just return false for that.
+					function_exists( 'WordPressdotorg\Security\SVNPasswords\has_svn_password' ) &&
+					'svn' === has_svn_password( $user['id'] )
+				);
 			},
 			'schema' => [
 				'type'    => [ 'boolean' ],
