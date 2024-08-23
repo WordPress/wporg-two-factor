@@ -64,26 +64,30 @@ export default function SVNPassword() {
 			</p>
 
 			<h3>Details</h3>
-			<p>
-				Username: <code>{ userRecord.record.username }</code>{ ' ' }
-				{ userRecord.record.username.match( /[^a-z0-9]/ ) && <>(case-sensitive)</> }
-				<br />
-				Password:{ ' ' }
-				{ generatedPassword || userRecord.record.svn_password ? (
-					<>
-						<code>
-							{ generatedPassword || 'svn_****************************************' }
-						</code>
-						{ generatedPassword && (
-							<CopyToClipboardButton text={ generatedPassword } />
-						) }
-					</>
-				) : (
-					<>
-						<em>Not configured</em>
-					</>
-				) }
-			</p>
+			<ul>
+				<li>
+					Username: <code>{ userRecord.record.username }</code>{ ' ' }
+					{ userRecord.record.username.match( /[^a-z0-9]/ ) && <>(case-sensitive)</> }
+				</li>
+				<li>
+					Password:{ ' ' }
+					{ generatedPassword || userRecord.record.svn_password ? (
+						<>
+							<code>
+								{ generatedPassword ||
+									'svn_****************************************' }
+							</code>
+							{ generatedPassword && (
+								<CopyToClipboardButton codes={ generatedPassword } />
+							) }
+						</>
+					) : (
+						<>
+							<em>Not configured</em>
+						</>
+					) }
+				</li>
+			</ul>
 
 			<Button
 				variant="secondary"
