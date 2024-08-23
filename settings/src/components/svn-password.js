@@ -71,15 +71,23 @@ export default function SVNPassword() {
 				</li>
 				<li>
 					Password:{ ' ' }
-					{ generatedPassword || userRecord.record.svn_password ? (
+					{ generatedPassword || userRecord.record.svn_password_created ? (
 						<>
-							<code>
-								{ generatedPassword ||
-									'svn_****************************************' }
-							</code>
+							<code>{ generatedPassword || 'svn_*****************' }</code>
 							&nbsp;
 							{ generatedPassword && (
 								<CopyToClipboardButton variant="link" codes={ generatedPassword } />
+							) }
+							{ userRecord.record.svn_password_created && (
+								<>
+									<br />
+									<em className="wporg-2fa__svn-password_generated">
+										Generated on{ ' ' }
+										{ new Date(
+											userRecord.record.svn_password_created
+										).toLocaleDateString() }
+									</em>
+								</>
 							) }
 						</>
 					) : (

@@ -4,7 +4,7 @@ namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
-use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, has_svn_password };
+use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, get_svn_password_creation_date };
 
 defined( 'WPINC' ) || die();
 
@@ -395,17 +395,23 @@ function register_user_fields(): void {
 
 	register_rest_field(
 		'user',
-		'svn_password',
+		'svn_password_created',
 		[
 			'get_callback' => function( $user ) {
-				return (
-					// Local environment doesn't have the SVN password system, just return false for that.
-					function_exists( 'WordPressdotorg\Security\SVNPasswords\has_svn_password' ) &&
-					'svn' === has_svn_password( $user['id'] )
-				);
+				// Local environment doesn't have the SVN password system, just return false for that.
+				if ( ! function_exists( 'WordPressdotorg\Security\SVNPasswords\get_svn_password_creation_date' ) ) {
+					return false;
+				}
+
+				$svn_password_created_date = get_svn_password_creation_date( $user['id'] );
+				if ( ! $svn_password_created_date ) {
+					return false;
+				}
+
+				return $svn_password_created_date;
 			},
 			'schema' => [
-				'type'    => [ 'boolean' ],
+				'type'    => [ 'boolean', 'string' ],
 				'context' => [ 'edit' ],
 			]
 		]

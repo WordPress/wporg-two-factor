@@ -21,7 +21,7 @@ export default function AccountStatus() {
 				record: {
 					email,
 					pending_email: pendingEmail,
-					svn_password: svnPasswordSet,
+					svn_password_created: svnPasswordSet,
 					svn_password_required: svnPasswordRequired,
 				},
 			},
