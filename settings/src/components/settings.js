@@ -38,8 +38,16 @@ export default function Settings() {
 				} }
 			/>
 		),
+		webauthn: (
+			<WebAuthn
+				onKeyAdd={ () => {
+					if ( ! backupCodesEnabled ) {
+						navigateToScreen( 'backup-codes' );
+					}
+				} }
+			/>
+		),
 		'backup-codes': <BackupCodes onSuccess={ () => navigateToScreen( 'home' ) } />,
-		webauthn: <WebAuthn />,
 	};
 
 	const currentScreenComponent =
