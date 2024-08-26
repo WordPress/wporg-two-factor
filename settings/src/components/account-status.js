@@ -31,10 +31,10 @@ export default function AccountStatus() {
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider
-			? 'Please enable a Two-Factor security key or app before enabling backup codes.'
+			? 'Please enable a Two-Factor security key or app before enabling recovery codes.'
 			: `You have
 				${ backupCodesEnabled ? '' : 'not' }
-				verified your backup codes for two-factor authentication.`;
+				verified your recovery codes for two-factor authentication.`;
 
 	return (
 		<div className={ 'wporg-2fa__account-status' }>
@@ -85,7 +85,7 @@ export default function AccountStatus() {
 				status={
 					! hasPrimaryProvider && ! backupCodesEnabled ? 'pending' : backupCodesEnabled
 				}
-				headerText="Two-Factor Backup Codes"
+				headerText="Two-Factor Recovery Codes"
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
