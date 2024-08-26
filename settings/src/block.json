@@ -14,7 +14,7 @@
 		"userId": {
 			"type": "integer"
 		},
-		"onboarding": {
+		"isOnboarding": {
 			"type": "boolean",
 			"default": false
 		}

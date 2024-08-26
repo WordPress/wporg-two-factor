@@ -86,7 +86,7 @@ function render_custom_ui() : void {
 	$block_attributes = [ 'userId' => $user_id ];
 
 	if ( is_onboarding_page() ) {
-		$block_attributes['onboarding'] = true;
+		$block_attributes['isOnboarding'] = true;
 	}
 
 	$json_attrs = json_encode( $block_attributes  );

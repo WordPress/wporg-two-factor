@@ -29,7 +29,7 @@ $alert-blue: #72aee6;
 		box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
 	}
 
-	&[data-onboarding="true"] > div.initial-load {
+	&[data-is-onboarding="true"] > div.initial-load {
 		box-shadow: none;
 	}
 

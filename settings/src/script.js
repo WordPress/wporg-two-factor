@@ -39,7 +39,7 @@ function renderSettings() {
 		<StrictMode>
 			<Main
 				userId={ parseInt( wrapper.dataset.userId ) }
-				onboarding={ wrapper.dataset.onboarding === 'true' }
+				isOnboarding={ wrapper.dataset.isOnboarding === 'true' }
 			/>
 		</StrictMode>
 	);
@@ -50,9 +50,9 @@ function renderSettings() {
  *
  * @param props
  * @param props.userId
- * @param props.onboarding
+ * @param props.isOnboarding
  */
-function Main( { userId, onboarding } ) {
+function Main( { userId, isOnboarding } ) {
 	const user = useUser( userId );
 	const {
 		userRecord: { record, edit, hasEdits, hasResolved },
@@ -149,7 +149,7 @@ function Main( { userId, onboarding } ) {
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-			{ onboarding ? <FirstTime /> : <Settings /> }
+			{ isOnboarding ? <FirstTime /> : <Settings /> }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
