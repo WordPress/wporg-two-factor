@@ -307,7 +307,7 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
 		return $redirect_to;
 	}
 
-	return get_edit_account_url();
+	return get_onboarding_account_url();
 }
 
 /**
@@ -340,7 +340,7 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 			'Your account has elevated privileges and requires extra security before you can continue. Please <a href="%s">enable two-factor authentication</a>.',
 			'wporg'
 		),
-		get_edit_account_url()
+		get_onboarding_account_url()
 	);
 
 	return $two_factor_notice . $existing_notices;
@@ -371,6 +371,15 @@ function block_webauthn_settings_page() {
  */
 function get_edit_account_url() : string {
 	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
+}
+
+/**
+ * Get the URL of the onboarding screen.
+ *
+ * @codeCoverageIgnore
+ */
+function get_onboarding_account_url() : string {
+	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/security';
 }
 
 /**

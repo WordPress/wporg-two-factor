@@ -15,16 +15,10 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import { useUser } from './hooks/useUser';
-import ScreenNavigation from './components/screen-navigation';
-import AccountStatus from './components/account-status';
-import Password from './components/password';
-import EmailAddress from './components/email-address';
-import TOTP from './components/totp';
-import WebAuthn from './components/webauthn/webauthn';
-import BackupCodes from './components/backup-codes';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
-import SVNPassword from './components/svn-password';
+import Settings from './components/settings';
+import FirstTime from './components/first-time/first-time';
 
 export const GlobalContext = createContext( null );
 
@@ -43,7 +37,10 @@ function renderSettings() {
 
 	root.render(
 		<StrictMode>
-			<Main userId={ parseInt( wrapper.dataset.userId ) } />
+			<Main
+				userId={ parseInt( wrapper.dataset.userId ) }
+				isOnboarding={ wrapper.dataset.isOnboarding === 'true' }
+			/>
 		</StrictMode>
 	);
 }
@@ -53,8 +50,9 @@ function renderSettings() {
  *
  * @param props
  * @param props.userId
+ * @param props.isOnboarding
  */
-function Main( { userId } ) {
+function Main( { userId, isOnboarding } ) {
 	const user = useUser( userId );
 	const {
 		userRecord: { record, edit, hasEdits, hasResolved },
@@ -66,25 +64,10 @@ function Main( { userId } ) {
 
 	let currentUrl = new URL( document.location.href );
 	const initialScreen = currentUrl.searchParams.get( 'screen' );
-	const [ screen, setScreen ] = useState( initialScreen );
-
-	// The index is the URL slug and the value is the React component.
-	const components = {
-		'account-status': <AccountStatus />,
-		email: <EmailAddress />,
-		password: <Password />,
-		totp: <TOTP />,
-		'backup-codes': <BackupCodes />,
-		webauthn: <WebAuthn />,
-		'svn-password': <SVNPassword />,
-	};
+	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
 
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes', 'svn-password' ];
-
-	if ( ! components[ screen ] ) {
-		setScreen( 'account-status' );
-	}
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -148,13 +131,6 @@ function Main( { userId } ) {
 		);
 	}
 
-	const currentScreenComponent =
-		'account-status' === screen ? (
-			components[ screen ]
-		) : (
-			<ScreenNavigation screen={ screen }>{ components[ screen ] }</ScreenNavigation>
-		);
-
 	const isRevalidationExpired =
 		twoFactorRequiredScreens.includes( screen ) &&
 		hasPrimaryProvider &&
@@ -172,10 +148,12 @@ function Main( { userId } ) {
 				error,
 				backupCodesVerified,
 				setBackupCodesVerified,
+				setScreen,
+				screen,
 			} }
 		>
 			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
-			{ currentScreenComponent }
+			{ isOnboarding ? <FirstTime /> : <Settings /> }
 			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);

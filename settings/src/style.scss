@@ -25,8 +25,12 @@ $alert-blue: #72aee6;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 400px;
+		min-height: 400px;
 		box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+	}
+
+	&[data-is-onboarding="true"] > div.initial-load {
+		box-shadow: none;
 	}
 
 	h3,
@@ -131,11 +135,12 @@ $alert-blue: #72aee6;
 @import "components/webauthn/webauthn";
 @import "components/totp";
 @import "components/backup-codes";
-@import "components/setup-progress-bar";
 @import "components/global-notice";
 @import "components/screen-link";
 @import "components/screen-navigation";
 @import "components/auto-tabbing-input";
 @import "components/revalidate-modal";
 @import "components/success";
+@import "components/first-time/first-time";
+@import "components/first-time/setup-progress-bar";
 @import "components/svn-password";

@@ -13,6 +13,10 @@
 	"attributes": {
 		"userId": {
 			"type": "integer"
+		},
+		"isOnboarding": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"textdomain": "wporg",

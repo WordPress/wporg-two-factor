@@ -16,8 +16,11 @@ import RegisterKey from './register-key';
 
 /**
  * Render the WebAuthn setting.
+ *
+ * @param {Object}   props
+ * @param {Function} props.onKeyAdd
  */
-export default function WebAuthn() {
+export default function WebAuthn( { onKeyAdd = () => {} } ) {
 	const {
 		user: { userRecord, webAuthnEnabled },
 		setGlobalNotice,
@@ -96,7 +99,8 @@ export default function WebAuthn() {
 		}
 
 		updateFlow( 'manage' );
-	}, [ webAuthnEnabled, toggleProvider, updateFlow ] );
+		onKeyAdd();
+	}, [ webAuthnEnabled, toggleProvider, updateFlow, onKeyAdd ] );
 
 	if ( 'register' === flow ) {
 		return (

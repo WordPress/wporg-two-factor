@@ -15,22 +15,17 @@ import { refreshRecord } from '../utilities/common';
 import { GlobalContext } from '../script';
 import Success from './success';
 
-export default function TOTP() {
+export default function TOTP( { onSuccess } ) {
 	const {
-		user: { backupCodesEnabled, totpEnabled },
-		navigateToScreen,
+		user: { totpEnabled },
 	} = useContext( GlobalContext );
 	const [ success, setSuccess ] = useState( false );
 
 	const afterTimeout = useCallback( () => {
 		setSuccess( false );
 
-		if ( ! backupCodesEnabled ) {
-			navigateToScreen( 'backup-codes' );
-		} else {
-			navigateToScreen( 'account-status' );
-		}
-	}, [ backupCodesEnabled, navigateToScreen ] );
+		onSuccess();
+	}, [ onSuccess ] );
 
 	if ( success ) {
 		return (

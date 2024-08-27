@@ -5,12 +5,19 @@
 
 	.wporg-2fa__backup-codes-list {
 		background-color: $gray-300;
+		margin-top: 24px;
 		padding: 15px 20px;
 
 		ol {
 			column-count: 2;
 			column-width: 110px;
 			margin: 0;
+		}
+
+		@media (max-width: 600px) {
+			ol {
+				column-count: 1;
+			}
 		}
 
 		li::marker {

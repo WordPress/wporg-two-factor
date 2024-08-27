@@ -1,0 +1,92 @@
+.wporg-2fa__progress-bar,
+#bbpress-forums .wporg-2fa__progress-bar,
+#bbpress-forums.bbpress-wrapper .wporg-2fa__progress-bar {
+	--color-enabled: var(--wp--preset--color--blueberry-1, #3858e9);
+	--color-disabled: #{$gray-400};
+	--color-disabled-text: #{$gray-700}; // Darker than `color-disabled` to meet a11y contrast standards.
+
+	position: relative;
+
+	.wporg-2fa__setup-steps {
+		position: relative;
+		margin-bottom: 32px;
+		z-index: 2; /* On top of the separators. */
+		display: flex;
+		justify-content: space-between;
+
+		.wporg-2fa__setup-count {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: white;
+			width: 32px;
+			height: 32px;
+			border-radius: 32px;
+			color: var(--color-disabled-text);
+			border: 1.5px solid var(--color-disabled);
+		}
+
+		li {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+
+			.wporg-2fa__setup-label {
+				display: block;
+				font-size: 12px;
+			}
+		}
+
+		li.is-enabled {
+			color: var(--wp--preset--color--charcoal-1 #1e1e1e);
+
+			.wporg-2fa__setup-count {
+				background-color: var(--color-enabled);
+				border-color: var(--color-enabled);
+				color: white;
+			}
+		}
+
+		li.is-disabled {
+			color: var(--color-disabled-text);
+
+			.wporg-2fa__setup-count {
+				background-color: white;
+				border-color: var(--color-disabled);
+			}
+		}
+
+		li.is-complete {
+			color: var(--color-disabled-text);
+
+			.wporg-2fa__setup-count {
+				background-color: var(--color-enabled);
+				border-color: var(--color-enabled);
+				color: white;
+			}
+		}
+	}
+}
+
+.wporg-2fa__progress-bar {
+	margin: 0;
+	width: 100%;
+	max-width: 350px;
+}
+
+.wporg-2fa__progress-bar .wporg-2fa__setup-step-separator::before {
+	content: '';
+	position: absolute;
+	height: 1.5px;
+	width: var(--wporg-separator-width, 0%);
+	background:  var(--wp--preset--color--blueberry-1, #3858e9);
+	z-index: 1;
+}
+
+.wporg-2fa__progress-bar .wporg-2fa__setup-step-separator {
+	position: absolute;
+	background: var(--color-disabled);
+	height: 1.5px;
+	top: 16px;
+	z-index: 0;
+}

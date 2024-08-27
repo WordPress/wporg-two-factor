@@ -7,10 +7,14 @@ defined( 'WPINC' ) || die();
 
 require __DIR__ . '/rest-api.php';
 
+const SETTINGS_PAGE_PATH = '/profile/edit/group/3';
+const ONBOARDING_PAGE_PATH = '/profile/security';
+
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\maybe_dequeue_stylesheet', 40 );
 add_action( 'wp_head', __NAMESPACE__ . '\maybe_add_custom_print_css' );
+add_action( 'template_redirect', __NAMESPACE__ . '\onboarding_template_page' );
 
 /**
  * Registers the block
@@ -45,6 +49,28 @@ function replace_core_ui_with_custom() : void {
 }
 
 /**
+ * Return true if the current page is the onboarding page.
+ *
+ * @return bool
+ */
+function is_onboarding_page() {
+	global $wp;
+
+	return 1 === preg_match( '#' . ONBOARDING_PAGE_PATH . '#', $wp->request );
+}
+
+/**
+ * Return true if we load the 2fa component on this path.
+ *
+ * @return bool
+ */
+function page_has_2fa_component() {
+	global $wp;
+
+	return is_onboarding_page() || 1 === preg_match( '#' . SETTINGS_PAGE_PATH . '#', $wp->request );
+}
+
+/**
  * Render our custom 2FA interface.
  *
  * @codeCoverageIgnore
@@ -57,7 +83,13 @@ function render_custom_ui() : void {
 		return;
 	}
 
-	$json_attrs = json_encode( [ 'userId' => $user_id ] );
+	$block_attributes = [ 'userId' => $user_id ];
+
+	if ( is_onboarding_page() ) {
+		$block_attributes['isOnboarding'] = true;
+	}
+
+	$json_attrs = json_encode( $block_attributes  );
 
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
@@ -160,10 +192,9 @@ function login_footer_revalidate_customizations() {
  * @todo this may not be necessary once https://github.com/WordPress/gutenberg/issues/54491 is resolved.
  */
 function maybe_dequeue_stylesheet() {
-	global $wp;
 
 	// Match the URL since page/blog IDs etc aren't consistent across environments.
-	if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
+	if ( page_has_2fa_component() ) {
 		return;
 	}
 
@@ -174,10 +205,9 @@ function maybe_dequeue_stylesheet() {
  * Add custom CSS for print styles.
  */
 function maybe_add_custom_print_css() {
-    global $wp;
 
     // Check if the current URL matches the specific condition
-    if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
+    if ( page_has_2fa_component() ) {
         ?>
         <style>
         @media print {
@@ -191,4 +221,23 @@ function maybe_add_custom_print_css() {
         </style>
         <?php
     }
+}
+
+/**
+ * Load the custom onboarding template for the security page.
+ */
+function onboarding_template_page() {
+	if ( is_onboarding_page() ) {
+		$user = wp_get_current_user();
+
+		if ( Two_Factor_Core::is_user_using_two_factor( $user->ID ) ) {
+			wp_safe_redirect( get_edit_account_url() );
+			exit;
+		}
+
+		status_header( 200 );
+		// Template lives in the theme.
+		locate_template( array( 'members/single/security.php' ), true );
+		exit;
+	}
 }
