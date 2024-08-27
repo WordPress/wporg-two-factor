@@ -24,37 +24,53 @@ export default function Settings() {
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
-		home: <AccountStatus />,
-		email: <EmailAddress />,
-		password: <Password />,
-		totp: (
-			<TOTP
-				onSuccess={ () => {
-					if ( ! backupCodesEnabled ) {
-						navigateToScreen( 'backup-codes' );
-					} else {
-						navigateToScreen( 'home' );
-					}
-				} }
-			/>
-		),
-		webauthn: (
-			<WebAuthn
-				onKeyAdd={ () => {
-					if ( ! backupCodesEnabled ) {
-						navigateToScreen( 'backup-codes' );
-					}
-				} }
-			/>
-		),
-		'backup-codes': <BackupCodes onSuccess={ () => navigateToScreen( 'home' ) } />,
+		email: {
+			title: 'Email',
+			component: <EmailAddress />,
+		},
+		password: {
+			title: 'Password',
+			component: <Password />,
+		},
+		totp: {
+			title: 'Two-factor authentication',
+			component: (
+				<TOTP
+					onSuccess={ () => {
+						if ( ! backupCodesEnabled ) {
+							navigateToScreen( 'backup-codes' );
+						} else {
+							navigateToScreen( 'home' );
+						}
+					} }
+				/>
+			),
+		},
+		'backup-codes': {
+			title: 'Backup codes',
+			component: <BackupCodes onSuccess={ () => navigateToScreen( 'home' ) } />,
+		},
+		webauthn: {
+			title: 'Two-factor security key',
+			component: (
+				<WebAuthn
+					onKeyAdd={ () => {
+						if ( ! backupCodesEnabled ) {
+							navigateToScreen( 'backup-codes' );
+						}
+					} }
+				/>
+			),
+		},
 	};
 
 	const currentScreenComponent =
 		'home' === screen ? (
-			components[ screen ]
+			<AccountStatus />
 		) : (
-			<ScreenNavigation screen={ screen }>{ components[ screen ] }</ScreenNavigation>
+			<ScreenNavigation screen={ screen } title={ components[ screen ].title }>
+				{ components[ screen ].component }
+			</ScreenNavigation>
 		);
 
 	return currentScreenComponent;

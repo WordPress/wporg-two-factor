@@ -32,14 +32,7 @@ const ScreenNavigation = ( { screen, children, title = '', canNavigate = true } 
 				/>
 			) }
 
-			<h3>
-				{ title.length
-					? title
-					: screen
-							.replace( '-', ' ' )
-							.replace( 'totp', 'Two-Factor Authentication' )
-							.replace( 'webauthn', 'Two-Factor Security Key' ) }
-			</h3>
+			<h3>{ title }</h3>
 		</CardHeader>
 		<CardBody className={ 'wporg-2fa__' + screen }>{ children }</CardBody>
 	</Card>
