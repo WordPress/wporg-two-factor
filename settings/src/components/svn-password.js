@@ -52,9 +52,9 @@ export default function SVNPassword() {
 	return (
 		<>
 			<p>
-				WordPress.org uses Subversion (SVN) for version control, every Plugin and Theme
-				hosted by WordPress.org has a access to a SVN repository that the author can commit
-				to. For information on using SVN, please see the{ ' ' }
+				WordPress.org uses Subversion (SVN) for version control, providing each hosted
+				plugin and theme with a repository that the author can commit to. For information on
+				using SVN, please see the{ ' ' }
 				<a href="https://developer.wordpress.org/plugins/wordpress-org/how-to-use-subversion/">
 					WordPress.org Plugin Developer Handbook
 				</a>
