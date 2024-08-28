@@ -85,7 +85,7 @@ export default function AccountStatus() {
 				status={
 					! hasPrimaryProvider && ! backupCodesEnabled ? 'pending' : backupCodesEnabled
 				}
-				headerText="Two-Factor backup codes"
+				headerText="Two-factor backup codes"
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
