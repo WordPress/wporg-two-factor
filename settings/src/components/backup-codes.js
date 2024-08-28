@@ -237,7 +237,9 @@ function Manage( { setGenerating } ) {
 			</div>
 
 			<Button isSecondary onClick={ () => setGenerating( true ) }>
-				{ backupCodesEnabled ? 'Regenerate backup codes' : 'Generate backup codes' }
+				{ backupCodesEnabled
+					? 'Regenerate and save backup codes'
+					: 'Generate and save backup codes' }
 			</Button>
 		</>
 	);
