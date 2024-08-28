@@ -91,7 +91,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 	if ( 'success' === step ) {
 		return (
 			<Success
-				message={ `Success! Your ${ keyName } is successfully registered.` }
+				message={ `Success! Your "${ keyName }" is successfully registered.` }
 				afterTimeout={ onSuccess }
 			/>
 		);

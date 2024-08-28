@@ -4,7 +4,7 @@
 	}
 
 	.wporg-2fa__backup-codes-list {
-		background-color: $gray-300;
+		background-color: var(--wp--preset--color--light-grey-2, #f6f6f6);
 		margin-top: 24px;
 		padding: 15px 20px;
 

@@ -19,7 +19,9 @@ $alert-blue: #72aee6;
 
 .wp-block-wporg-two-factor-settings {
 	position: relative;
-	font-size: 13px;
+	font-size: 14px;
+	font-family: 'Inter', sans-serif;
+	text-wrap: pretty;
 
 	> div.initial-load {
 		display: flex;
@@ -48,12 +50,16 @@ $alert-blue: #72aee6;
 		input[type="number"] {
 			padding: 6px 10px;
 			font-size: 14px;
-			font-family: "Open Sans", sans-serif;
 		}
 	}
 
 	.components-card__body p:first-child {
 		margin-top: 0;
+	}
+
+	label,
+	.components-base-control__help {
+		font-family: 'Inter', sans-serif;
 	}
 
 	label {
@@ -86,6 +92,10 @@ $alert-blue: #72aee6;
 
 	& + .components-notice.is-error {
 		margin-top: 24px;
+	}
+
+	> button {
+		font-size: 14px; /* Overwrite the Gutenberg default. */
 	}
 }
 

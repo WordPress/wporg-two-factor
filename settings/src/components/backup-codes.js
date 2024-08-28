@@ -164,7 +164,7 @@ function Setup( { setRegenerating, onSuccess } ) {
 					disabled={ ! hasPrinted }
 					onClick={ handleFinished }
 				>
-					All Finished
+					Done
 				</Button>
 			</Flex>
 		</>

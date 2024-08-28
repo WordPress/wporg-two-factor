@@ -25,7 +25,7 @@ const ScreenNavigation = ( { screen, children, title = '', canNavigate = true } 
 					ariaLabel="Back to the account status page"
 					anchorText={
 						<>
-							<Icon icon={ chevronLeft } width={ 14 } />
+							<Icon icon={ chevronLeft } width={ 24 } height={ 24 } />
 							Back
 						</>
 					}
