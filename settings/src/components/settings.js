@@ -25,7 +25,7 @@ export default function Settings() {
 	// The index is the URL slug and the value is the React component.
 	const components = {
 		email: {
-			title: 'Email',
+			title: 'Account email',
 			component: <EmailAddress />,
 		},
 		password: {
