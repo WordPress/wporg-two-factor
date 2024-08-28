@@ -21,7 +21,11 @@ import { GlobalContext } from '../script';
  * Render the correct component based on the URL.
  */
 export default function Settings() {
-	const { backupCodesEnabled, navigateToScreen, screen } = useContext( GlobalContext );
+	const {
+		user: { backupCodesEnabled },
+		navigateToScreen,
+		screen,
+	} = useContext( GlobalContext );
 
 	// The index is the URL slug and the value is the React component.
 	const components = {
