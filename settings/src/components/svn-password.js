@@ -100,15 +100,16 @@ export default function SVNPassword() {
 					) }
 				</li>
 			</ul>
-
-			<Button
-				variant="secondary"
-				onClick={ handleGenerate }
-				isBusy={ isGenerating }
-				disabled={ isGenerating }
-			>
-				Regenerate Password
-			</Button>
+			<div className="wporg-2fa__submit-actions">
+				<Button
+					variant="secondary"
+					onClick={ handleGenerate }
+					isBusy={ isGenerating }
+					disabled={ isGenerating }
+				>
+					Regenerate Password
+				</Button>
+			</div>
 		</>
 	);
 }
