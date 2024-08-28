@@ -61,12 +61,12 @@ export default function SVNPassword() {
 				.
 			</p>
 
-			<p>
+			<p className="wporg-2fa__screen-intro">
 				For security, your WordPress.org account password should not be used to commit to
 				SVN, use a separate SVN password, which you can generate here.
 			</p>
 
-			<h3>Details</h3>
+			<h4>Details</h4>
 			<ul>
 				<li>
 					Username: <code>{ userRecord.record.username }</code>{ ' ' }
