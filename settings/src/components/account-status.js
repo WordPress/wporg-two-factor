@@ -53,7 +53,7 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="email"
 				status={ emailStatus }
-				headerText="Account Email"
+				headerText="Account email"
 				bodyText={
 					pendingEmail
 						? `Your account email is pending a change to ${ pendingEmail }.`
@@ -64,7 +64,7 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="webauthn"
 				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-				headerText="Two-Factor Security Key"
+				headerText="Two-factor security key"
 				bodyText={
 					webAuthnEnabled
 						? 'You have two-factor authentication enabled using security keys.'
@@ -76,7 +76,7 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="totp"
 				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
-				headerText="Two-Factor App"
+				headerText="Two-factor app"
 				bodyText={
 					totpEnabled
 						? 'You have two-factor authentication enabled using an app.'
@@ -90,7 +90,7 @@ export default function AccountStatus() {
 				status={
 					! hasPrimaryProvider && ! backupCodesEnabled ? 'pending' : backupCodesEnabled
 				}
-				headerText="Two-Factor Backup Codes"
+				headerText="Two-factor backup codes"
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
