@@ -12,6 +12,16 @@ add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\two_factor_user_a
 add_action( 'update_user_meta', __NAMESPACE__ . '\action_update_user_meta', 10, 4 );
 
 /**
+ * Convert a Provider class name into a friendly nice name.
+ *
+ * @param string $provider
+ * @return string
+ */
+function provider_name_from_key( $provider ) {
+	return str_replace( '_', ' ', str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider ) );
+}
+
+/**
  * Record stats for number of authentications per provider per day.
  */
 function two_factor_user_authenticated( $user_id, $provider ) {
@@ -19,10 +29,7 @@ function two_factor_user_authenticated( $user_id, $provider ) {
 		return;
 	}
 
-	$provider = str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider->get_key() );
-	$provider = str_replace( '_', ' ', $provider );
-
-	bump_stats_extra( 'two-factor-auth', $provider );
+	bump_stats_extra( 'two-factor-auth', provider_name_from_key( $provider->get_key() ) );
 }
 
 /**
@@ -69,9 +76,8 @@ function action_update_user_meta( $meta_id, $user_id, $meta_key, $new_meta_value
 			$new_providers      = $new_meta_value ?? [];
 			$enabled_providers  = array_diff( $new_providers, $old_providers );
 
-			foreach ( $enabled_providers as $provider ) {
-				$provider_name = str_replace( '_', ' ', str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider ) );
-				bump_stats_extra( 'wporg-two-factor', "Set $provider_name after nag" );
+			foreach ( $enabled_providers as $provider_key ) {
+				bump_stats_extra( 'wporg-two-factor', 'Set ' . provider_name_from_key( $provider_key ) . ' after nag' );
 			}
 		}
 	};
