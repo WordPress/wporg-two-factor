@@ -4,15 +4,15 @@
 import { useCallback, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
-export default function CopyToClipboardButton( { codes, variant = 'secondary' } ) {
+export default function CopyToClipboardButton( { contents, variant = 'secondary' } ) {
 	const [ copied, setCopied ] = useState( false );
 
 	const onClick = useCallback( () => {
-		navigator.clipboard.writeText( codes ).then( () => {
+		navigator.clipboard.writeText( contents ).then( () => {
 			setCopied( true );
 			setTimeout( () => setCopied( false ), 2000 );
 		} );
-	}, [ codes ] );
+	}, [ contents ] );
 
 	return (
 		<Button variant={ variant } onClick={ onClick }>

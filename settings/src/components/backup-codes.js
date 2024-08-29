@@ -143,7 +143,7 @@ function Setup( { setRegenerating, onSuccess } ) {
 					<CodeList codes={ backupCodes } />
 
 					<ButtonGroup>
-						<CopyToClipboardButton codes={ backupCodes } />
+						<CopyToClipboardButton contents={ backupCodes } />
 						<PrintButton />
 						<DownloadButton codes={ backupCodes } />
 					</ButtonGroup>
