@@ -82,15 +82,12 @@ export default function SVNPassword() {
 								<CopyToClipboardButton variant="link" codes={ generatedPassword } />
 							) }
 							{ userRecord.record.svn_password_created && (
-								<>
-									<br />
-									<em className="wporg-2fa__svn-password_generated">
-										Generated on{ ' ' }
-										{ new Date(
-											userRecord.record.svn_password_created
-										).toLocaleDateString() }
-									</em>
-								</>
+								<div className="wporg-2fa__svn-password_generated">
+									Generated on{ ' ' }
+									{ new Date(
+										userRecord.record.svn_password_created
+									).toLocaleDateString() }
+								</div>
 							) }
 						</>
 					) : (

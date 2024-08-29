@@ -51,7 +51,7 @@ export default function ListKeys() {
 
 	return (
 		<>
-			<h4 className="wporg-2fa__webauthn-keys-header">Security Keys</h4>
+			<h4>Security Keys</h4>
 			<ul className="wporg-2fa__webauthn-keys-list">
 				{ keys.map( ( key ) => (
 					<li key={ key.id }>
