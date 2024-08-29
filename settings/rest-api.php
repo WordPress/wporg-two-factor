@@ -369,11 +369,6 @@ function register_user_fields(): void {
 					return false;
 				}
 
-				// Temporarily only show this to 2FA beta-testers, until the systems side is handled.
-				if ( ! is_2fa_beta_tester( $user ) ) {
-					return false;
-				}
-
 				// Committers, supes, etc. It's likely these users will need a SVN password.
 				if ( function_exists( 'is_special_user' ) && is_special_user( $user->ID ) ) {
 					return true;
