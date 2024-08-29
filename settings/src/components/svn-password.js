@@ -91,7 +91,10 @@ export default function SVNPassword() {
 							<code>{ generatedPassword || 'svn_*****************' }</code>
 							&nbsp;
 							{ generatedPassword && (
-								<CopyToClipboardButton variant="link" contents={ generatedPassword } />
+								<CopyToClipboardButton
+									variant="link"
+									contents={ generatedPassword }
+								/>
 							) }
 							{ userRecord.record.svn_password_created && (
 								<div className="wporg-2fa__svn-password_generated">
