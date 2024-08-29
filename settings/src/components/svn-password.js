@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
-import { useCallback, useContext, useState } from '@wordpress/element';
+import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { refreshRecord } from '../utilities/common';
 import CopyToClipboardButton from './copy-to-clipboard-button';
 
@@ -48,6 +48,18 @@ export default function SVNPassword() {
 			setError( apiFetchError );
 		}
 	} );
+
+	const getButtonText = useMemo( () => {
+		if ( isGenerating ) {
+			return 'Generating...';
+		}
+
+		if ( ! userRecord.record.svn_password_created ) {
+			return 'Generate Password';
+		}
+
+		return 'Regenerate Password';
+	}, [ isGenerating, userRecord.record.svn_password_created ] );
 
 	return (
 		<>
@@ -104,7 +116,7 @@ export default function SVNPassword() {
 					isBusy={ isGenerating }
 					disabled={ isGenerating }
 				>
-					Regenerate Password
+					{ getButtonText }
 				</Button>
 			</div>
 		</>
