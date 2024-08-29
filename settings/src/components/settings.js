@@ -64,7 +64,7 @@ export default function Settings() {
 			),
 		},
 		'svn-password': {
-			title: 'SVN Password',
+			title: 'SVN credentials',
 			component: <SVNPassword />,
 		},
 	};

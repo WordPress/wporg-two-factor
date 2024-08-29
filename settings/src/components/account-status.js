@@ -101,7 +101,7 @@ export default function AccountStatus() {
 					status={
 						! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet
 					}
-					headerText="SVN Credentials"
+					headerText="SVN credentials"
 					bodyText={
 						! svnPasswordSet
 							? 'You have not configured a SVN password for your account.'
