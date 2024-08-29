@@ -29,6 +29,7 @@ function is_2fa_beta_tester( $user = false ) : bool {
 }
 
 require_once __DIR__ . '/settings/settings.php';
+require_once __DIR__ . '/stats.php';
 
 /**
  * Load the WebAuthn plugin.
@@ -76,7 +77,6 @@ add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
 add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
-add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\two_factor_user_authenticated', 10, 2 );
 
 /**
  * Determine which providers should be available to users.
@@ -431,20 +431,6 @@ function after_provider_deactivated( $user_id, $provider = null ) {
 			'two-factor-login'    => null,
 		] );
 	}
-}
-
-/**
- * Record stats for number of authentications per provider per day.
- */
-function two_factor_user_authenticated( $user_id, $provider ) {
-	if ( ! function_exists( 'bump_stats_extra' ) || ! $provider ) {
-		return;
-	}
-
-	$provider = str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider->get_key() );
-	$provider = str_replace( '_', ' ', $provider );
-
-	bump_stats_extra( 'two-factor-auth', $provider );
 }
 
 /*
