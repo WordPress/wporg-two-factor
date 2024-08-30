@@ -34,7 +34,7 @@ export default function AccountStatus() {
 			? 'Please enable a Two-Factor security key or app before enabling backup codes.'
 			: `You have
 				${ backupCodesEnabled ? '' : 'not' }
-				verified your backup codes for two-factor authentication.`;
+				verified your backup codes.`;
 
 	return (
 		<div className={ 'wporg-2fa__account-status' }>
@@ -63,7 +63,7 @@ export default function AccountStatus() {
 				bodyText={
 					webAuthnEnabled
 						? 'You have two-factor authentication enabled using security keys.'
-						: 'You have not enabled security keys for two-factor authentication.'
+						: 'You have not enabled security keys.'
 				}
 				isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
 			/>
@@ -75,7 +75,7 @@ export default function AccountStatus() {
 				bodyText={
 					totpEnabled
 						? 'You have two-factor authentication enabled using an app.'
-						: 'You have not enabled an app for two-factor authentication.'
+						: 'You have not enabled an app.'
 				}
 				isPrimary={ 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled }
 			/>
