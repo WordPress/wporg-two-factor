@@ -273,19 +273,17 @@ function user_should_2fa( $user ) : bool {
 		return true;
 	}
 
-	/*
 	// If a user ... they should have 2FA enabled.
 	if (
 		// Is (or was) a plugin committer
 		$user->has_plugins ||
 		// Has (or had) a live theme
-		$user->has_themes ||
+		$user->has_themes /* ||
 		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
-		$user->has_elevated_role
+		$user->has_elevated_role */
 	) {
 		return true;
 	}
- 	*/
 
 	return false;
 }
