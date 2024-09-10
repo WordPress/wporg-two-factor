@@ -2,7 +2,7 @@
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
 
-const COOKIE_NAME = 'wporg_2fa_validation';
+const COOKIE_NAME = 'wporg_2fa_status';
 
 defined( 'WPINC' ) || die();
 
@@ -96,7 +96,7 @@ function set_cookie() {
 	/*
 	 * Set a cookie to let JS know when the validation expires.
 	 *
-	 * The value is "wporg_2fa_validated=TIMESTAMP", where TIMESTAMP is when the validation will expire.
+	 * The value is "wporg_2fa_status=TIMESTAMP", where TIMESTAMP is when the validation will expire.
 	 * The cookie will expire a minute before the server would cease to accept the save action.
 	 */
 	setcookie(
