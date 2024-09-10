@@ -2,6 +2,17 @@
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core;
 
+/**
+ * The name of the cookie used to store the revalidation time.
+ *
+ * This cookie is not a security cookie, it's only purpose is to flag to the JS whether
+ * the user session has a valid 2FA state or not.
+ *
+ * The value of the cookie may be incorrect, in which case the server will handle redirection
+ * to the revalidation flow.
+ *
+ * @var string
+ */
 const COOKIE_NAME = 'wporg_2fa_status';
 
 defined( 'WPINC' ) || die();
