@@ -89,7 +89,7 @@ function render_custom_ui() : void {
 		$block_attributes['isOnboarding'] = true;
 	}
 
-	$json_attrs = json_encode( $block_attributes  );
+	$json_attrs = json_encode( $block_attributes );
 
 	$preload_paths = [
 		'/wp/v2/users/' . $user_id . '?context=edit',
@@ -205,22 +205,21 @@ function maybe_dequeue_stylesheet() {
  * Add custom CSS for print styles.
  */
 function maybe_add_custom_print_css() {
-
-    // Check if the current URL matches the specific condition
-    if ( page_has_2fa_component() ) {
-        ?>
-        <style>
-        @media print {
-            #item-header,
-            #headline,
-            footer,
-            .button-nav {
-                display: none !important;
-            }
-        }
-        </style>
-        <?php
-    }
+	if ( ! page_has_2fa_component() ) {
+		return;
+	}
+	?>
+	<style>
+	@media print {
+	    #item-header,
+	    #headline,
+	    footer,
+	    .button-nav {
+		display: none !important;
+	    }
+	}
+	</style>
+	<?php
 }
 
 /**
