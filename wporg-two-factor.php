@@ -226,16 +226,6 @@ function user_requires_2fa( $user ) : bool {
 		return false;
 	}
 
-	// @codeCoverageIgnoreStart
-	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
-		// 2FA is opt-in during beta testing.
-		// todo Remove this once we open it to all users.
-		if ( ! is_2fa_beta_tester( $user ) ) {
-			return false;
-		}
-	}
-	// @codeCoverageIgnoreEnd
-
 	$required = false;
 
 	if ( is_special_user( $user->ID ) ) {
@@ -246,6 +236,18 @@ function user_requires_2fa( $user ) : bool {
 		$required = true;
 	}
 
+	// If a user ... they have to have 2FA enabled.
+	if (
+		// Is (or was) a plugin committer
+		$user->has_plugins ||
+		// Has (or had) a live theme
+		$user->has_themes /* ||
+		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
+		$user->has_elevated_role */
+	) {
+		return true;
+	}
+	
 	return $required;
 }
 
