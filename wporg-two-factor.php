@@ -241,9 +241,7 @@ function user_requires_2fa( $user ) : bool {
 		// Is (or was) a plugin committer
 		$user->has_plugins ||
 		// Has (or had) a live theme
-		$user->has_themes /* ||
-		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
-		$user->has_elevated_role */
+		$user->has_themes
 	) {
 		return true;
 	}
