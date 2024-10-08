@@ -23,7 +23,9 @@ defined( 'WPINC' ) || die();
  * @return array {
  *    @type int  $last_validated   The timestamp of the last time the user was validated.
  *    @type int  $expires_at       The timestamp when the current validation expires.
+ *    @type int  $expires_save     The timestamp when the user will need to revalidate to save.
  *    @type bool $needs_revalidate Whether the user needs to revalidate.
+ *    @type bool $can_save         Whether the user can currently save.
  * }
  */
 function get_revalidation_status() {
@@ -60,25 +62,24 @@ function get_revalidate_url( $redirect_to = '' ) {
 /**
  * Get the URL for revalidating 2FA via JavaScript.
  *
- * The calling code should be listening for a 'reValidationComplete' event.
+ * The calling code can listening for a 'reValidationComplete' event, or
+ * simply have the user continue to $redirect_to.
  *
  * @param string $redirect_to The URL to redirect to after revalidating.
  * @return string
  */
 function get_js_revalidation_url( $redirect_to = '' ) {
-	$url = get_revalidate_url( $redirect_to );
-
-	// Add some JS to the footer to handle the revalidate actions.
+	// Enqueue the JS to to handle the revalidate action.
 	enqueue_assets();
 
-	return $url;
+	return get_revalidate_url( $redirect_to );
 }
 
 /**
  * Output the JavaScript & CSS for the revalidate modal.
  *
  * This is output to the footer of the page, and listens for clicks on revalidate links.
- * When a revalidate link is clicked, a modal dialog is opened with an iframe to the revalidate URL.
+ * When a revalidate link is clicked, a modal dialog is opened with an iframe to the revalidate 2FA session.
  * When the revalidation is complete, the dialog is closed and the calling code is notified via a 'reValidationComplete' event.
  */
 function enqueue_assets() {
