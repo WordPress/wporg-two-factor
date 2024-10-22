@@ -75,7 +75,7 @@ add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primar
 add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
-add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
+add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 3 ); // Must run _after_ all other plugins.
 add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
 
 /**
@@ -192,16 +192,18 @@ function remove_super_admins_until_2fa_enabled() : void {
  * That is necessary even though we'll redirect all requests to their profile, because otherwise they could still
  * perform privileged actions on the front end, via the REST API, etc.
  */
-function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, array $args, WP_User $user ) : array {
-	if ( 0 === $user->ID || ! user_requires_2fa( $user ) ) {
+function remove_capabilities_until_2fa_enabled( array $allcaps, array $caps, array $args ) : array {
+	$current_user = wp_get_current_user();
+
+	if ( 0 === $current_user->ID || ! user_requires_2fa( $current_user ) ) {
 		return $allcaps;
 	}
 
-	if ( ! Two_Factor_Core::is_user_using_two_factor( $user->ID ) ) {
+	if ( ! Two_Factor_Core::is_user_using_two_factor( $current_user->ID ) ) {
 		// This also relies on `remove_super_admins_until_2fa_enabled()`, see notes in that function.
 		$allcaps = get_role( 'subscriber' )->capabilities;
 
-		if ( function_exists( 'bbp_is_user_inactive' ) && ! bbp_is_user_inactive( $user->ID ) ) {
+		if ( function_exists( 'bbp_is_user_inactive' ) && ! bbp_is_user_inactive( $current_user->ID ) ) {
 			$allcaps = array_merge( $allcaps, bbp_get_caps_for_role( bbp_get_participant_role() ) );
 			$allcaps['read_private_forums'] = false;
 		}
