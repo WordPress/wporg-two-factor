@@ -103,8 +103,7 @@ function set_cookie() {
 		return;
 	}
 
-	$status     = get_status();
-	$expires_at = $status['expires_save'];
+	$expires_at = get_status()['expires_save'] ?? time();
 
 	/*
 	 * Set a cookie to let JS know when the validation expires.
