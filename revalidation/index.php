@@ -1,6 +1,8 @@
 <?php
-namespace WordPressdotorg\Two_Factor;
+namespace WordPressdotorg\Two_Factor\Revalidation;
 use Two_Factor_Core;
+
+defined( 'WPINC' ) || die();
 
 /**
  * The name of the cookie used to store the revalidation time.
@@ -15,8 +17,6 @@ use Two_Factor_Core;
  */
 const COOKIE_NAME = 'wporg_2fa_status';
 
-defined( 'WPINC' ) || die();
-
 /**
  * Get the revalidation status for the current user, aka "sudo mode".
  *
@@ -28,7 +28,7 @@ defined( 'WPINC' ) || die();
  *    @type bool $can_save         Whether the user can currently save.
  * }
  */
-function get_revalidation_status() {
+function get_status() {
 	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
 	$timeout        = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'display' );
 	$save_timeout   = 2 * apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'save' );
@@ -50,7 +50,7 @@ function get_revalidation_status() {
  * @param string $redirect_to The URL to redirect to after revalidating.
  * @return string
  */
-function get_revalidate_url( $redirect_to = '' ) {
+function get_url( $redirect_to = '' ) {
 	$url = Two_Factor_Core::get_user_two_factor_revalidate_url();
 	if ( ! empty( $redirect_to ) ) {
 		$url = add_query_arg( 'redirect_to', urlencode( $redirect_to ), $url );
@@ -68,11 +68,11 @@ function get_revalidate_url( $redirect_to = '' ) {
  * @param string $redirect_to The URL to redirect to after revalidating.
  * @return string
  */
-function get_js_revalidation_url( $redirect_to = '' ) {
+function get_js_url( $redirect_to = '' ) {
 	// Enqueue the JS to to handle the revalidate action.
 	enqueue_assets();
 
-	return get_revalidate_url( $redirect_to );
+	return get_url( $redirect_to );
 }
 
 /**
@@ -91,7 +91,7 @@ function enqueue_assets() {
 		'l10n'       => [
 			'title' => __( 'Two-Factor Authentication', 'wporg' ),
 		],
-		'url'        => get_revalidate_url(),
+		'url'        => get_url(),
 	] );
 }
 
@@ -102,8 +102,8 @@ function set_cookie() {
 		return;
 	}
 
-	$status                  = get_revalidation_status();
-	$revalidation_expires_at = $status['expires_save'];
+	$status     = get_status();
+	$expires_at = $status['expires_save'];
 
 	/*
 	 * Set a cookie to let JS know when the validation expires.
@@ -113,8 +113,8 @@ function set_cookie() {
 	 */
 	setcookie(
 		COOKIE_NAME,
-		$revalidation_expires_at,
-		$revalidation_expires_at - MINUTE_IN_SECONDS, // The cookie will cease to exist to JS at this time.
+		$expires_at,
+		$expires_at - MINUTE_IN_SECONDS, // The cookie will cease to exist to JS at this time.
 		COOKIEPATH,
 		COOKIE_DOMAIN,
 		is_ssl(),
