@@ -90,7 +90,7 @@ function enqueue_assets() {
 		'cookieName' => COOKIE_NAME,
 		'l10n'       => [
 			'title'   => __( 'Two-Factor Authentication', 'wporg' ),
-			'message' => __( 'To continue, please validate your two-factor details.', 'wporg' ),
+			'message' => __( 'Please verify your Two-Factor Authentication to continue.', 'wporg' ),
 		],
 		'url'        => get_url(),
 	] );
