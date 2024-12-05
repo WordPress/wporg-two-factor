@@ -39,14 +39,18 @@ window.wp = window.wp || {};
 			revalidateModal.remove();
 		}
 
+		const triggerElement = triggerEvent?.currentTarget || triggerEvent?.target;
+		const revalidationMessage = triggerElement?.dataset['2faMessage'] || settings.l10n.message;
+
 		revalidateModal = document.createElement( 'dialog' );
 		revalidateModal.className = 'wporg-2fa-revalidate-modal';
-		revalidateModal.innerHTML = '<h1>' + settings.l10n.title + '</h1>';
+		revalidateModal.innerHTML  = '<h1>' + settings.l10n.title + '</h1>';
+		revalidateModal.innerHTML += '<p>' + revalidationMessage + '</p>';
 
-		const iframe    = document.createElement( 'iframe' );
-		const linkHref  = triggerEvent?.currentTarget?.href || triggerEvent?.target?.href;
+		const linkHref  = triggerElement?.href;
 		const iframeSrc = urlLooksLikeRevalidationURL( linkHref ) ? linkHref : settings.url;
 
+		const iframe = document.createElement( 'iframe' );
 		iframe.src = iframeSrc + '&interim-login=1';
 
 		const closeButton = document.createElement( 'button' );

@@ -89,7 +89,8 @@ function enqueue_assets() {
 	wp_localize_script( 'wporg-2fa-revalidation', 'wporgTwoFactorRevalidation', [
 		'cookieName' => COOKIE_NAME,
 		'l10n'       => [
-			'title' => __( 'Two-Factor Authentication', 'wporg' ),
+			'title'   => __( 'Two-Factor Authentication', 'wporg' ),
+			'message' => __( 'To continue, please validate your two-factor details.', 'wporg' ),
 		],
 		'url'        => get_url(),
 	] );
