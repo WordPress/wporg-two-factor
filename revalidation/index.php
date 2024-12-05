@@ -45,6 +45,24 @@ function get_status() {
 }
 
 /**
+ * Perform a redirect to the revalidation URL if the user needs to revalidate.
+ *
+ * @param string $redirect_to The URL to redirect to after revalidating.
+ * @return void
+ */
+function auth_redirect( $redirect_to = '' ) {
+	$status = get_status();
+
+	if ( ! $status['needs_revalidate'] ) {
+		return;
+	}
+
+	// If the user is not validated, redirect to the revalidation URL.
+	wp_safe_redirect( get_url( $redirect_to ) );
+	exit;
+}
+
+/**
  * Get the URL for revalidating 2FA, with a redirect parameter.
  *
  * @param string $redirect_to The URL to redirect to after revalidating.
