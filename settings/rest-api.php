@@ -302,7 +302,7 @@ function register_user_fields(): void {
 				 *       when an admin is editing other users, they get prompted to update their 2FA as well.
 				 */
 
-				$status = get_revalidation_status();
+				$status = Revalidation\get_status();
 				if ( ! $status['last_validated'] ) {
 					return false;
 				}
