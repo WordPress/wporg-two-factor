@@ -40,26 +40,30 @@ window.wp = window.wp || {};
 		}
 
 		const triggerElement = triggerEvent?.currentTarget || triggerEvent?.target;
-		const revalidationMessage = triggerElement?.dataset['2faMessage'] || settings.l10n.message;
 
 		revalidateModal = document.createElement( 'dialog' );
 		revalidateModal.className = 'wporg-2fa-revalidate-modal';
-		revalidateModal.innerHTML  = '<h1>' + settings.l10n.title + '</h1>';
-		revalidateModal.innerHTML += '<p>' + revalidationMessage + '</p>';
+
+		const heading = document.createElement( 'h1' );
+		heading.textContent = settings.l10n.title;
+		revalidateModal.appendChild( heading );
+
+		const revalidationMessage = document.createElement( 'p' );
+		revalidationMessage.textContent = triggerElement?.dataset['2faMessage'] || settings.l10n.message;
+		revalidateModal.appendChild( revalidationMessage );
 
 		const linkHref  = triggerElement?.href;
 		const iframeSrc = urlLooksLikeRevalidationURL( linkHref ) ? linkHref : settings.url;
 
 		const iframe = document.createElement( 'iframe' );
 		iframe.src = iframeSrc + '&interim-login=1';
+		revalidateModal.appendChild( iframe );
 
 		const closeButton = document.createElement( 'button' );
 		closeButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 		closeButton.addEventListener( 'click', function() {
 			revalidateModal.close();
 		} );
-
-		revalidateModal.appendChild( iframe );
 		revalidateModal.appendChild( closeButton );
 
 		document.body.appendChild( revalidateModal );
