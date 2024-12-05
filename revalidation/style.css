@@ -1,5 +1,6 @@
 dialog.wporg-2fa-revalidate-modal {
 	border-radius: 8px;
+	max-width: 500px;
 }
 dialog.wporg-2fa-revalidate-modal > h1 {
 	margin: unset;
