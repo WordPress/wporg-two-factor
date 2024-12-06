@@ -139,9 +139,11 @@ window.wp = window.wp || {};
 		// Finally, notify others.
 		( theTriggerEvent?.target || window ).dispatchEvent( new Event( 'reValidationComplete', { bubbles: true } ) );
 
-		// If the last event was a click, throw that again.
+		// If the last event was a click, throw that again, but by re-creating it.
 		if ( theTriggerEvent?.type === 'click' ) {
-			theTriggerEvent.target.dispatchEvent( theTriggerEvent );
+			theTriggerEvent.target.dispatchEvent(
+				new theTriggerEvent.constructor( theTriggerEvent.type, theTriggerEvent )
+			);
 		}
 	};
 
