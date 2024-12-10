@@ -20,7 +20,7 @@ const COOKIE_NAME = 'wporg_2fa_status';
 /**
  * Get the revalidation status for the current user, aka "sudo mode".
  *
- * @return array {
+ * @return false|array {
  *    @type int  $last_validated   The timestamp of the last time the user was validated.
  *    @type int  $expires_at       The timestamp when the current validation expires.
  *    @type int  $expires_save     The timestamp when the user will need to revalidate to save.
@@ -29,6 +29,11 @@ const COOKIE_NAME = 'wporg_2fa_status';
  * }
  */
 function get_status() {
+	// If the user isn't using 2FA, none of this function returns useful data.
+	if ( ! Two_Factor_Core::is_user_using_two_factor( get_current_user_id() ) ) {
+		return false;
+	}
+
 	$last_validated = Two_Factor_Core::is_current_user_session_two_factor();
 	$timeout        = apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'display' );
 	$save_timeout   = 2 * apply_filters( 'two_factor_revalidate_time', 10 * MINUTE_IN_SECONDS, get_current_user_id(), 'save' );
@@ -52,6 +57,10 @@ function get_status() {
  */
 function auth_redirect( $redirect_to = '' ) {
 	$status = get_status();
+
+	if ( ! $status ) {
+		wp_die( 'Two-Factor Authentication Required.', 401 );
+	}
 
 	if ( ! $status['needs_revalidate'] ) {
 		return;
