@@ -105,7 +105,7 @@ window.wp = window.wp || {};
 	const maybeRevalidateOnLinkNavigate = function( e ) {
 		// Check to see if revalidation is required, otherwise we're in Sudo mode.
 		if ( ! revalidateRequired() ) {
-			maybeRemoveRevalidateURL( e.currentTarget );
+			maybeRemoveRevalidateURL( e.currentTarget || e.target );
 			return;
 		}
 
@@ -144,6 +144,9 @@ window.wp = window.wp || {};
 			theTriggerEvent.target.dispatchEvent(
 				new theTriggerEvent.constructor( theTriggerEvent.type, theTriggerEvent )
 			);
+		} else if ( theTriggerEvent?.type === 'submit' ) {
+			// Throwing a submit event doesn't seem to work, so we'll just submit the form directly.
+			theTriggerEvent.target.submit();
 		}
 	};
 
@@ -158,9 +161,15 @@ window.wp = window.wp || {};
 		messageHandler,
 	};
 
-	// Attach event listeners to all revalidate links and those that require 2FA sessions.
-	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]' ).forEach(
+	/*
+	 * Attach event listeners to all revalidate links and those that require 2FA sessions.
+	 * For forms, we listen on submit instead, which happens after form validation.
+	 */
+	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]:not(form)' ).forEach(
 		(el) => el.addEventListener( 'click', maybeRevalidateOnLinkNavigate )
+	);
+	document.querySelectorAll( 'form[data-2fa-required]' ).forEach(
+		(el) => el.addEventListener( 'submit', maybeRevalidateOnLinkNavigate )
 	);
 
 	// Watch for revalidation completion.
