@@ -29,7 +29,7 @@ window.wp = window.wp || {};
 
 	// Does the provided URL look like a revalidation url?
 	const urlLooksLikeRevalidationURL = function( url ) {
-		return url.includes( 'wp-login.php' ) && url.includes( 'action=revalidate_2fa' );
+		return url && url.includes( 'wp-login.php' ) && url.includes( 'action=revalidate_2fa' );
 	};
 
 	// Display a modal dialog asking to revalidate.
@@ -159,7 +159,7 @@ window.wp = window.wp || {};
 	};
 
 	// Attach event listeners to all revalidate links and those that require 2FA sessions.
-	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], a[data-2fa-required]' ).forEach(
+	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]' ).forEach(
 		(el) => el.addEventListener( 'click', maybeRevalidateOnLinkNavigate )
 	);
 
