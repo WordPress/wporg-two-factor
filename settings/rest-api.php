@@ -303,7 +303,7 @@ function register_user_fields(): void {
 				 */
 
 				$status = Revalidation\get_status();
-				if ( ! $status['last_validated'] ) {
+				if ( ! $status || ! $status['last_validated'] ) {
 					return false;
 				}
 
