@@ -83,7 +83,7 @@ function register_rest_routes() : void {
 			'methods'  => WP_REST_Server::READABLE,
 			'callback' => __NAMESPACE__ . '\rest_get_totp_setup',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', $request['user_id'] );
+				return current_user_can( 'edit_user', (int) $request['user_id'] );
 			},
 			'args' => array(
 				'user_id' => array(
@@ -101,7 +101,7 @@ function register_rest_routes() : void {
 			'methods'  => WP_REST_Server::EDITABLE,
 			'callback' => __NAMESPACE__ . '\rest_update_provider_status',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', $request['user_id'] );
+				return current_user_can( 'edit_user', (int) $request['user_id'] );
 			},
 			'args' => array(
 				'user_id' => array(
