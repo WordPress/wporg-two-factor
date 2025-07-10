@@ -78,7 +78,7 @@ function page_has_2fa_component() {
 function render_custom_ui() : void {
 	$user_id = function_exists( 'bbp_get_displayed_user_id' ) ? bbp_get_displayed_user_id() : bp_displayed_user_id();
 
-	if ( ! current_user_can( 'edit_user', $user_id ) ) {
+	if ( ! is_user_logged_in() || ! $user_id || ! current_user_can( 'edit_user', $user_id ) ) {
 		echo 'You cannot edit this user.';
 		return;
 	}
