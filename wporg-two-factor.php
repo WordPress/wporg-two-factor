@@ -76,6 +76,8 @@ function load_webauthn_plugin() {
 		 * The WebAuthn plugin only registers the provider if database schema is up-to-date.
 		 * The schema is stored on a per-network basis, and as we don't allow the WebAuthn plugin to update the schema
 		 * on plugins_loaded, we need to filter the version to match the one that the plugin expects.
+		 *
+		 * @see https://github.com/sjinks/wp-two-factor-provider-webauthn/commit/f243d59ae3a883fe4f4b499ca201ea72f0492f3d
 		 */
 		add_filter( 'default_site_option_2fa-wa-schema-version', static function( $default ) {
 			return 1;
