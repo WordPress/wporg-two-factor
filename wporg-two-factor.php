@@ -78,10 +78,6 @@ function load_webauthn_plugin() {
 		 * on plugins_loaded, we need to filter the version to match the one that the plugin expects.
 		 */
 		add_filter( 'default_site_option_2fa-wa-schema-version', static function( $default ) {
-			if ( 'local' === wp_get_environment_type() ) {
-				return $default;
-			}
-	
 			return 1;
 		} );
 	}
