@@ -69,6 +69,21 @@ function load_webauthn_plugin() {
 		if ( 'wporg_' === $wpdb->base_prefix ) {
 			add_action( 'admin_init', [ $webauthn, 'maybe_update_schema' ] );
 		}
+
+		/**
+		 * Lie to the WebAuthn plugin about the Table schema (if needed).
+		 *
+		 * The WebAuthn plugin only registers the provider if database schema is up-to-date.
+		 * The schema is stored on a per-network basis, and as we don't allow the WebAuthn plugin to update the schema
+		 * on plugins_loaded, we need to filter the version to match the one that the plugin expects.
+		 */
+		add_filter( 'default_site_option_2fa-wa-schema-version', static function( $default ) {
+			if ( 'local' === wp_get_environment_type() ) {
+				return $default;
+			}
+	
+			return 1;
+		} );
 	}
 }
 load_webauthn_plugin();
