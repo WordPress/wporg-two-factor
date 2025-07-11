@@ -56,16 +56,19 @@ function load_webauthn_plugin() {
 	$webauthn = WebAuthn_Plugin::instance();
 	$webauthn->init();
 
-	// Use central WebAuthn tables, instead of ones for each site that shares our user tables.
-	$wpdb->webauthn_credentials = 'wporg_' . WebAuthn_Plugin_Constants::WA_CREDENTIALS_TABLE_NAME;
-	$wpdb->webauthn_users       = 'wporg_' . WebAuthn_Plugin_Constants::WA_USERS_TABLE_NAME;
+	// These customizations only apply to non-local environments (ie. production/staging).
+	if ( 'local' !== wp_get_environment_type() ) {
+		// Use central WebAuthn tables, instead of ones for each site that shares our user tables.
+		$wpdb->webauthn_credentials = 'wporg_' . WebAuthn_Plugin_Constants::WA_CREDENTIALS_TABLE_NAME;
+		$wpdb->webauthn_users       = 'wporg_' . WebAuthn_Plugin_Constants::WA_USERS_TABLE_NAME;
 
-	// The schema update checks should not check for updates on every request.
-	remove_action( 'plugins_loaded', [ $webauthn, 'maybe_update_schema' ] );
+		// The schema update checks should not check for updates on every request.
+		remove_action( 'plugins_loaded', [ $webauthn, 'maybe_update_schema' ] );
 
-	// The schema update checks do need occur, but only on admin requests on the main network.
-	if ( 'wporg_' === $wpdb->base_prefix || 'local' === wp_get_environment_type() ) {
-		add_action( 'admin_init', [ $webauthn, 'maybe_update_schema' ] );
+		// The schema update checks do need occur, but only on admin requests on the main network.
+		if ( 'wporg_' === $wpdb->base_prefix ) {
+			add_action( 'admin_init', [ $webauthn, 'maybe_update_schema' ] );
+		}
 	}
 }
 load_webauthn_plugin();
