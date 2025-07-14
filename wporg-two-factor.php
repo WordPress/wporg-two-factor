@@ -16,17 +16,6 @@ use WP_User, WP_Error;
 
 defined( 'WPINC' ) || die();
 
-/**
- * todo remove this when launch for all users.
- * @codeCoverageIgnore
- */
-function is_2fa_beta_tester( $user = false ) : bool {
-	$user         = $user ?: wp_get_current_user();
-	$beta_testers = array( 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley', 'dufresnesteven' );
-
-	return in_array( $user->user_login, $beta_testers, true );
-}
-
 require_once __DIR__ . '/settings/settings.php';
 require_once __DIR__ . '/stats.php';
 require_once __DIR__ . '/revalidation/index.php';
