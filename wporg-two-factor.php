@@ -11,7 +11,6 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Backup_Codes;
-use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
 use WildWolf\WordPress\TwoFactorWebAuthn\Constants as WebAuthn_Plugin_Constants;
 use WP_User, WP_Error;
 
@@ -52,36 +51,12 @@ function load_webauthn_plugin() {
 		}
 		return;
 	}
-	
-	$webauthn = WebAuthn_Plugin::instance();
-	$webauthn->init();
 
 	// These customizations only apply to non-local environments (ie. production/staging).
 	if ( 'local' !== wp_get_environment_type() ) {
 		// Use central WebAuthn tables, instead of ones for each site that shares our user tables.
 		$wpdb->webauthn_credentials = 'wporg_' . WebAuthn_Plugin_Constants::WA_CREDENTIALS_TABLE_NAME;
 		$wpdb->webauthn_users       = 'wporg_' . WebAuthn_Plugin_Constants::WA_USERS_TABLE_NAME;
-
-		// The schema update checks should not check for updates on every request.
-		remove_action( 'plugins_loaded', [ $webauthn, 'maybe_update_schema' ] );
-
-		// The schema update checks do need occur, but only on admin requests on the main network.
-		if ( 'wporg_' === $wpdb->base_prefix ) {
-			add_action( 'admin_init', [ $webauthn, 'maybe_update_schema' ] );
-		}
-
-		/**
-		 * Lie to the WebAuthn plugin about the Table schema (if needed).
-		 *
-		 * The WebAuthn plugin only registers the provider if database schema is up-to-date.
-		 * The schema is stored on a per-network basis, and as we don't allow the WebAuthn plugin to update the schema
-		 * on plugins_loaded, we need to filter the version to match the one that the plugin expects.
-		 *
-		 * @see https://github.com/sjinks/wp-two-factor-provider-webauthn/commit/f243d59ae3a883fe4f4b499ca201ea72f0492f3d
-		 */
-		add_filter( 'default_site_option_2fa-wa-schema-version', static function( $default ) {
-			return 1;
-		} );
 	}
 }
 load_webauthn_plugin();
