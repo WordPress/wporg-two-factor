@@ -117,7 +117,7 @@ function enqueue_assets() {
 		'cookieName' => COOKIE_NAME,
 		'l10n'       => [
 			'title'   => __( 'Two-Factor Authentication', 'wporg' ),
-			'message' => __( 'Please verify your Two-Factor Authentication to continue.', 'wporg' ),
+			'message' => __( 'Please Verify your Two-Factor Authentication to continue.', 'wporg' ),
 		],
 		'url'        => get_url(),
 	] );
@@ -141,7 +141,7 @@ function set_cookie() {
 	setcookie(
 		COOKIE_NAME,
 		$expires_at,
-		$expires_at - MINUTE_IN_SECONDS, // The cookie will cease to exist to JS at this time.
+		$expires_at - 90, // The cookie will cease to exist to JS at this time.
 		COOKIEPATH,
 		COOKIE_DOMAIN,
 		is_ssl(),
