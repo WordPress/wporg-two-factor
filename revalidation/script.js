@@ -187,18 +187,19 @@ window.wp = window.wp || {};
 
 	/*
 	 * Attach event listeners to all revalidate links and those that require 2FA sessions.
-	 * For forms, we listen on submit instead, which happens after form validation.
+	 *
+	 * If the element is an action inside a form, we'll listen on submit.
+	 *  (The .form attribute is only present on input & submission elements).
+	 * If the element is a form, we listen on submit.
+	 * Otherwise, we listen on click of the element.
 	 */
-	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]:not(form, button, input)' ).forEach(
-		(el) => el.addEventListener( 'click', maybeRevalidateOnLinkNavigate )
-	);
-	document.querySelectorAll( 'form[data-2fa-required], button[data-2fa-required], input[data-2fa-required]' ).forEach(
+	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]' ).forEach(
 		(el) => {
-			// If the element is inside a form, we'll listen on submit.
 			if ( 'form' in el && el.form ) {
 				el.form.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
+			} elseif ( 'FORM' == el.tagName.toUpperCase() ) {
+				el.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
 			} else {
-				// Otherwise, we listen on click.
 				el.addEventListener( 'click', maybeRevalidateOnLinkNavigate );
 			}
 		}
