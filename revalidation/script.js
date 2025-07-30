@@ -96,21 +96,21 @@ window.wp = window.wp || {};
 			return false;
 		}
 
-		const properties = [ 'href', 'action', 'formAction' ];
+		const attributesToCheckFor = [ 'href', 'action', 'formAction' ];
 		let linkUrl      = '';
-		let targetProp   = '';
+		let targetAttr   = '';
 
-		for ( var prop of properties ) {
-			if ( prop in element && element[ prop ] ) {
-				linkUrl    = element[ prop ];
-				targetProp = prop;
+		for ( var attr of attributesToCheckFor ) {
+			if ( element.hasAttribute( attr ) && element.getAttribute( attr ) ) {
+				linkUrl    = element.getAttribute( attr );
+				targetAttr = attr;
 				break;
 			}
 		}
 
 		if (
 			! linkUrl ||
-			! targetProp ||
+			! targetAttr ||
 			! urlLooksLikeRevalidationURL( linkUrl ) ||
 			! linkUrl.includes( 'redirect_to=' )
 		) {
@@ -125,7 +125,7 @@ window.wp = window.wp || {};
 		}
 
 		// Overwrite.
-		element[ targetProp ] = redirect;
+		element.setAttribute( targetAttr, redirect );
 
 		return true;
 	};
