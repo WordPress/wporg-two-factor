@@ -39,7 +39,7 @@ window.wp = window.wp || {};
 			revalidateModal.remove();
 		}
 
-		const triggerElement = triggerEvent?.currentTarget || triggerEvent?.target;
+		const triggerElement = triggerEvent?.submitter || triggerEvent?.currentTarget || triggerEvent?.target;
 
 		revalidateModal = document.createElement( 'dialog' );
 		revalidateModal.className = 'wporg-2fa-revalidate-modal';
@@ -52,7 +52,7 @@ window.wp = window.wp || {};
 		revalidationMessage.textContent = triggerElement?.dataset['2faMessage'] || settings.l10n.message;
 		revalidateModal.appendChild( revalidationMessage );
 
-		const linkHref  = triggerElement?.href;
+		const linkHref  = triggerElement?.href || triggerElement?.action || triggerElement?.formAction || '';
 		const iframeSrc = urlLooksLikeRevalidationURL( linkHref ) ? linkHref : settings.url;
 
 		const iframe = document.createElement( 'iframe' );
@@ -71,24 +71,53 @@ window.wp = window.wp || {};
 		revalidateModal.showModal();
 	};
 
-	// Remove the revalidate URL from the link, replacing it with the redirect_to if present.
+	// Remove the revalidate URL from the link/form/formbutton, replacing it with the redirect_to if present.
 	const maybeRemoveRevalidateURL = function( element ) {
-		// If we're on a element within a link, run back up the DOM to the proper parent.
-		while ( element && element.tagName !== 'A' && element.parentElement ) {
+		// If we're on a element within the target element (as denoted by the data attribute, or href), run up the tree.
+		while (
+			element &&
+			(
+				(
+					// Elements designated with data-2fa-required.
+					element.dataset &&
+					! ( '2faRequired' in element.dataset )
+				) || (
+					// Elements with a href that appears to be a revalidation URL.
+					'A' === element.tagName.toUpperCase() &&
+					! element.href.includes( 'action=revalidate_2fa' )
+				)
+			) &&
+			element.parentElement
+		) {
 			element = element.parentElement;
 		}
 
-		// If it's not a <a> link, or not a valid revalidate link, bail.
+		if ( ! element ) {
+			return false;
+		}
+
+		const attributesToCheckFor = [ 'href', 'action', 'formAction' ];
+		let linkUrl      = '';
+		let targetAttr   = '';
+
+		for ( var attr of attributesToCheckFor ) {
+			if ( element.hasAttribute( attr ) && element.getAttribute( attr ) ) {
+				linkUrl    = element.getAttribute( attr );
+				targetAttr = attr;
+				break;
+			}
+		}
+
 		if (
-			! element ||
-			! element.href ||
-			! urlLooksLikeRevalidationURL( element.href ) ||
-			! element.href.includes( 'redirect_to=' )
+			! linkUrl ||
+			! targetAttr ||
+			! urlLooksLikeRevalidationURL( linkUrl ) ||
+			! linkUrl.includes( 'redirect_to=' )
 		) {
 			return false;
 		}
 
-		const href     = new URL( element.href );
+		const href     = new URL( linkUrl );
 		const redirect = decodeURIComponent( href.searchParams.get( 'redirect_to' ) );
 
 		if ( ! redirect ) {
@@ -96,7 +125,7 @@ window.wp = window.wp || {};
 		}
 
 		// Overwrite.
-		element.href = redirect;
+		element.setAttribute( targetAttr, redirect );
 
 		return true;
 	};
@@ -105,7 +134,7 @@ window.wp = window.wp || {};
 	const maybeRevalidateOnLinkNavigate = function( e ) {
 		// Check to see if revalidation is required, otherwise we're in Sudo mode.
 		if ( ! revalidateRequired() ) {
-			maybeRemoveRevalidateURL( e.currentTarget || e.target );
+			maybeRemoveRevalidateURL( e.submitter || e.currentTarget || e.target );
 			return;
 		}
 
@@ -135,6 +164,10 @@ window.wp = window.wp || {};
 		if ( theTriggerEvent?.target ) {
 			maybeRemoveRevalidateURL( theTriggerEvent.target );
 		}
+		// If it's a form, remove it from the element that's triggering us.
+		if ( theTriggerEvent?.submitter ) {
+			maybeRemoveRevalidateURL( theTriggerEvent.submitter );
+		}
 
 		// Finally, notify others.
 		( theTriggerEvent?.target || window ).dispatchEvent( new Event( 'reValidationComplete', { bubbles: true } ) );
@@ -145,8 +178,8 @@ window.wp = window.wp || {};
 				new theTriggerEvent.constructor( theTriggerEvent.type, theTriggerEvent )
 			);
 		} else if ( theTriggerEvent?.type === 'submit' ) {
-			// Throwing a submit event doesn't seem to work, so we'll just submit the form directly.
-			theTriggerEvent.target.submit();
+			// Request the form submit in the context of the original submitter (to ensure form* attributes are respected).
+			theTriggerEvent.target.requestSubmit( theTriggerEvent.submitter || theTriggerEvent.target );
 		}
 	};
 
@@ -163,13 +196,22 @@ window.wp = window.wp || {};
 
 	/*
 	 * Attach event listeners to all revalidate links and those that require 2FA sessions.
-	 * For forms, we listen on submit instead, which happens after form validation.
+	 *
+	 * If the element is an action inside a form, we'll listen on submit.
+	 *  (The .form attribute is only present on input & submission elements).
+	 * If the element is a form, we listen on submit.
+	 * Otherwise, we listen on click of the element.
 	 */
-	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]:not(form)' ).forEach(
-		(el) => el.addEventListener( 'click', maybeRevalidateOnLinkNavigate )
-	);
-	document.querySelectorAll( 'form[data-2fa-required]' ).forEach(
-		(el) => el.addEventListener( 'submit', maybeRevalidateOnLinkNavigate )
+	document.querySelectorAll( 'a[href*="action=revalidate_2fa"], [data-2fa-required]' ).forEach(
+		(el) => {
+			if ( 'form' in el && el.form ) {
+				el.form.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
+			} else if ( 'FORM' == el.tagName.toUpperCase() ) {
+				el.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
+			} else {
+				el.addEventListener( 'click', maybeRevalidateOnLinkNavigate );
+			}
+		}
 	);
 
 	// Watch for revalidation completion.
