@@ -73,11 +73,20 @@ window.wp = window.wp || {};
 
 	// Remove the revalidate URL from the link/form/formbutton, replacing it with the redirect_to if present.
 	const maybeRemoveRevalidateURL = function( element ) {
-		// If we're on a element within the target element (as denoted by the data attribute), run up the tree.
+		// If we're on a element within the target element (as denoted by the data attribute, or href), run up the tree.
 		while (
 			element &&
-			element.dataset &&
-			! ( '2faRequired' in element.dataset ) &&
+			(
+				(
+					// Elements designated with data-2fa-required.
+					element.dataset &&
+					! ( '2faRequired' in element.dataset )
+				) || (
+					// Elements with a href that appears to be a revalidation URL.
+					'A' === element.tagName.toUpperCase() &&
+					! element.href.includes( 'action=revalidate_2fa' )
+				)
+			) &&
 			element.parentElement
 		) {
 			element = element.parentElement;
@@ -197,7 +206,7 @@ window.wp = window.wp || {};
 		(el) => {
 			if ( 'form' in el && el.form ) {
 				el.form.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
-			} elseif ( 'FORM' == el.tagName.toUpperCase() ) {
+			} else if ( 'FORM' == el.tagName.toUpperCase() ) {
 				el.addEventListener( 'submit', maybeRevalidateOnLinkNavigate );
 			} else {
 				el.addEventListener( 'click', maybeRevalidateOnLinkNavigate );
