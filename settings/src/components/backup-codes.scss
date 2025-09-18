@@ -1,13 +1,23 @@
 .wporg-2fa__backup-codes {
+	> *:not(:last-child) {
+		margin-bottom: 1em;
+	}
+
 	.wporg-2fa__backup-codes-list {
-		background-color: $gray-300;
-		margin: 1em 0;
+		background-color: var(--wp--preset--color--light-grey-2, #f6f6f6);
+		margin-top: 24px;
 		padding: 15px 20px;
 
 		ol {
 			column-count: 2;
 			column-width: 110px;
 			margin: 0;
+		}
+
+		@media (max-width: 600px) {
+			ol {
+				column-count: 1;
+			}
 		}
 
 		li::marker {
@@ -17,10 +27,6 @@
 		    */
 			color: $gray-700;
 		}
-	}
-
-	.components-notice {
-		margin-bottom: 1em;
 	}
 }
 

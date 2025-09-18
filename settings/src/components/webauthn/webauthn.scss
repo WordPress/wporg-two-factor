@@ -1,0 +1,25 @@
+.wporg-2fa__webauthn,
+.bbp-single-user .wporg-2fa__webauthn {
+	.wporg-2fa__webauthn-keys-list {
+		li {
+			display: flex;
+			padding: 16px 0;
+			border-bottom: 1px solid $gray-300;
+	
+			&:last-of-type {
+				border-bottom: none;
+			}
+		}
+	
+		.wporg-2fa__webauthn-key-name {
+			flex: 1;
+			font-size: 13px;
+		}
+	}
+}
+
+.components-modal__frame.wporg-2fa__confirm-delete-key {
+	.components-notice.is-error {
+		margin-top: 18px;
+	}
+}

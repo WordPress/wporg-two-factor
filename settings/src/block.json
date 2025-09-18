@@ -2,22 +2,27 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "wporg-two-factor/settings",
-	"version": "0.1.0",
+	"version": "0.1.4",
 	"title": "wporg Two-Factor Settings",
 	"category": "widgets",
 	"icon": "lock",
 	"supports": {
-		"html": false
+		"html": false,
+		"inserter": false
 	},
 	"attributes": {
 		"userId": {
 			"type": "integer"
+		},
+		"isOnboarding": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"textdomain": "wporg",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"script": [ "file:./script.js", "zxcvbn-async", "two-factor-qr-code-generator" ],
+	"viewScript": [ "wp-util", "zxcvbn-async", "two-factor-qr-code-generator", "file:./script.js" ],
 	"style": [ "file:./style-index.css", "wp-components" ],
 	"render": "file:./render.php"
 }

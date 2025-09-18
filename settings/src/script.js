@@ -1,21 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { StrictMode, createContext, useCallback, useEffect, useState } from '@wordpress/element';
-import { Icon, chevronLeft } from '@wordpress/icons';
-import { Card, CardHeader, CardBody, Flex, Spinner } from '@wordpress/components';
+import {
+	StrictMode,
+	createContext,
+	useCallback,
+	useEffect,
+	useState,
+	createRoot,
+} from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getUserRecord } from './utilities';
-import ScreenLink from './components/screen-link'
-import AccountStatus from './components/account-status';
-import Password from './components/password';
-import EmailAddress from './components/email-address';
-import TOTP from './components/totp';
-import BackupCodes from './components/backup-codes';
+import { useUser } from './hooks/useUser';
 import GlobalNotice from './components/global-notice';
+import RevalidateModal from './components/revalidate-modal';
+import Settings from './components/settings';
+import FirstTime from './components/first-time/first-time';
 
 export const GlobalContext = createContext( null );
 
@@ -30,51 +33,55 @@ function renderSettings() {
 		return;
 	}
 
-	// todo import from wp.element once https://github.com/WordPress/gutenberg/pull/46467 lands
-	const root = ReactDOM.createRoot( wrapper );
+	const root = createRoot( wrapper );
 
 	root.render(
 		<StrictMode>
-			<Main userId={ parseInt( wrapper.dataset.userId ) } />
+			<Main
+				userId={ parseInt( wrapper.dataset.userId ) }
+				isOnboarding={ wrapper.dataset.isOnboarding === 'true' }
+			/>
 		</StrictMode>
 	);
 }
 
 /**
  * Render the correct component based on the URL.
+ *
+ * @param props
+ * @param props.userId
+ * @param props.isOnboarding
  */
-function Main( { userId } ) {
-	const userRecord                              = getUserRecord( userId );
-	const { record, edit, hasEdits, hasResolved } = userRecord;
-	const [ globalNotice, setGlobalNotice ]       = useState( '' );
-	let currentUrl                                = new URL( document.location.href );
+function Main( { userId, isOnboarding } ) {
+	const user = useUser( userId );
+	const {
+		userRecord: { record, edit, hasEdits, hasResolved },
+		hasPrimaryProvider,
+	} = user;
+	const [ globalNotice, setGlobalNotice ] = useState( '' );
+	const [ error, setError ] = useState( '' );
+	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
 
-	// The index is the URL slug and the value is the React component.
-	const components = {
-		'account-status': AccountStatus,
-		'email':          EmailAddress,
-		'password':       Password,
-		'totp':           TOTP,
-		'backup-codes':   BackupCodes,
-	};
+	let currentUrl = new URL( document.location.href );
+	const initialScreen = currentUrl.searchParams.get( 'screen' );
+	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
 
-	let initialScreen = currentUrl.searchParams.get( 'screen' );
-
-	if ( ! components[ initialScreen ] ) {
-		initialScreen = 'account-status';
-		currentUrl.searchParams.set( 'screen', initialScreen );
-		history.pushState( {}, '', currentUrl );
-	}
-
-	const [ screen, setScreen ] = useState( initialScreen );
-	const CurrentScreen         = components[ screen ];
+	// The screens where a recent two factor challenge is required.
+	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes', 'svn-password' ];
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
 		window.addEventListener( 'popstate', handlePopState );
 
-		return () => { window.removeEventListener( 'popstate', handlePopState ) }
+		return () => {
+			window.removeEventListener( 'popstate', handlePopState );
+		};
 	}, [] );
+
+	useEffect( () => {
+		currentUrl.searchParams.set( 'screen', screen );
+		window.history.pushState( {}, '', currentUrl );
+	}, [ screen ] );
 
 	// Trigger a re-render when the back/forward buttons are clicked.
 	const handlePopState = useCallback( () => {
@@ -92,68 +99,62 @@ function Main( { userId } ) {
 	 * This is used in conjunction with real links in order to preserve deep linking and other foundational
 	 * behaviors that are broken otherwise.
 	 */
-	const clickScreenLink = useCallback( ( event, screen ) => {
-		event.preventDefault();
+	const navigateToScreen = useCallback(
+		( nextScreen ) => {
+			// Reset to initial after navigating away from a page.
+			// Note: password was initially not in record, this would prevent incomplete state
+			// from resetting when leaving the password setting page.
+			// See https://github.com/WordPress/wporg-two-factor/issues/117#issuecomment-1515693367.
+			if ( hasEdits ) {
+				edit( {
+					...record,
+					password: undefined,
+				} );
+			}
 
-		// Reset to initial after navigating away from a page.
-		// @todo This no longer works, maybe `userRecord` is not passed by reference between screens?
-		// Also, some screens will have additional state that should be reset, but this won't have any way of
-		// knowing that. So maybe just remove this?
-		if ( hasEdits ) {
-			edit( record );
-		}
+			currentUrl = new URL( document.location.href );
+			currentUrl.searchParams.set( 'screen', nextScreen );
+			window.history.pushState( {}, '', currentUrl );
 
-		currentUrl = new URL( document.location.href );
-		currentUrl.searchParams.set( 'screen', screen );
-		history.pushState( {}, '', currentUrl );
-
-		setGlobalNotice( '' );
-		setScreen( screen );
-	}, [] );
+			setError( '' );
+			setGlobalNotice( '' );
+			setScreen( nextScreen );
+		},
+		[ hasEdits ]
+	);
 
 	if ( ! hasResolved ) {
-		return <Spinner />;
-	}
-
-	let screenContent;
-
-	if ( 'account-status' === screen ) {
-		screenContent = (
-			<div className={ 'wporg-2fa__' + screen }>
-				<AccountStatus />
+		return (
+			<div className="initial-load">
+				<Spinner />
 			</div>
 		);
-
-	} else {
-		screenContent = (
-			<Card>
-				<CardHeader className="wporg-2fa__navigation" size="xSmall">
-					<Flex>
-						<ScreenLink
-							screen="account-status"
-							anchorText={
-								<>
-									<Icon icon={ chevronLeft } />
-									Back
-								</>
-							}
-						/>
-
-						<h3>{ screen.replace( '-', ' ' ).replace( 'totp', 'Two-Factor Authentication' ) }</h3>
-					</Flex>
-				</CardHeader>
-
-				<CardBody className={ 'wporg-2fa__' + screen }>
-					<CurrentScreen />
-				</CardBody>
-			</Card>
-		);
 	}
 
+	const isRevalidationExpired =
+		twoFactorRequiredScreens.includes( screen ) &&
+		hasPrimaryProvider &&
+		record[ '2fa_revalidation' ]?.expires_at <= new Date().getTime() / 1000;
+
+	const shouldRevalidate = 'revalidation_required' === error.code || isRevalidationExpired;
+
 	return (
-		<GlobalContext.Provider value={ { clickScreenLink, userRecord, setGlobalNotice } }>
-			<GlobalNotice notice={ globalNotice } />
-			{ screenContent }
+		<GlobalContext.Provider
+			value={ {
+				navigateToScreen,
+				user,
+				setGlobalNotice,
+				setError,
+				error,
+				backupCodesVerified,
+				setBackupCodesVerified,
+				setScreen,
+				screen,
+			} }
+		>
+			<GlobalNotice notice={ globalNotice } setNotice={ setGlobalNotice } />
+			{ isOnboarding ? <FirstTime /> : <Settings /> }
+			{ shouldRevalidate && <RevalidateModal /> }
 		</GlobalContext.Provider>
 	);
 }

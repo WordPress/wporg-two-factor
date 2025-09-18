@@ -1,0 +1,49 @@
+name: Build and push to build branch.
+
+on:
+    push:
+        branches: [trunk]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            - name: Install all dependencies
+              run: |
+                  composer install
+                  yarn
+
+            - name: Build
+              run: yarn workspaces run build
+
+            - name: Trim the repo down to just the plugin files
+              run: |
+                  rm -rf node_modules
+                  rm -rf settings/node_modules
+                  rm -rf vendor
+
+            - name: Append build number to version
+              run: |
+                VER=$( jq -r .version ./settings/build/block.json )
+                VER="${VER%%-*}"
+                new_file="$(jq --arg ver "$VER-${GITHUB_SHA::7}" '.version = $ver' ./settings/build/block.json)"
+                echo -E "$new_file" > ./settings/build/block.json
+
+            - name: Add all the plugin files
+              run: |
+                  git add * --force
+
+            - name: Commit and push
+              uses: actions-js/push@a52398fac807b0c1e5f1492c969b477c8560a0ba # 1.3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: build
+                  force: true
+                  message: 'Build: ${{ github.sha }}'

@@ -4,7 +4,7 @@ WordPress.org-specific customizations for the Two Factor plugin
 
 ## Setup
 
-1. Set up a local WP site.
+1. Set up a local WP Multisite.
 1. Add this code to your `wp-config.php`:
 	```php
 	define( 'WP_ENVIRONMENT_TYPE', 'local' );
@@ -21,7 +21,6 @@ WordPress.org-specific customizations for the Two Factor plugin
 		return in_array( $user->user_login, $GLOBALS['supes'], true );
 	}
 	```
-1. Install and build the `wporg-mu-plugins` repository.
 1. Add this code to your `wp-content/mu-plugins/0-sandbox.php`:
 	```php
 	require_once WPMU_PLUGIN_DIR. '/wporg-mu-plugins/mu-plugins/loader.php';
@@ -45,14 +44,23 @@ WordPress.org-specific customizations for the Two Factor plugin
 	add_action( 'init', __NAMESPACE__ . '\add_rewrite_rules' );
 	```
 1. Install, build, and activate the `wporg-support` theme.
-1. Install `bbPress` and `Gutenberg`. You might need to clone & build `trunk` branch of `Gutenberg` if we happen to be using any new features.
+1. Install `two-factor-provider-webauthn`, `bbPress` and `Gutenberg`. You might need to clone & build `trunk` branch of `Gutenberg` if we happen to be using any new features.
 1. `git clone` https://github.com/WordPress/two-factor/ into `wp-content/plugins` and follow their setup instructions.
 1. `git clone` this repo into `wp-content/plugins`
 1. `cd wporg-two-factor && composer install`
-1. `cd settings && npm install && npm run build`
-1. Activate all four plugins.
-1. If you want to make JS changes, then `cd settings && npm start`
+1. `yarn && yarn workspaces run build`
+1. Setup environment tools `yarn setup:tools`
+1. Start the environment: `yarn wp-env start`
+1. Network-activate all of the plugins.
+1. If you want to make JS changes, then `yarn workspaces run start`
+1. Open `wp-admin/options-general.php?page=bbpress` and uncheck `Prefix all forum content with the Forum Root slug (Recommended)`, then save.
 1. Visit https://example.org/users/{username}/edit/account/ to view the custom settings UI. If you get a `404` error, visit `wp-admin/options-permalinks.php` and then try again.
+
+## Testing
+
+Front-end unit tests can be run in `/settings` using the `npm run test:unit` or `npm run test:unit:watch` commands.
+
+Back-end unit tests can be run in `/` using the `composer run test` or `composer run test:watch` commands. `composer run coverage` will generate a coverage report.
 
 ## Security
 

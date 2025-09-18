@@ -1,0 +1,41 @@
+name: Test
+
+# This workflow is triggered on pushes to trunk, and any PRs.
+on:
+  push:
+    branches: [trunk]
+  pull_request:
+
+jobs:
+
+  lint:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2
+
+      - name: Install NPM dependencies
+        run: yarn
+
+      - name: Start the Docker testing environment
+        run: yarn wp-env start --xdebug=coverage
+
+      - name: Setup environment tools
+        run: yarn setup:tools
+
+      - name: Test PHP
+        run: yarn test
+
+      - name: Test JS
+        run: yarn test:js

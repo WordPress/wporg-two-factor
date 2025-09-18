@@ -1,0 +1,26 @@
+.wporg-2fa__navigation {
+	padding: 24px 0 16px !important; /* Override Gutenberg auto-generated. */
+	border-bottom: 0 !important;
+	justify-content: center !important;
+	position: relative;
+
+
+	a {
+		display: flex;
+    	align-items: center;
+		position: absolute;
+		left: 24px;
+		font-weight: 600;
+		gap: 2px;
+	}
+
+	svg {
+		fill: var(--wp--preset--color--blueberry-1, #3858e9);
+	}
+
+	h3 {
+		font-weight: 600;
+		margin: unset;
+	}
+
+}

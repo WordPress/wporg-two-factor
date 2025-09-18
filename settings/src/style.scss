@@ -1,47 +1,162 @@
 @import '~@wordpress/base-styles/colors';
+@import '~@wordpress/base-styles/colors.native';
 
-.wp-block-wporg-two-factor-settings {
-	position: relative;
+// Gutenberg doesn't provide an "info" color, so this is taken from wp-admin's `.notice-info` class.
+$alert-blue: #72aee6;
 
-	h3 {
-		font-size: 14px;
-		clear: none;
-	}
+#main {
+	margin-bottom: 2rem;
+}
 
-	.components-button {
-		margin-right: 20px;
+#bbp-your-profile {
+	.components-notice,
+	.notice {
+		a {
+			text-decoration: underline;
+		}
 	}
 }
 
-.wporg-2fa__navigation {
-	padding: 0 24px !important; /* Override Gutenberg auto-generated. */
+.wp-block-wporg-two-factor-settings {
+	position: relative;
+	font-size: 14px;
+	font-family: 'Inter', sans-serif;
+	text-wrap: pretty;
 
-	a {
-		position: relative;
-		top: -4px;
-		color: #4ca6cf;
+	> div.initial-load {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 400px;
+		box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
 	}
 
-	svg {
-		position: relative;
-		top: 7px;
-		margin-right: -3px;
-		fill: #4ca6cf;
+	&[data-is-onboarding="true"] > div.initial-load {
+		box-shadow: none;
 	}
 
-	h3 {
-		flex: 1 1 auto;
-		margin: 25px 0;
-		text-align: center;
-		text-transform: capitalize;
+	h3,
+	h4 {
+		clear: none;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	/* Restore wporg-support styles that bbPress overrides */
+	.bbp-single-user & {
+		input[type="text"],
+		input[type="email"],
+		input[type="search"],
+		input[type="password"],
+		input[type="number"] {
+			padding: 6px 10px;
+			font-size: 14px;
+		}
+	}
+
+	.components-card {
+		border-radius: inherit !important;
+		box-shadow: #d9d9d9 0px 0px 0px 1px;
+	}
+
+	.components-card__body p:first-child {
+		margin-top: 0;
+	}
+
+	label,
+	.components-base-control__help {
+		font-family: 'Inter', sans-serif;
+	}
+
+	label {
+		text-transform: initial;
+		font-size: 14px;
+		font-weight: 400;
+		margin-bottom: 8px;
+	}
+}
+
+.wporg-2fa__screen-key {
+	display: flex;
+	align-items: center;
+	margin: 12px 0 6px;
+	gap: 4px;
+}
+
+.wporg-2fa__screen-intro,
+.wporg-2fa__screen-intro p {
+	margin-bottom: 24px;
+}
+
+.wporg-2fa__submit-actions {
+	margin-top: 24px;
+	margin-bottom: 0;
+	display: flex;
+	justify-content: flex-start;
+	gap: 16px 10px;
+	flex-wrap: wrap;
+
+	& + .components-notice.is-error {
+		margin-top: 24px;
+	}
+
+	> button {
+		font-size: 14px; /* Overwrite the Gutenberg default. */
+	}
+}
+
+.wporg-2fa__token {
+	letter-spacing: .3em;
+}
+
+.wporg-2fa__process-status {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 48px 0;
+
+	svg.components-spinner {
+		overflow: visible;
+		margin-top: 0;
+	}
+}
+
+.components-notice {
+	margin-left: 0;
+	margin-right: 0;
+
+	&.is-error, &.is-success {
+		margin: 0;
+	}
+
+	&.is-error a {
+		color: $gray-900; // The default blue is hard to read on the red background.
+	}
+
+	.components-notice__content {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		svg {
+			flex-shrink: 0;
+		}
 	}
 }
 
 @import "components/account-status";
 @import "components/password";
 @import "components/email-address";
+@import "components/webauthn/webauthn";
 @import "components/totp";
 @import "components/backup-codes";
-@import "components/setup-progress-bar";
 @import "components/global-notice";
 @import "components/screen-link";
+@import "components/screen-navigation";
+@import "components/auto-tabbing-input";
+@import "components/revalidate-modal";
+@import "components/success";
+@import "components/first-time/first-time";
+@import "components/first-time/setup-progress-bar";
+@import "components/svn-password";

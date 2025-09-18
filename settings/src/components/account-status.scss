@@ -1,18 +1,35 @@
 .wporg-2fa__account-status {
 	.wporg-2fa__status-card {
+		&:hover,
+		&:focus-within {
+			z-index: 1;
+		}
+
+		&.is-disabled,
+		&.is-disabled .wporg-2fa__status-card-open {
+			cursor: not-allowed;
+		}
+
 		a {
-			text-decoration: none;
+			display: block;
+			text-decoration: none !important;
+
+			&:hover,
+			&:focus {
+				outline: var(--wp-admin-border-width-focus) solid var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+				outline-offset: 0;
+			}
 		}
 
 		.components-card__body {
 			display: grid;
-			grid-template-columns: min-content auto min-content;
+			grid-template-columns: min-content auto min-content min-content;
 			grid-template-areas:
-				"status header      open"
-				"status description open"
+				"status header      primary open"
+				"status description primary open"
 			;
-			grid-column-gap: 10px;
-			padding: 18px 14px;
+			grid-column-gap: 18px;
+			padding: 18px;
 
 			.wporg-2fa__status-icon {
 				grid-area: status;
@@ -23,15 +40,27 @@
 				grid-area: header;
 				align-self: end;
 				margin: 0;
-				font-size: 1.1em;
+				font-size: 1em;
 				color: $gray-900;
+				font-weight: 600;
 			}
 
-			p {
+			.wporg-2fa__status-card-body {
 				grid-area: description;
 				align-self: start;
 				margin: 0;
 				color: $gray-700;
+			}
+
+			.wporg-2fa__status-card-badge {
+				align-self: center;
+				border: 1px solid var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+				border-radius: 3px;
+				font-size: 0.7rem;
+				line-height: 1;
+				padding: 6px 10px;
+				color: var(--wp-components-color-accent,var(--wp-admin-theme-color,#007cba));
+				word-break: normal;
 			}
 
 			.wporg-2fa__status-card-open {
@@ -44,13 +73,14 @@
 	.wporg-2fa__status-icon {
 		&.is-enabled,
 		&.is-ok {
-			fill: $alert-green;
+			fill: $black;
 		}
 
 		&.is-pending {
 			fill: $alert-yellow;
 		}
 
+		&.is-info,
 		&.is-disabled,
 		&.is-error {
 			fill: $alert-red;

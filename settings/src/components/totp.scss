@@ -1,19 +1,104 @@
-.wporg-2fa__qr-code {
-	text-align: center;
-}
+.wporg-2fa__totp {
+	$min-container-height: 500px;
 
-.wporg-2fa__manual-code {
-	font-family: monospace;
-	font-weight: bold;
-	letter-spacing: 0.1em;
-}
+	.wporg-2fa__totp_success {
+		min-height: $min-container-height;
+	}
 
-.wporg-2fa__verify-code {
-	width: 10ch;
-	margin-bottom: 20px;
-}
+	.wporg-2fa__totp_setup-container {
+		min-height: $min-container-height;
+		position: relative;
 
-.wporg-2fa__enabled-status {
-	color: $alert-green;
-	text-transform: uppercase;
+		> .components-button {
+			position: absolute;
+			right: 0;
+			bottom: -10px;
+			text-decoration: none !important;
+		}
+
+		> .components-notice {
+			width: 100%;
+		}
+	}
+
+	.wporg-2fa__totp_setup-method-container {
+		max-width: 360px;
+
+		.components-button {
+			width: fit-content;
+		}
+
+		p {
+			margin: 0;
+		}
+
+		@media screen and (max-width: 480px) {
+			max-width: unset;
+			width: 100%;
+		}
+	}
+
+	.wporg-2fa__setup-form-container {
+
+		& > .components-notice.is-error {
+			opacity: 0;
+			height: 0;
+
+			&.is-shown {
+				transition: opacity 0.5s ease;
+				margin-bottom: 16px;
+				height: auto;
+				opacity: 1;
+			}
+		}
+
+		@media screen and (max-width: 480px) {
+			width: 100%;
+		}
+	}
+
+	.wporg-2fa__qr-code {
+		min-height: 250px;
+	}
+
+	.wporg-2fa__manual {
+		display: flex;
+		flex-direction: column;
+		width: fit-content;
+		align-self: center;
+		margin-bottom: 32px;
+		max-width: 360px;
+
+		.components-button {
+			width: fit-content;
+		}
+
+		code {
+			font-family: 'IBM Plex Mono';
+			font-style: normal;
+			font-weight: 400;
+			font-size: 15px;
+			line-height: 20px;
+			margin-top: 32px;
+		}
+
+	}
+
+	.wporg-2fa__enabled-status {
+		color: $alert-green;
+		text-transform: uppercase;
+		font-weight: 700;
+	}
+
+	.wporg-2fa__setup-form {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-self: center;
+		text-align: left;
+
+		@media screen and (max-width: 480px) {
+			width: 100%;
+		}
+	}
 }
