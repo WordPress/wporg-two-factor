@@ -138,7 +138,7 @@ function render_custom_ui() : void {
 	echo do_blocks( "<!-- wp:wporg-two-factor/settings $json_attrs /-->" );
 }
 
-/*
+/**
  * Print JS and CSS for customizing the interim revalidation iframe.
  *
  * @codeCoverageIgnore
