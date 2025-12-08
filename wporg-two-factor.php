@@ -11,6 +11,7 @@
 
 namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Backup_Codes;
+use WildWolf\WordPress\TwoFactorWebAuthn\Plugin as WebAuthn_Plugin;
 use WildWolf\WordPress\TwoFactorWebAuthn\Constants as WebAuthn_Plugin_Constants;
 use WP_User, WP_Error;
 
@@ -47,6 +48,9 @@ function load_webauthn_plugin() {
 		$wpdb->webauthn_credentials = 'wporg_' . WebAuthn_Plugin_Constants::WA_CREDENTIALS_TABLE_NAME;
 		$wpdb->webauthn_users       = 'wporg_' . WebAuthn_Plugin_Constants::WA_USERS_TABLE_NAME;
 	}
+
+	// Init the WebAuthn plugin early, this ensures the provider is registered in time for our filters.
+	WebAuthn_Plugin::instance()->init();
 }
 load_webauthn_plugin();
 
