@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
 import { Button, ButtonGroup, CheckboxControl, Flex, Notice, Spinner } from '@wordpress/components';
-import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, caution, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -116,7 +116,7 @@ function Setup( { setGenerating, onSuccess } ) {
 				<p>Please print the codes and keep them in a safe place.</p>
 
 				<Notice status="warning" isDismissible={ false }>
-					<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+					<Icon icon={ caution } className="wporg-2fa__print-codes-warning" />
 					Without access to the one-time password app or a backup code, you will lose
 					access to your account. Once you navigate away from this page, you will not be
 					be able to view these codes again.
@@ -225,7 +225,7 @@ function Manage( { setGenerating } ) {
 
 				{ backupCodesEnabled && backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } />
+						<Icon icon={ caution } />
 						<div>
 							You only have <strong>{ backupCodesRemaining }</strong> backup codes
 							remaining. Please regenerate and save new ones before you run out. If
