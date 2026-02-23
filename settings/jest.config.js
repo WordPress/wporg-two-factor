@@ -4,9 +4,7 @@ const config = {
 	moduleNameMapper: {
 		'^uuid$': require.resolve( 'uuid' ),
 	},
-	transformIgnorePatterns: [
-		'node_modules/(?!(parsel-js)/)',
-	],
+	transformIgnorePatterns: [ 'node_modules/(?!(parsel-js)/)' ],
 	setupFilesAfterEnv: [ './jest.setup.js' ],
 };
 

@@ -34,7 +34,8 @@ jobs:
         run: npm install
 
       - name: Set PHP version for wp-env
-        run: echo '{ "phpVersion": "${{ matrix.php-version }}" }' > .wp-env.override.json
+        run: |
+          echo '{ "phpVersion": "${{ matrix.php-version }}" }' > .wp-env.override.json
 
       - name: Start the Docker testing environment
         run: npx wp-env start --xdebug=coverage
