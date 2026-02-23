@@ -1,7 +1,8 @@
 <?php
 namespace WordPressdotorg\Two_Factor;
-use TwoFactor_Provider_WebAuthn, Two_Factor_Core;
+use Two_Factor_Core;
 use function WordPressdotorg\Two_Factor\{ after_provider_setup, after_provider_deactivated };
+use WildWolf\WordPress\TwoFactorWebAuthn\WebAuthn_Provider as TwoFactor_Provider_WebAuthn; // \TwoFactor_Provider_WebAuthn is marked final.
 
 /**
  * Extends the TwoFactor_Provider_WebAuthn class for WordPress.org needs.
