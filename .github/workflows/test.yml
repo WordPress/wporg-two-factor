@@ -26,16 +26,13 @@ jobs:
           tools: composer:v2
 
       - name: Install NPM dependencies
-        run: yarn
+        run: npm install
 
       - name: Start the Docker testing environment
-        run: yarn wp-env start --xdebug=coverage
-
-      - name: Setup environment tools
-        run: yarn setup:tools
+        run: npx wp-env start --xdebug=coverage
 
       - name: Test PHP
-        run: yarn test
+        run: npm test
 
       - name: Test JS
-        run: yarn test:js
+        run: npm run test:js

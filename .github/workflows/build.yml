@@ -18,10 +18,10 @@ jobs:
             - name: Install all dependencies
               run: |
                   composer install
-                  yarn
+                  npm install
 
             - name: Build
-              run: yarn workspaces run build
+              run: npm run build --workspaces
 
             - name: Trim the repo down to just the plugin files
               run: |

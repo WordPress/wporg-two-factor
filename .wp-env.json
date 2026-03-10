@@ -1,4 +1,5 @@
 {
+	"multisite": true,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
 		"https://downloads.wordpress.org/plugin/bbpress.latest-stable.zip",
@@ -7,8 +8,17 @@
 		"."
 	],
 	"mappings": {
-		"wp-content/themes/wporg-support": "WordPress/wordpress.org/wordpress.org/public_html/wp-content/themes/pub/wporg-support/",
-		"wp-content/mu-plugins/pub/": "WordPress/wporg-mu-plugins#build",
-		"wp-content/mu-plugins/mu-plugin.php": "./.wp-env/mu-plugin.php"
+		"wp-content/themes/wporg-parent-2021": "WordPress/wporg-parent-2021#build",
+		"wp-content/themes/wporg-support-2024": "WordPress/wordpress.org/wordpress.org/public_html/wp-content/themes/pub/wporg-support-2024/",
+		"wp-content/mu-plugins": "./.wp-env/mu-plugins",
+		"wp-content/mu-plugins/pub": "WordPress/wporg-mu-plugins#build"
+	},
+	"lifecycleScripts": {
+		"afterStart": "wp-env run cli --env-cwd=wp-content/plugins/wporg-two-factor composer install && wp-env run tests-cli --env-cwd=wp-content/plugins/wporg-two-factor composer install && wp-env run cli wp plugin activate --network --all && wp-env run cli wp theme activate wporg-support-2024 && wp-env run cli wp option update _bbp_include_root 0 && wp-env run cli wp rewrite flush"
+	},
+	"env": {
+		"tests": {
+			"multisite": false
+		}
 	}
 }

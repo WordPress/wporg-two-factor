@@ -262,18 +262,28 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\set_primary_provider_for_user
 	 */
-	public function test_set_primary_provider_for_user() {
-		// Set backup codes as primary.
+	public function test_set_primary_provider_for_user_without_ordinary_provider() {
+		// Backup codes alone (without an ordinary provider) are stripped by require_ordinary_provider(),
+		// so get_primary_provider_for_user() will wp_die() since enabled providers no longer exist.
 		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
 		$backup_codes_provider->generate_codes( self::$regular_user );
 		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
-
-		$expected = null;
-		$actual   = Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
 		$this->assertTrue( $enabled );
-		$this->assertSame( $expected, $actual );
 
-		// Enable TOTP (as secondary).
+		$this->expectException( WPDieException::class );
+		Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\set_primary_provider_for_user
+	 */
+	public function test_set_primary_provider_for_user() {
+		// Enable backup codes.
+		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
+		$backup_codes_provider->generate_codes( self::$regular_user );
+		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
+
+		// Enable TOTP.
 		$totp_provider = Two_Factor_Core::get_providers()['Two_Factor_Totp'];
 		$totp_provider->set_user_totp_key( self::$regular_user->ID, $totp_provider->generate_key() );
 		$enabled       = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Totp' );
@@ -292,7 +302,7 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 		$expected_key = 'Two_Factor_Totp';
 		$actual_key   = $provider->get_key();
-		$this->assertSame( $expected_key, $provider->get_key() );
+		$this->assertSame( $expected_key, $actual_key );
 
 		// Validate that Backup Codes are now available as secondary.
 		$expected = [ 'Two_Factor_Totp', 'Two_Factor_Backup_Codes' ];
