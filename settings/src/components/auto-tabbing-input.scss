@@ -1,3 +1,5 @@
+@use '~@wordpress/base-styles/colors' as *;
+
 .wporg-2fa__auto-tabbing-input {
 	display: flex;
 	margin-top: 8px;
@@ -11,7 +13,7 @@
 		padding: 0px !important;
 
 		&:focus {
-			outline-color: $blue-50;
+			outline-color: #2271b1; // WP-admin focus blue.
 		}
 		
 		&:not(:last-child) {
