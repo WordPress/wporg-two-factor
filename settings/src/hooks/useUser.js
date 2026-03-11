@@ -18,9 +18,7 @@ export function useUser( userId ) {
 	const totpEnabled = availableProviders.includes( 'Two_Factor_Totp' );
 	const backupCodesEnabled = availableProviders.includes( 'Two_Factor_Backup_Codes' );
 	const webAuthnEnabled = availableProviders.includes( 'TwoFactor_Provider_WebAuthn' );
-	const applicationPasswords = Array.isArray( userRecord.record?.application_passwords )
-		? userRecord.record.application_passwords
-		: [];
+	const applicationPasswords = userRecord.record?.application_passwords ?? [];
 	const hasPrimaryProvider = totpEnabled || webAuthnEnabled;
 
 	return {
