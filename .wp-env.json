@@ -1,4 +1,5 @@
 {
+	"multisite": true,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
 		"https://downloads.wordpress.org/plugin/bbpress.latest-stable.zip",
@@ -7,8 +8,17 @@
 		"."
 	],
 	"mappings": {
-		"wp-content/themes/wporg-support": "WordPress/wordpress.org/wordpress.org/public_html/wp-content/themes/pub/wporg-support/",
-		"wp-content/mu-plugins/pub/": "WordPress/wporg-mu-plugins#build",
-		"wp-content/mu-plugins/mu-plugin.php": "./.wp-env/mu-plugin.php"
+		"wp-content/themes/wporg-parent-2021": "WordPress/wporg-parent-2021#build",
+		"wp-content/themes/wporg-support-2024": "WordPress/wordpress.org/wordpress.org/public_html/wp-content/themes/pub/wporg-support-2024/",
+		"wp-content/mu-plugins": "./.wp-env/mu-plugins",
+		"wp-content/mu-plugins/pub": "WordPress/wporg-mu-plugins#build"
+	},
+	"lifecycleScripts": {
+		"afterStart": "./.wp-env/after-start.sh"
+	},
+	"env": {
+		"tests": {
+			"multisite": false
+		}
 	}
 }

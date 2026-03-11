@@ -42,7 +42,12 @@ function _manually_load_plugin() {
 
 	require_once dirname( __DIR__, 3 ) . '/mu-plugins/pub/mu-plugins/loader.php';
 	require dirname( __DIR__, 2 ) . '/two-factor/two-factor.php';
-	require dirname( __DIR__, 2 ) . '/two-factor-provider-webauthn/index.php';
+	$webauthn_files = glob( dirname( __DIR__, 2 ) . '/two-factor-provider-webauthn*/index.php' );
+	if ( ! $webauthn_files ) {
+		echo "Could not find two-factor-provider-webauthn plugin.\n";
+		exit( 1 );
+	}
+	require $webauthn_files[0];
 	require dirname( __DIR__ ) . '/wporg-two-factor.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
