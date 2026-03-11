@@ -30,6 +30,7 @@ export default function AccountStatus() {
 			totpEnabled,
 			backupCodesEnabled,
 			webAuthnEnabled,
+			applicationPasswords,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
@@ -110,6 +111,17 @@ export default function AccountStatus() {
 				/>
 			) : (
 				''
+			) }
+
+			{ applicationPasswords.length > 0 && (
+				<SettingStatusCard
+					screen="application-passwords"
+					status="enabled"
+					headerText="Application passwords"
+					bodyText={ `You have ${ applicationPasswords.length } application password${
+						applicationPasswords.length !== 1 ? 's' : ''
+					}.` }
+				/>
 			) }
 		</div>
 	);

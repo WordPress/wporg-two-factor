@@ -67,7 +67,13 @@ function Main( { userId, isOnboarding } ) {
 	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
 
 	// The screens where a recent two factor challenge is required.
-	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes', 'svn-password' ];
+	const twoFactorRequiredScreens = [
+		'webauthn',
+		'totp',
+		'backup-codes',
+		'svn-password',
+		'application-passwords',
+	];
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
