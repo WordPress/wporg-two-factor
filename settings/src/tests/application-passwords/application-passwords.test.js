@@ -105,6 +105,18 @@ describe( 'ApplicationPasswords', () => {
 			expect( getByText( 'Never used' ) ).toBeTruthy();
 		} );
 
+		it( 'should display the last IP when available', () => {
+			const { getByText } = render( <ApplicationPasswords /> );
+
+			expect( getByText( '192.168.1.1' ) ).toBeTruthy();
+		} );
+
+		it( 'should display an em dash when last IP is not available', () => {
+			const { getAllByText } = render( <ApplicationPasswords /> );
+
+			expect( getAllByText( '—' ).length ).toBeGreaterThanOrEqual( 1 );
+		} );
+
 		it( 'should render a revoke button for each password', () => {
 			const { getAllByText } = render( <ApplicationPasswords /> );
 
