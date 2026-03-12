@@ -1,3 +1,5 @@
+@use '~@wordpress/base-styles/colors' as *;
+
 .wporg-2fa__account-status {
 	.wporg-2fa__status-card {
 		&:hover,

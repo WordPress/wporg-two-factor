@@ -1,3 +1,5 @@
+@use '~@wordpress/base-styles/colors' as *;
+
 .wporg-2fa__webauthn,
 .bbp-single-user .wporg-2fa__webauthn {
 	.wporg-2fa__webauthn-keys-list {
