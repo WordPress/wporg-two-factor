@@ -73,7 +73,7 @@ export default function Settings() {
 			component: <SVNPassword />,
 		},
 		'application-passwords': {
-			title: 'Application Passwords',
+			title: 'Application passwords',
 			component: <ApplicationPasswords />,
 		},
 	};

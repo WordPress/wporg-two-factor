@@ -60,7 +60,7 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 	public function test_application_passwords_field_returns_expected_data() : void {
 		wp_set_current_user( self::$privileged_user->ID, self::$privileged_user->user_login );
 
-		$created = WP_Application_Passwords::create_new_application_password(
+		WP_Application_Passwords::create_new_application_password(
 			self::$privileged_user->ID,
 			array( 'name' => 'Test App' )
 		);
@@ -80,8 +80,8 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'created', $password );
 		$this->assertArrayHasKey( 'last_used', $password );
 		$this->assertArrayHasKey( 'last_ip', $password );
-		$this->assertFalse( $password['last_used'] );
-		$this->assertFalse( $password['last_ip'] );
+		$this->assertNull( $password['last_used'] );
+		$this->assertNull( $password['last_ip'] );
 	}
 
 	/**

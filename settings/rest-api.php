@@ -423,8 +423,8 @@ function register_user_fields(): void {
 						'uuid'      => $password['uuid'],
 						'name'      => $password['name'],
 						'created'   => gmdate( 'c', $password['created'] ),
-						'last_used' => $password['last_used'] ? gmdate( 'c', $password['last_used'] ) : false,
-						'last_ip'   => $password['last_ip'] ? $password['last_ip'] : false,
+						'last_used' => $password['last_used'] ? gmdate( 'c', $password['last_used'] ) : null,
+						'last_ip'   => $password['last_ip'] ? $password['last_ip'] : null,
 					];
 				}, $passwords ) );
 			},
@@ -449,13 +449,13 @@ function register_user_fields(): void {
 							'format'      => 'date-time',
 						],
 						'last_used' => [
-							'type'        => [ 'string', 'boolean' ],
-							'description' => 'The date the application password was last used, as ISO 8601, or false if never used.',
+							'type'        => [ 'string', 'null' ],
+							'description' => 'The date the application password was last used, as ISO 8601, or null if never used.',
 							'format'      => 'date-time',
 						],
 						'last_ip'   => [
-							'type'        => [ 'string', 'boolean' ],
-							'description' => 'The IP address the application password was last used from, or false if not available.',
+							'type'        => [ 'string', 'null' ],
+							'description' => 'The IP address the application password was last used from, or null if not available.',
 						],
 					],
 				],

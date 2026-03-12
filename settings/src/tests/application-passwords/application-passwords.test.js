@@ -35,8 +35,8 @@ const mockAppPasswords = [
 		uuid: 'uuid-2',
 		name: 'Jetpack',
 		created: '2026-02-20T08:00:00+00:00',
-		last_used: false,
-		last_ip: false,
+		last_used: null,
+		last_ip: null,
 	},
 ];
 
