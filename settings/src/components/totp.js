@@ -166,7 +166,7 @@ function Setup( { setSuccess } ) {
  * @param props.qrCodeUrl
  */
 function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
-	const handleClick = useCallback( () => setSetupMethod( 'manual' ) );
+	const handleClick = useCallback( () => setSetupMethod( 'manual' ), [ setSetupMethod ] );
 
 	return (
 		<div className="wporg-2fa__totp_setup-method-container">
@@ -201,7 +201,7 @@ function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
 function SetupMethodManual( { setSetupMethod, secretKey } ) {
 	const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
 
-	const handleClick = useCallback( () => setSetupMethod( 'qr-code' ) );
+	const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setSetupMethod ] );
 
 	return (
 		<div className="wporg-2fa__manual">
@@ -272,11 +272,11 @@ function SetupForm( {
 		if ( error && inputs.some( ( input, index ) => input !== prevInputs[ index ] ) ) {
 			setError( '' );
 		}
-	}, [ error, inputs, inputsRef ] );
+	}, [ error, inputs, setError ] );
 
 	const handleClearClick = useCallback( () => {
 		setInputs( Array( 6 ).fill( '' ) );
-	}, [] );
+	}, [ setInputs ] );
 
 	const canSubmit = qrCodeUrl && secretKey && inputs.every( ( input ) => !! input );
 

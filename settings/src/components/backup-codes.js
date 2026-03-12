@@ -96,7 +96,7 @@ function Setup( { setGenerating, onSuccess } ) {
 		};
 
 		generateCodes();
-	}, [] );
+	}, [ setBackupCodesVerified, setError, userRecord ] );
 
 	// Finish the setup process.
 	const handleFinished = useCallback( async () => {
@@ -106,7 +106,7 @@ function Setup( { setGenerating, onSuccess } ) {
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setGenerating( false );
 		onSuccess();
-	} );
+	}, [ setBackupCodesVerified, setGlobalNotice, setGenerating, onSuccess ] );
 
 	return (
 		<>

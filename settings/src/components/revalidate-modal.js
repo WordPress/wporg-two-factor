@@ -66,7 +66,7 @@ function RevalidateIframe() {
 		return () => {
 			window.removeEventListener( 'message', maybeRefreshUser );
 		};
-	}, [] );
+	}, [ record, userRecord ] );
 
 	return (
 		<iframe

@@ -6,6 +6,7 @@ import {
 	createContext,
 	useCallback,
 	useEffect,
+	useRef,
 	useState,
 	createRoot,
 } from '@wordpress/element';
@@ -62,12 +63,22 @@ function Main( { userId, isOnboarding } ) {
 	const [ error, setError ] = useState( '' );
 	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
 
-	let currentUrl = new URL( document.location.href );
-	const initialScreen = currentUrl.searchParams.get( 'screen' );
+	const currentUrl = useRef( new URL( document.location.href ) );
+	const initialScreen = currentUrl.current.searchParams.get( 'screen' );
 	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
 
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [ 'webauthn', 'totp', 'backup-codes', 'svn-password' ];
+
+	// Trigger a re-render when the back/forward buttons are clicked.
+	const handlePopState = useCallback( () => {
+		currentUrl.current = new URL( document.location.href );
+		const newScreen = currentUrl.current.searchParams.get( 'screen' );
+
+		if ( newScreen ) {
+			setScreen( newScreen );
+		}
+	}, [] );
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
@@ -76,22 +87,12 @@ function Main( { userId, isOnboarding } ) {
 		return () => {
 			window.removeEventListener( 'popstate', handlePopState );
 		};
-	}, [] );
+	}, [ handlePopState ] );
 
 	useEffect( () => {
-		currentUrl.searchParams.set( 'screen', screen );
-		window.history.pushState( {}, '', currentUrl );
+		currentUrl.current.searchParams.set( 'screen', screen );
+		window.history.pushState( {}, '', currentUrl.current );
 	}, [ screen ] );
-
-	// Trigger a re-render when the back/forward buttons are clicked.
-	const handlePopState = useCallback( () => {
-		currentUrl = new URL( document.location.href );
-		const newScreen = currentUrl.searchParams.get( 'screen' );
-
-		if ( newScreen ) {
-			setScreen( newScreen );
-		}
-	}, [] );
 
 	/**
 	 * Update the screen without refreshing the page.
@@ -112,15 +113,15 @@ function Main( { userId, isOnboarding } ) {
 				} );
 			}
 
-			currentUrl = new URL( document.location.href );
-			currentUrl.searchParams.set( 'screen', nextScreen );
-			window.history.pushState( {}, '', currentUrl );
+			currentUrl.current = new URL( document.location.href );
+			currentUrl.current.searchParams.set( 'screen', nextScreen );
+			window.history.pushState( {}, '', currentUrl.current );
 
 			setError( '' );
 			setGlobalNotice( '' );
 			setScreen( nextScreen );
 		},
-		[ hasEdits ]
+		[ hasEdits, edit, record ]
 	);
 
 	if ( ! hasResolved ) {
