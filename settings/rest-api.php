@@ -411,6 +411,57 @@ function register_user_fields(): void {
 		]
 	);
 
+	register_rest_field(
+		'user',
+		'application_passwords',
+		[
+			'get_callback' => function( $user ) {
+				$passwords = \WP_Application_Passwords::get_user_application_passwords( $user['id'] );
+
+				return array_values( array_map( function( $password ) {
+					return [
+						'uuid'      => $password['uuid'],
+						'name'      => $password['name'],
+						'created'   => gmdate( 'c', $password['created'] ),
+						'last_used' => $password['last_used'] ? gmdate( 'c', $password['last_used'] ) : null,
+						'last_ip'   => $password['last_ip'] ? $password['last_ip'] : null,
+					];
+				}, $passwords ) );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+				'items'   => [
+					'type'       => 'object',
+					'properties' => [
+						'uuid'      => [
+							'type'        => 'string',
+							'description' => 'The unique identifier for the application password.',
+							'format'      => 'uuid',
+						],
+						'name'      => [
+							'type'        => 'string',
+							'description' => 'The name of the application password.',
+						],
+						'created'   => [
+							'type'        => 'string',
+							'description' => 'The date the application password was created, as ISO 8601.',
+							'format'      => 'date-time',
+						],
+						'last_used' => [
+							'type'        => [ 'string', 'null' ],
+							'description' => 'The date the application password was last used, as ISO 8601, or null if never used.',
+							'format'      => 'date-time',
+						],
+						'last_ip'   => [
+							'type'        => [ 'string', 'null' ],
+							'description' => 'The IP address the application password was last used from, or null if not available.',
+						],
+					],
+				],
+			],
+		]
+	);
 }
 
 /**

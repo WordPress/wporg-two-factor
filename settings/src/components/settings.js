@@ -14,6 +14,7 @@ import TOTP from './totp';
 import WebAuthn from './webauthn/webauthn';
 import BackupCodes from './backup-codes';
 import SVNPassword from './svn-password';
+import ApplicationPasswords from './application-passwords';
 
 import { GlobalContext } from '../script';
 
@@ -70,6 +71,10 @@ export default function Settings() {
 		'svn-password': {
 			title: 'SVN credentials',
 			component: <SVNPassword />,
+		},
+		'application-passwords': {
+			title: 'Application passwords',
+			component: <ApplicationPasswords />,
 		},
 	};
 
