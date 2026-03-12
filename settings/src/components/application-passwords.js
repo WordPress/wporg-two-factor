@@ -93,7 +93,9 @@ export default function ApplicationPasswords() {
 						<th>Name</th>
 						<th>Created</th>
 						<th>Last used</th>
-						<th></th>
+						<th>
+							<span className="screen-reader-text">Actions</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
