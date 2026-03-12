@@ -93,6 +93,7 @@ export default function ApplicationPasswords() {
 						<th>Name</th>
 						<th>Created</th>
 						<th>Last used</th>
+						<th>Last IP</th>
 						<th>
 							<span className="screen-reader-text">Actions</span>
 						</th>
@@ -108,6 +109,7 @@ export default function ApplicationPasswords() {
 									? new Date( appPassword.last_used ).toLocaleDateString()
 									: 'Never used' }
 							</td>
+							<td>{ appPassword.last_ip || '—' }</td>
 							<td className="wporg-2fa__app-password-actions">
 								<Button
 									variant="link"
