@@ -98,6 +98,11 @@ function require_ordinary_provider( array $enabled_providers, int $user_id ) : a
 			$enabled_providers[] = 'Two_Factor_Backup_Codes';
 		}
 	} else {
+		// Clean up the raw meta so get_available_providers_for_user() doesn't see stale providers and return a WP_Error.
+		if ( $enabled_providers ) {
+			delete_user_meta( $user_id, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY );
+		}
+
 		$enabled_providers = array();
 	}
 

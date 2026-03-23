@@ -261,17 +261,37 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 	/**
 	 * @covers WordPressdotorg\Two_Factor\set_primary_provider_for_user
+	 * @covers WordPressdotorg\Two_Factor\require_ordinary_provider
 	 */
 	public function test_set_primary_provider_for_user_without_ordinary_provider() {
-		// Backup codes alone (without an ordinary provider) are stripped by require_ordinary_provider(),
-		// so get_primary_provider_for_user() will wp_die() since enabled providers no longer exist.
+		/*
+		 * When backup codes are the only 2FA method, the user effectively has no 2FA,
+		 * so the primary provider should be null rather than triggering a fatal error.
+		 */
 		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
 		$backup_codes_provider->generate_codes( self::$regular_user );
 		$enabled = Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
 		$this->assertTrue( $enabled );
 
-		$this->expectException( WPDieException::class );
-		Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID );
+		$this->assertNull( Two_Factor_Core::get_primary_provider_for_user( self::$regular_user->ID ) );
+	}
+
+	/**
+	 * Verify that require_ordinary_provider() cleans up the raw user meta when
+	 * no ordinary provider is enabled, preventing get_available_providers_for_user()
+	 * from returning a WP_Error.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\require_ordinary_provider
+	 */
+	public function test_require_ordinary_provider_cleans_meta_without_ordinary_provider() {
+		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
+		$backup_codes_provider->generate_codes( self::$regular_user );
+		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
+
+		// After require_ordinary_provider runs via the filter, available providers should be an empty array, not a WP_Error.
+		$available = Two_Factor_Core::get_available_providers_for_user( self::$regular_user );
+		$this->assertIsArray( $available );
+		$this->assertEmpty( $available );
 	}
 
 	/**
@@ -334,17 +354,23 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		] );
 		$this->assertNotFalse( Two_Factor_Core::is_current_user_session_two_factor() );
 
-		// Set enabled providers to a non-existent provider so
-		// get_available_providers_for_user() returns a WP_Error.
+		// Temporarily remove require_ordinary_provider() so get_available_providers_for_user() returns a WP_Error.
+		$require_ordinary = 'WordPressdotorg\Two_Factor\require_ordinary_provider';
+		remove_filter( 'two_factor_enabled_providers_for_user', $require_ordinary, 99 );
 		update_user_meta( $user_id, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, [ 'Non_Existent_Provider' ] );
 
-		$this->assertInstanceOf( WP_Error::class, Two_Factor_Core::get_available_providers_for_user( $user_id ) );
+		try {
+			$this->assertInstanceOf( WP_Error::class, Two_Factor_Core::get_available_providers_for_user( $user_id ) );
 
-		// This should not fatal.
-		after_provider_deactivated( $user_id );
+			after_provider_deactivated( $user_id );
 
-		// The session meta should be cleared.
-		$this->assertFalse( Two_Factor_Core::is_current_user_session_two_factor() );
+			// The session meta should be cleared.
+			$this->assertFalse( Two_Factor_Core::is_current_user_session_two_factor() );
+		} finally {
+			add_filter( 'two_factor_enabled_providers_for_user', $require_ordinary, 99, 2 );
+			unset( $_COOKIE[ LOGGED_IN_COOKIE ] );
+			$manager->destroy_all();
+		}
 	}
 
 	/**

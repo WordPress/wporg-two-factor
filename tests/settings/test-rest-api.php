@@ -77,4 +77,32 @@ class Test_WPorg_Two_Factor_Settings_REST_API extends WP_UnitTestCase {
 		$this->assertSame( 'rest_forbidden', $actual['code'] );
 		$this->assertSame( 403, $actual['data']['status'] );
 	}
+
+	/**
+	 * Verify that the 2fa_available_providers REST field doesn't fatal when
+	 * get_available_providers_for_user() returns a WP_Error.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\Settings\register_rest_fields
+	 */
+	/**
+	 * Verify that the 2fa_available_providers REST field returns an empty array
+	 * when backup codes are the only 2FA method.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\Settings\register_rest_fields
+	 */
+	public function test_available_providers_field_without_ordinary_provider() {
+		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
+
+		$backup_codes_provider = Two_Factor_Backup_Codes::get_instance();
+		$backup_codes_provider->generate_codes( self::$regular_user );
+		Two_Factor_Core::enable_provider_for_user( self::$regular_user->ID, 'Two_Factor_Backup_Codes' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users/' . self::$regular_user->ID );
+		$request->set_query_params( [ 'context' => 'edit' ] );
+		$response = rest_do_request( $request );
+		$data     = rest_get_server()->response_to_data( $response, false );
+
+		$this->assertIsArray( $data['2fa_available_providers'] );
+		$this->assertEmpty( $data['2fa_available_providers'] );
+	}
 }
