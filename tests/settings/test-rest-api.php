@@ -79,12 +79,6 @@ class Test_WPorg_Two_Factor_Settings_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Verify that the 2fa_available_providers REST field doesn't fatal when
-	 * get_available_providers_for_user() returns a WP_Error.
-	 *
-	 * @covers WordPressdotorg\Two_Factor\Settings\register_rest_fields
-	 */
-	/**
 	 * Verify that the 2fa_available_providers REST field returns an empty array
 	 * when backup codes are the only 2FA method.
 	 *
