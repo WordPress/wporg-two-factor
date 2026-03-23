@@ -422,11 +422,8 @@ function after_provider_deactivated( $user_id, $provider = null ) {
 
 	$available_providers = Two_Factor_Core::get_available_providers_for_user( $user_id );
 
-	// Workaround until #164 lands.
-	unset( $available_providers['Two_Factor_Backup_Codes'] );
-
 	// If they no longer have 2FA providers setup, remove the session meta.
-	if ( ! $available_providers ) {
+	if ( ! $available_providers || is_wp_error( $available_providers ) ) {
 		Two_Factor_Core::update_current_user_session( [
 			'two-factor-provider' => null,
 			'two-factor-login'    => null,
