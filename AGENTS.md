@@ -4,8 +4,8 @@
 
 WordPress.org-specific customizations for the [Two Factor](https://github.com/WordPress/two-factor) plugin. This is a WordPress **mu-plugin** (network-activated) that extends the upstream Two Factor plugin with encrypted TOTP, WebAuthn support, a custom React-based settings UI (Gutenberg block), session revalidation, and capability restrictions for privileged users without 2FA.
 
-**Languages:** PHP (WordPress plugin, ~13 source files), JavaScript/React (Gutenberg block in `settings/`).
-**Runtime:** PHP 7.4+ (CI uses 7.4), Node 18+ (`.nvmrc`), Docker (for wp-env test environment).
+**Languages:** PHP (WordPress plugin, ~8 source files), JavaScript/React (Gutenberg block in `settings/`).
+**Runtime:** PHP 7.4+ (CI uses 7.4), Node 18+ (`.nvmrc`, CI uses 20), Docker (for wp-env test environment).
 **Namespace:** `WordPressdotorg\Two_Factor`
 
 ## Repository Layout
@@ -21,6 +21,7 @@ settings/                     # Gutenberg block workspace (npm workspace)
   rest-api.php                # REST API endpoints and user fields
   src/                        # React source (components/, hooks/, tests/, utilities/)
     block.json                # Block metadata
+    render.php                # Block server-side render callback
   build/                      # Compiled output (gitignored)
   package.json                # Workspace package with wp-scripts
   jest.config.js, jest.setup.js, babel.config.json
@@ -67,13 +68,13 @@ npx wp-env stop                # Stops containers
 
 ```sh
 npx wp-env start               # Must be running first
-npm test                       # Runs PHPUnit inside the tests-cli container (25 tests, ~1s)
+npm test                       # Runs PHPUnit inside the tests-cli container (~1s)
 ```
 
 **JavaScript tests** do NOT require Docker:
 
 ```sh
-npm run test:js                # Runs Jest tests in settings/ workspace (4 suites, 33 tests, ~3s)
+npm run test:js                # Runs Jest tests in settings/ workspace (~3s)
 ```
 
 ### Linting
@@ -93,9 +94,9 @@ composer run format            # Auto-fix with PHPCBF
 
 ## CI Checks (GitHub Actions on PRs)
 
-Three workflows run on every pull request. All must pass:
+Two workflows run on every pull request (both must pass), plus a build workflow on trunk:
 
-1. **`.github/workflows/lint.yml`** — Runs `npm run lint:js`. JS lint errors (not warnings) will fail the build. The existing codebase has 0 errors and 21 warnings (all `react-hooks/exhaustive-deps`).
+1. **`.github/workflows/lint.yml`** — Runs `npm run lint:js`. JS lint errors (not warnings) will fail the build.
 
 2. **`.github/workflows/test.yml`** — Starts wp-env, then runs `npm test` (PHP) and `npm run test:js` (JS). Both must pass.
 
@@ -108,7 +109,7 @@ Three workflows run on every pull request. All must pass:
 - **JS test files** use `*.test.js` convention inside `settings/src/tests/`.
 - **Never use `remove_all_filters()` or `remove_all_actions()` in tests.** Always save specific callbacks and add/remove them individually.
 - **The `settings/` directory is an npm workspace.** JS build/lint/test commands are delegated via `--workspaces` or `-w settings`.
-- **Dependencies not obvious from layout:** The plugin depends on `WordPress/two-factor`, `two-factor-provider-webauthn`, `WordPress/wporg-mu-plugins` (build branch), `bbpress`, and `gutenberg` — all mapped via `.wp-env.json`.
+- **Dependencies not obvious from layout:** The plugin depends on `WordPress/two-factor`, `two-factor-provider-webauthn`, `WordPress/wporg-mu-plugins` (build branch), `bbpress`, `gutenberg`, and themes `wporg-parent-2021` (build branch) and `wporg-support-2024` — all mapped via `.wp-env.json`.
 
 ## Validation Checklist
 
