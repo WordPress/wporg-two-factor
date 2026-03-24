@@ -29,8 +29,8 @@ tests/
   bootstrap.php               # PHPUnit bootstrap — loads plugins in wp-env context
   test-wporg-two-factor.php   # PHP tests for main plugin
   settings/                   # PHP tests for REST API and application passwords
-.wp-env.json                  # wp-env config (multisite dev, single-site tests)
-.wp-env/after-start.sh        # Lifecycle script: composer install, plugin activation
+.wp-env.json                  # wp-env config (multisite dev, single-site test install)
+.wp-env/after-start.sh        # Lifecycle script: composer install, plugin/theme activation, bbPress config
 phpcs.xml                     # PHPCS config: WordPress-Core/Docs/Extra with exclusions
 phpunit.xml.dist              # PHPUnit config (multisite, prefix "test-")
 composer.json                 # PHP deps: phpcs, phpunit, wpcs, polyfills
