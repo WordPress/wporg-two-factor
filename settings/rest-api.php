@@ -252,7 +252,9 @@ function register_user_fields(): void {
 		'2fa_available_providers',
 		[
 			'get_callback' => function( $user ) {
-				return array_keys( Two_Factor_Core::get_available_providers_for_user( get_userdata( $user['id'] ) ) );
+				$providers = Two_Factor_Core::get_available_providers_for_user( get_userdata( $user['id'] ) );
+
+				return is_wp_error( $providers ) ? array() : array_keys( $providers );
 			},
 			'schema' => [
 				'type'    => 'array',
