@@ -199,7 +199,8 @@ function SetupMethodQRCode( { setSetupMethod, qrCodeUrl } ) {
  * @param props.secretKey
  */
 function SetupMethodManual( { setSetupMethod, secretKey } ) {
-	const readableSecretKey = secretKey.match( /.{1,4}/g ).join( ' ' );
+	const groups = ( secretKey || '' ).match( /.{1,4}/g );
+	const readableSecretKey = groups ? groups.join( ' ' ) : '';
 
 	const handleClick = useCallback( () => setSetupMethod( 'qr-code' ), [ setSetupMethod ] );
 
