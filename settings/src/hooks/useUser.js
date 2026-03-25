@@ -21,7 +21,7 @@ export function useUser( userId ) {
 	const hasPrimaryProvider = totpEnabled || webAuthnEnabled;
 
 	return {
-		userRecord: { ...userRecord },
+		userRecord,
 		isSaving,
 		hasPrimaryProvider,
 		primaryProvider,
