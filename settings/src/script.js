@@ -90,8 +90,14 @@ function Main( { userId, isOnboarding } ) {
 	}, [ handlePopState ] );
 
 	useEffect( () => {
-		currentUrl.current.searchParams.set( 'screen', screen );
-		window.history.pushState( {}, '', currentUrl.current );
+		const currentScreen = currentUrl.current.searchParams.get( 'screen' );
+
+		// Only update the URL if it is out of sync with the current screen,
+		// and avoid adding a new history entry to prevent duplicates.
+		if ( currentScreen !== screen ) {
+			currentUrl.current.searchParams.set( 'screen', screen );
+			window.history.replaceState( {}, '', currentUrl.current );
+		}
 	}, [ screen ] );
 
 	/**
