@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
-              uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+              uses: actions/checkout@v4
 
             - uses: actions/setup-node@v4
               with:
@@ -37,14 +37,10 @@ jobs:
                 new_file="$(jq --arg ver "$VER-${GITHUB_SHA::7}" '.version = $ver' ./settings/build/block.json)"
                 echo -E "$new_file" > ./settings/build/block.json
 
-            - name: Add all the plugin files
-              run: |
-                  git add * --force
-
             - name: Commit and push
-              uses: actions-js/push@a52398fac807b0c1e5f1492c969b477c8560a0ba # 1.3
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: build
-                  force: true
-                  message: 'Build: ${{ github.sha }}'
+              run: |
+                  git config user.name "GitHub Actions"
+                  git config user.email "actions@github.com"
+                  git add * --force
+                  git commit -m "Build: ${{ github.sha }}" --allow-empty
+                  git push --force origin HEAD:build
