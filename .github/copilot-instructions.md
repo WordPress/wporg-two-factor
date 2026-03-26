@@ -21,7 +21,7 @@ Key subsystems: provider management (WebAuthn/TOTP/Backup Codes), capability enf
 Follow **WordPress coding standards** strictly:
 - PHP: tabs for indentation, Yoda conditions (`'value' === $var`), snake_case functions, braces on same line.
 - JS/React: tabs for indentation, follow wp-scripts/eslint conventions.
-- Follow the `.editorconfig` in the repository root.
+- When in doubt, match the existing file's style and adhere to the WordPress coding standards above.
 
 **Architecture rules:**
 - The main plugin file (`wporg-two-factor.php`) uses the `WordPressdotorg\Two_Factor` namespace.
@@ -45,7 +45,7 @@ Every PR **must** include tests for the changes. This is a security plugin — u
 - Location: `tests/` directory, files prefixed with `test-`.
 - Framework: PHPUnit 9.6 with WordPress test utilities (`WP_UnitTestCase`).
 - Run: `npm test` (runs PHPUnit inside wp-env).
-- Coverage target: 100% for testable code. Use `@codeCoverageIgnore` only for code that genuinely cannot be tested.
+- Coverage target: 100% for meaningful, testable code. Use `@codeCoverageIgnore` pragmatically (as configured in `phpunit.xml.dist`) to exclude non-behavioral glue, unreachable or environment-specific paths, but never to hide untested business logic.
 - **NEVER use `remove_all_filters()` or `remove_all_actions()` in tests** — it removes production callbacks. Always add/remove specific callbacks by reference.
 - Test classes extend `WP_UnitTestCase`. Use `wpSetUpBeforeClass` for expensive setup, `tear_down` for cleanup.
 - The test bootstrap (`tests/bootstrap.php`) mocks WordPress.org-specific functions.
