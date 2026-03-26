@@ -1,5 +1,7 @@
 # WordPress.org Two-Factor Plugin — Copilot Agent Instructions
 
+> See also `AGENTS.md` in the repository root for additional context shared across all AI agents.
+
 ## Project Overview
 
 This is a **security-critical** WordPress plugin that customizes the [Two-Factor](https://github.com/WordPress/two-factor) plugin for WordPress.org. It enforces 2FA on privileged accounts (committers, deputies, theme authors, WordCamp organizers), strips capabilities from users who haven't enabled 2FA, and provides a React-based settings UI with REST API endpoints.
@@ -117,7 +119,7 @@ tests/
 | Run PHP tests | `npm test` |
 | Run JS tests | `npm run test:js` |
 | Lint JS | `npm run lint:js` |
-| Lint PHP | `composer lint` (inside wp-env) |
+| Lint PHP | `npx wp-env run cli --env-cwd=wp-content/plugins/wporg-two-factor composer lint` |
 | Build settings block | `npm run build --workspaces` |
 | WP-CLI in dev env | `npx wp-env run cli wp <command>` |
 

@@ -1,5 +1,7 @@
 # Agent Instructions for wporg-two-factor
 
+> Copilot-specific instructions (Playwright, wp-env URLs, login credentials) are in `.github/copilot-instructions.md`.
+
 ## Overview
 
 WordPress.org-specific customizations for the [Two Factor](https://github.com/WordPress/two-factor) plugin. This is a standard WordPress network-activated plugin that extends the upstream Two Factor plugin with encrypted TOTP, WebAuthn support, a custom React-based settings UI (Gutenberg block), session revalidation, and capability restrictions for privileged users without 2FA.
