@@ -24,16 +24,61 @@ jobs:
           php-version: '8.3'
           tools: composer:v2
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+            settings/node_modules
+          key: node-modules-${{ hashFiles('package-lock.json', 'settings/package-lock.json') }}
+
       - name: Install NPM dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: cache-playwright
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
       - name: Install Playwright browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Cache Docker images
+        uses: actions/cache@v4
+        id: cache-docker
+        with:
+          path: /tmp/wp-env-docker
+          key: docker-wp-env-${{ hashFiles('.wp-env.json') }}
+
+      - name: Load cached Docker images
+        if: steps.cache-docker.outputs.cache-hit == 'true'
+        run: |
+          for f in /tmp/wp-env-docker/*.tar; do
+            docker load < "$f"
+          done
 
       # Docker is pre-installed on ubuntu-latest runners.
       # wp-env uses Docker to run WordPress + MySQL containers.
       - name: Start wp-env
         run: npx wp-env start --xdebug=coverage
+
+      - name: Save Docker images to cache
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/wp-env-docker
+          for image in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep -v '<none>'); do
+            filename=$(echo "$image" | tr '/:' '_')
+            docker save "$image" -o "/tmp/wp-env-docker/${filename}.tar"
+          done
 
       - name: Verify environment is healthy
         run: |
