@@ -7,7 +7,7 @@
 WordPress.org-specific customizations for the [Two Factor](https://github.com/WordPress/two-factor) plugin. This is a standard WordPress network-activated plugin that extends the upstream Two Factor plugin with encrypted TOTP, WebAuthn support, a custom React-based settings UI (Gutenberg block), session revalidation, and capability restrictions for privileged users without 2FA.
 
 **Languages:** PHP (WordPress plugin, ~8 source files), JavaScript/React (Gutenberg block in `settings/`).
-**Runtime:** PHP 7.4+ (CI uses 7.4), Node 18+ (`.nvmrc`, CI uses 20), Docker (for wp-env test environment).
+**Runtime:** PHP 7.4+ (CI uses 7.4), Node 24+ (`.nvmrc`, CI uses 20), Docker (for wp-env test environment).
 **Namespace:** `WordPressdotorg\Two_Factor`
 
 ## Repository Layout
