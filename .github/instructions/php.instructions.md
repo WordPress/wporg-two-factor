@@ -10,4 +10,3 @@ Follow WordPress PHP coding standards and WordPress documentation standards:
 - Use strict type comparisons (`===`, `!==`) unless there's a specific reason not to.
 - Sanitize all input, escape all output. Use `sanitize_*()`, `esc_html()`, `esc_attr()`, `wp_kses()` as appropriate.
 - Prefix functions and hooks with the plugin namespace or use the `WordPressdotorg\Two_Factor` namespace.
-- PHPDoc blocks for all functions with `@param`, `@return`, and `@covers` in tests.

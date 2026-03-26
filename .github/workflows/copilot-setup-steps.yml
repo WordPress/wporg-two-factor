@@ -46,11 +46,11 @@ jobs:
 
       - name: Install Playwright browsers
         if: steps.cache-playwright.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright@1.58.2 install --with-deps chromium
 
       - name: Install Playwright deps
         if: steps.cache-playwright.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright@1.58.2 install-deps chromium
 
       - name: Cache Docker images
         uses: actions/cache@v4
