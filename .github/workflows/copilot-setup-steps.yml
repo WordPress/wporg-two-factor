@@ -62,6 +62,7 @@ jobs:
       - name: Load cached Docker images
         if: steps.cache-docker.outputs.cache-hit == 'true'
         run: |
+          shopt -s nullglob
           for f in /tmp/wp-env-docker/*.tar; do
             docker load < "$f"
           done
@@ -75,7 +76,8 @@ jobs:
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
           mkdir -p /tmp/wp-env-docker
-          for image in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep -v '<none>'); do
+          images=$(docker ps -a --format '{{.Image}} {{.Names}}' | awk '$2 ~ /^wp-env/ {print $1}' | sort -u)
+          for image in $images; do
             filename=$(echo "$image" | tr '/:' '_')
             docker save "$image" -o "/tmp/wp-env-docker/${filename}.tar"
           done
