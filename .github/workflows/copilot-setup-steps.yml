@@ -37,21 +37,6 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: cache-playwright
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Playwright browsers
-        if: steps.cache-playwright.outputs.cache-hit != 'true'
-        run: npx playwright@1.58.2 install --with-deps chromium
-
-      - name: Install Playwright deps
-        if: steps.cache-playwright.outputs.cache-hit == 'true'
-        run: npx playwright@1.58.2 install-deps chromium
-
       - name: Cache Docker images
         uses: actions/cache@v4
         id: cache-docker
