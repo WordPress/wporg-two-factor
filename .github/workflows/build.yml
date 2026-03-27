@@ -39,8 +39,8 @@ jobs:
 
             - name: Commit and push
               run: |
-                  git config user.name "GitHub Actions"
-                  git config user.email "actions@github.com"
+                  git config user.name "$(git log -1 --format='%an' ${{ github.sha }})"
+                  git config user.email "$(git log -1 --format='%ae' ${{ github.sha }})"
                   git add * --force
                   git commit -m "Build: ${{ github.sha }}" --allow-empty
                   git push --force origin HEAD:build
