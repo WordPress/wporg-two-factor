@@ -48,14 +48,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          cache: 'npm'
 
       - name: Install NPM dependencies
-        run: yarn
+        run: npm install
 
       - name: Test JS
         run: npm run test:js
