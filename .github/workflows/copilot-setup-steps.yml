@@ -42,7 +42,7 @@ jobs:
         id: cache-docker
         with:
           path: /tmp/wp-env-docker
-          key: docker-wp-env-${{ hashFiles('.wp-env.copilot.json') }}
+          key: docker-wp-env-${{ hashFiles('.wp-env.json') }}
 
       - name: Load cached Docker images
         if: steps.cache-docker.outputs.cache-hit == 'true'
@@ -55,7 +55,7 @@ jobs:
       # Docker is pre-installed on ubuntu-latest runners.
       # wp-env uses Docker to run WordPress + MySQL containers.
       - name: Start wp-env
-        run: npx wp-env start --config=.wp-env.copilot.json --xdebug=coverage
+        run: npx wp-env start --xdebug=coverage
 
       - name: Save Docker images to cache
         if: steps.cache-docker.outputs.cache-hit != 'true'
@@ -73,6 +73,6 @@ jobs:
           curl -sf http://localhost:8888/ > /dev/null
           curl -sf http://localhost:8889/ > /dev/null
           # Run test suites to confirm everything works
-          npx wp-env run tests-cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor vendor/bin/phpunit
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/wporg-two-factor vendor/bin/phpunit
           npm run test:js
           npm run lint:js

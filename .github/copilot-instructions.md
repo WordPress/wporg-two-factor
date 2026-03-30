@@ -76,10 +76,10 @@ Every PR **must** include tests for the changes. This is a security plugin — u
 
 Before opening a PR, verify your changes pass all checks:
 
-1. **PHP tests:** `npx wp-env run tests-cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor vendor/bin/phpunit`
+1. **PHP tests:** `npm test`
 2. **JS tests:** `npm run test:js`
 3. **JS linting:** `npm run lint:js`
-4. **PHP linting:** `npx wp-env run cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor composer lint`
+4. **PHP linting:** `npx wp-env run cli --env-cwd=wp-content/plugins/wporg-two-factor composer lint`
 5. **E2E verification (mandatory):** Use Playwright to verify the change works in the browser. This is required for every PR — even if the change seems low-risk, open the affected pages and confirm there are no regressions. For UI changes, take screenshots to document the result.
 
 If any check fails, fix the issue — do not skip or ignore failures.
@@ -105,8 +105,7 @@ tests/
   test-wporg-two-factor.php   # Main PHP test suite
   settings/
     test-rest-api.php          # REST API endpoint tests
-.wp-env.json                  # wp-env configuration for local development
-.wp-env.copilot.json          # wp-env configuration for Copilot agents (GitHub refs for plugins)
+.wp-env.json                  # wp-env configuration (multisite, plugins from GitHub repos, themes)
 .wp-env/
   after-start.sh              # Lifecycle script: composer install, plugin activation, bbPress config
   mu-plugins/                 # Mock mu-plugins for local development
@@ -116,15 +115,13 @@ tests/
 
 | Task | Command |
 |---|---|
-| Start dev environment | `npx wp-env start --config=.wp-env.copilot.json` |
-| Run PHP tests | `npx wp-env run tests-cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor vendor/bin/phpunit` |
+| Start dev environment | `npx wp-env start` |
+| Run PHP tests | `npm test` |
 | Run JS tests | `npm run test:js` |
 | Lint JS | `npm run lint:js` |
-| Lint PHP | `npx wp-env run cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor composer lint` |
+| Lint PHP | `npx wp-env run cli --env-cwd=wp-content/plugins/wporg-two-factor composer lint` |
 | Build settings block | `npm run build --workspaces` |
-| WP-CLI in dev env | `npx wp-env run cli --config=.wp-env.copilot.json wp <command>` |
-
-**Important:** Always pass `--config=.wp-env.copilot.json` to all `wp-env` commands. The copilot config uses GitHub repo refs for faster plugin installation in CI.
+| WP-CLI in dev env | `npx wp-env run cli wp <command>` |
 
 ## Commit Message Style
 
