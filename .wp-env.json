@@ -1,5 +1,4 @@
 {
-	"//": "Plugins and core must use GitHub repo refs (not zip downloads) for Copilot agents to work.",
 	"core": "WordPress/WordPress",
 	"multisite": true,
 	"plugins": [

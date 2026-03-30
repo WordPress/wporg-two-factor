@@ -105,7 +105,7 @@ tests/
   test-wporg-two-factor.php   # Main PHP test suite
   settings/
     test-rest-api.php          # REST API endpoint tests
-.wp-env.json                  # wp-env configuration (multisite, plugins from GitHub repos, themes)
+.wp-env.json                  # wp-env configuration — plugins MUST use GitHub repo refs (not zip downloads) for Copilot agents
 .wp-env/
   after-start.sh              # Lifecycle script: composer install, plugin activation, bbPress config
   mu-plugins/                 # Mock mu-plugins for local development
