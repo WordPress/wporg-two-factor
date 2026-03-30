@@ -80,7 +80,7 @@ Before opening a PR, verify your changes pass all checks:
 2. **JS tests:** `npm run test:js`
 3. **JS linting:** `npm run lint:js`
 4. **PHP linting:** `npx wp-env run cli --config=.wp-env.copilot.json --env-cwd=wp-content/plugins/wporg-two-factor composer lint`
-5. **E2E verification:** Use Playwright to verify the change works in the browser.
+5. **E2E verification (mandatory):** Use Playwright to verify the change works in the browser. This is required for every PR — even if the change seems low-risk, open the affected pages and confirm there are no regressions. For UI changes, take screenshots to document the result.
 
 If any check fails, fix the issue — do not skip or ignore failures.
 
