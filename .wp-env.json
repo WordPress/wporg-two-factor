@@ -5,7 +5,7 @@
 		"WordPress/gutenberg",
 		"bbpress/bbPress",
 		"WordPress/two-factor",
-		"sjinks/wp-two-factor-provider-webauthn",
+		"https://downloads.wordpress.org/plugin/two-factor-provider-webauthn.latest-stable.zip",
 		"."
 	],
 	"mappings": {
