@@ -4,4 +4,3 @@ tests/coverage
 vendor
 node_modules
 .claude/settings.local.json
-.wp-env.override.json
