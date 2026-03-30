@@ -1,4 +1,5 @@
 {
+	"core": "WordPress/WordPress",
 	"multisite": true,
 	"plugins": [
 		"WordPress/gutenberg",
