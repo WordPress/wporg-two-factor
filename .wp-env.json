@@ -3,7 +3,7 @@
 	"multisite": true,
 	"plugins": [
 		"WordPress/gutenberg",
-		"WordPress/bbpress",
+		"bbpress/bbPress",
 		"WordPress/two-factor",
 		"sjinks/wp-two-factor-provider-webauthn",
 		"."
