@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { GlobalContext } from '../script';
-import { Modal } from '@wordpress/components';
+import { Modal, Notice } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 import { refreshRecord } from '../utilities/common';
 
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
+	const [ errorMessage, setErrorMessage ] = useState( null );
 
 	const goBack = useCallback(
 		( event ) => {
@@ -29,12 +31,22 @@ export default function RevalidateModal() {
 		>
 			<p>To update your two-factor options, you must first revalidate your session.</p>
 
-			<RevalidateIframe />
+			{ errorMessage && (
+				<Notice
+					status="error"
+					isDismissible={ false }
+					className="wporg-2fa__revalidate-modal-error"
+				>
+					{ errorMessage }
+				</Notice>
+			) }
+
+			<RevalidateIframe setErrorMessage={ setErrorMessage } />
 		</Modal>
 	);
 }
 
-function RevalidateIframe() {
+function RevalidateIframe( { setErrorMessage } ) {
 	const {
 		user: { userRecord },
 	} = useContext( GlobalContext );
@@ -55,9 +67,12 @@ function RevalidateIframe() {
 			try {
 				await refreshRecord( userRecord );
 			} catch ( error ) {
-				// TODO: handle error more properly here, likely by showing a error notice
-				// eslint-disable-next-line no-console
-				console.error( 'Failed to refresh user record:', error );
+				setErrorMessage(
+					__(
+						'There was an error revalidating your session. Please reload the page and try again.',
+						'wporg'
+					)
+				);
 			}
 		}
 
