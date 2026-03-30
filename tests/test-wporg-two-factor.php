@@ -41,6 +41,8 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 
 		$GLOBALS['super_admins']         = array();
 		$GLOBALS['mock_is_special_user'] = array();
+
+		wp_cache_delete( 'webauthn:' . self::$privileged_user->ID, 'users' );
 	}
 
 	/**
@@ -309,6 +311,35 @@ class Test_WPorg_Two_Factor extends WP_UnitTestCase {
 		$actual   = Two_Factor_Core::get_enabled_providers_for_user( self::$regular_user );
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Verify that capabilities are maintained when a user has only WebAuthn enabled (no TOTP).
+	 *
+	 * This is a regression test for https://github.com/WordPress/wporg-two-factor/issues/331 — a banner
+	 * ("Please enable two-factor authentication") was incorrectly shown to users whose only 2FA provider was a
+	 * security key, due to a plugin load-order race that prevented the WebAuthn provider from being registered
+	 * before the capability check ran.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\remove_capabilities_until_2fa_enabled
+	 */
+	public function test_caps_maintained_when_only_webauthn_enabled() : void {
+		global $mock_is_special_user, $super_admins;
+		$mock_is_special_user = array( self::$privileged_user->ID );
+		$super_admins[]       = self::$privileged_user->user_login;
+
+		// Enable only WebAuthn for the user (no TOTP).
+		update_user_meta( self::$privileged_user->ID, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, array( 1 => 'TwoFactor_Provider_WebAuthn' ) );
+		update_user_meta( self::$privileged_user->ID, Two_Factor_Core::PROVIDER_USER_META_KEY, 'TwoFactor_Provider_WebAuthn' );
+
+		// Mock WebAuthn credential availability via object cache (no real DB credentials in unit tests).
+		wp_cache_set( 'webauthn:' . self::$privileged_user->ID, true, 'users' );
+
+		$this->assertTrue( Two_Factor_Core::is_user_using_two_factor( self::$privileged_user->ID ) );
+
+		wp_set_current_user( self::$privileged_user->ID ); // Triggers remove_super_admins_until_2fa_enabled().
+		$this->assertTrue( is_super_admin( self::$privileged_user->ID ) );
+		$this->assertTrue( user_can( self::$privileged_user, 'manage_network' ) ); // Triggers remove_capabilities_until_2fa_enabled().
 	}
 
 	/**

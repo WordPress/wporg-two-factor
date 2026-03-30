@@ -24,10 +24,11 @@ require_once __DIR__ . '/revalidation/index.php';
 /**
  * Load the WebAuthn plugin.
  *
- * Make sure the WebAuthn plugin loads early, because all of our functions that call
- * `Two_Factor_Core::is_user_using_two_factor()` etc assume that all providers are loaded. If WebAuthn is loaded
- * too late, then `remove_capabilities_until_2fa_enabled()` would cause `get_enable_2fa_notice()` to be shown on
- * the front end if WebAuthn is enabled and TOTP isn't.
+ * Runs on `plugins_loaded` to ensure both this plugin and the WebAuthn plugin are fully loaded before we
+ * customise the database table names and register the provider. If the WebAuthn plugin were to finish loading
+ * after this plugin, calling this function directly at file-include time would bail early (class_exists() would
+ * be false), the custom `wporg_` table names would never be set, and any credential lookup would query the wrong
+ * table — causing `is_user_using_two_factor()` to return false for users whose only provider is WebAuthn.
  *
  * @codeCoverageIgnore
  */
@@ -52,7 +53,7 @@ function load_webauthn_plugin() {
 	// Init the WebAuthn plugin early, this ensures the provider is registered in time for our filters.
 	WebAuthn_Plugin::instance()->init();
 }
-load_webauthn_plugin();
+add_action( 'plugins_loaded', __NAMESPACE__ . '\load_webauthn_plugin', 1 ); // Must run after all plugins load.
 
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_enabled_providers_for_user', __NAMESPACE__ . '\require_ordinary_provider', 99, 2 ); // Must run _after_ all other plugins.
