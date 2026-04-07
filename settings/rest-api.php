@@ -10,6 +10,7 @@ defined( 'WPINC' ) || die();
 
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_rest_routes' );
 add_action( 'rest_api_init', __NAMESPACE__ . '\register_user_fields' );
+add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\allow_application_password_management', 10, 3 );
 add_filter( 'rest_pre_insert_user', __NAMESPACE__ . '\require_email_confirmation', 10, 2 );
 add_filter( 'bp_before_profile_edit_content', __NAMESPACE__ . '\process_email_change_confirmation' );
 add_filter( 'admin_page_access_denied', __NAMESPACE__ . '\redirect_wpadmin_profile' );
@@ -464,6 +465,69 @@ function register_user_fields(): void {
 			],
 		]
 	);
+}
+
+/**
+ * Allow users to manage their own application passwords on multisite, even if
+ * they are not a member of the current blog.
+ *
+ * Core's WP_REST_Application_Passwords_Controller::get_user() checks
+ * is_user_member_of_blog() and returns a 404 for non-members. On WordPress.org,
+ * most users aren't members of every blog (e.g., profiles.wordpress.org), so
+ * application password operations like revoke fail.
+ *
+ * This works by filtering `get_user_metadata` to return a minimal capabilities
+ * array for the current user's blog capabilities key, which makes
+ * is_user_member_of_blog() return true.
+ *
+ * @param mixed            $result  Response to replace the requested version with. Can be anything
+ *                                  a normal endpoint can return, or null to not hijack the request.
+ * @param \WP_REST_Server  $server  Server instance.
+ * @param \WP_REST_Request $request Request used to generate the response.
+ * @return mixed Unmodified $result.
+ */
+function allow_application_password_management( $result, $server, $request ) {
+	if ( ! is_multisite() ) {
+		return $result;
+	}
+
+	if ( ! preg_match( '#^/wp/v2/users/\d+/application-passwords#', $request->get_route() ) ) {
+		return $result;
+	}
+
+	$current_user_id = get_current_user_id();
+	if ( ! $current_user_id ) {
+		return $result;
+	}
+
+	add_filter(
+		'get_user_metadata',
+		function ( $check, $user_id, $meta_key ) use ( $current_user_id ) {
+			global $wpdb;
+
+			if ( $user_id !== $current_user_id ) {
+				return $check;
+			}
+
+			$blog_id          = get_current_blog_id();
+			$capabilities_key = $wpdb->base_prefix;
+			if ( 1 !== $blog_id ) {
+				$capabilities_key .= $blog_id . '_';
+			}
+			$capabilities_key .= 'capabilities';
+
+			if ( $meta_key !== $capabilities_key ) {
+				return $check;
+			}
+
+			// Return a nested array: get_metadata() unwraps one level when $single is true.
+			return array( array( 'subscriber' => true ) );
+		},
+		10,
+		3
+	);
+
+	return $result;
 }
 
 /**

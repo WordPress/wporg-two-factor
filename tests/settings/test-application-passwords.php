@@ -156,6 +156,59 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Verify that a user who is not a member of the current blog can still
+	 * revoke their own application password via the REST API.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\allow_application_password_management
+	 */
+	public function test_non_member_can_revoke_application_password() : void {
+		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
+
+		list( , $item ) = WP_Application_Passwords::create_new_application_password(
+			self::$regular_user->ID,
+			array( 'name' => 'Revoke Test' )
+		);
+
+		// Remove the user from the current blog to simulate profiles.wordpress.org.
+		$remove_user_callback = function ( $check, $user_id, $meta_key ) {
+			global $wpdb;
+
+			if ( $user_id !== self::$regular_user->ID ) {
+				return $check;
+			}
+
+			$blog_id          = get_current_blog_id();
+			$capabilities_key = $wpdb->base_prefix;
+			if ( 1 !== $blog_id ) {
+				$capabilities_key .= $blog_id . '_';
+			}
+			$capabilities_key .= 'capabilities';
+
+			if ( $meta_key !== $capabilities_key ) {
+				return $check;
+			}
+
+			// Return false wrapped in an array: get_metadata() unwraps one level,
+			// yielding false, which fails is_array() in is_user_member_of_blog().
+			return array( false );
+		};
+
+		add_filter( 'get_user_metadata', $remove_user_callback, 9, 3 );
+
+		$this->assertFalse(
+			is_user_member_of_blog( self::$regular_user->ID ),
+			'Precondition: user should not be a member of the blog.'
+		);
+
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/users/' . self::$regular_user->ID . '/application-passwords/' . $item['uuid'] );
+		$response = rest_do_request( $request );
+
+		remove_filter( 'get_user_metadata', $remove_user_callback, 9 );
+
+		$this->assertSame( 200, $response->get_status(), 'Non-member should be able to revoke their own application password.' );
+	}
+
+	/**
 	 * @covers WordPressdotorg\Two_Factor\register_user_fields
 	 */
 	public function test_application_passwords_field_excludes_sensitive_data() : void {
