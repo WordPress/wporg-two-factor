@@ -495,39 +495,49 @@ function allow_application_password_management( $result, $server, $request ) {
 		return $result;
 	}
 
-	$current_user_id = get_current_user_id();
-	if ( ! $current_user_id ) {
+	if ( ! get_current_user_id() ) {
 		return $result;
 	}
 
-	add_filter(
-		'get_user_metadata',
-		function ( $check, $user_id, $meta_key ) use ( $current_user_id ) {
-			global $wpdb;
-
-			if ( $user_id !== $current_user_id ) {
-				return $check;
-			}
-
-			$blog_id          = get_current_blog_id();
-			$capabilities_key = $wpdb->base_prefix;
-			if ( 1 !== $blog_id ) {
-				$capabilities_key .= $blog_id . '_';
-			}
-			$capabilities_key .= 'capabilities';
-
-			if ( $meta_key !== $capabilities_key ) {
-				return $check;
-			}
-
-			// Return a nested array: get_metadata() unwraps one level when $single is true.
-			return array( array( 'subscriber' => true ) );
-		},
-		10,
-		3
-	);
+	add_filter( 'get_user_metadata', __NAMESPACE__ . '\spoof_blog_membership_for_current_user', 10, 3 );
 
 	return $result;
+}
+
+/**
+ * Make is_user_member_of_blog() return true for the current user.
+ *
+ * When get_user_meta() is called with the current blog's capabilities key for the
+ * current user, return a minimal capabilities array so is_user_member_of_blog()
+ * sees an array and returns true.
+ *
+ * @see allow_application_password_management()
+ *
+ * @param mixed  $check    The value to return instead of the user meta value. Default null.
+ * @param int    $user_id  The user ID.
+ * @param string $meta_key The meta key.
+ * @return mixed A capabilities array for the current user's blog capabilities key, or $check unchanged.
+ */
+function spoof_blog_membership_for_current_user( $check, $user_id, $meta_key ) {
+	global $wpdb;
+
+	if ( $user_id !== get_current_user_id() ) {
+		return $check;
+	}
+
+	$blog_id          = get_current_blog_id();
+	$capabilities_key = $wpdb->base_prefix;
+	if ( 1 !== $blog_id ) {
+		$capabilities_key .= $blog_id . '_';
+	}
+	$capabilities_key .= 'capabilities';
+
+	if ( $meta_key !== $capabilities_key ) {
+		return $check;
+	}
+
+	// Return a nested array: get_metadata() unwraps one level when $single is true.
+	return array( array( 'subscriber' => true ) );
 }
 
 /**
