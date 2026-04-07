@@ -170,7 +170,7 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 		);
 
 		// Remove the user from the current blog to simulate profiles.wordpress.org.
-		$remove_user_callback = function( $check, $user_id, $meta_key ) {
+		$remove_user_callback = function ( $check, $user_id, $meta_key ) {
 			global $wpdb;
 
 			if ( $user_id !== self::$regular_user->ID ) {

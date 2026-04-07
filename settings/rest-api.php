@@ -496,10 +496,14 @@ function allow_application_password_management( $result, $server, $request ) {
 	}
 
 	add_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog', 10, 3 );
-	add_filter( 'rest_post_dispatch', function( $response ) {
-		remove_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog', 10 );
-		return $response;
-	} );
+	add_filter(
+		'rest_post_dispatch',
+		function ( $response ) {
+			remove_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog' );
+
+			return $response;
+		}
+	);
 
 	return $result;
 }
@@ -521,7 +525,7 @@ function allow_application_password_management( $result, $server, $request ) {
 function treat_as_member_of_blog( $check, $user_id, $meta_key ) {
 	global $wpdb;
 
-	if ( $user_id !== get_current_user_id() ) {
+	if ( get_current_user_id() !== $user_id ) {
 		return $check;
 	}
 
