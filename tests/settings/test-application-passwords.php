@@ -159,7 +159,7 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 	 * Verify that a user who is not a member of the current blog can still
 	 * revoke their own application password via the REST API.
 	 *
-	 * @covers WordPressdotorg\Two_Factor\allow_application_password_management
+	 * @covers WordPressdotorg\Two_Factor\treat_as_member_of_blog
 	 */
 	public function test_non_member_can_revoke_application_password() : void {
 		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );

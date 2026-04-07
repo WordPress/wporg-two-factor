@@ -476,10 +476,6 @@ function register_user_fields(): void {
  * most users aren't members of every blog (e.g., profiles.wordpress.org), so
  * application password operations like revoke fail.
  *
- * This works by filtering `get_user_metadata` to return a minimal capabilities
- * array for the current user's blog capabilities key, which makes
- * is_user_member_of_blog() return true.
- *
  * @param mixed            $result  Response to replace the requested version with. Can be anything
  *                                  a normal endpoint can return, or null to not hijack the request.
  * @param \WP_REST_Server  $server  Server instance.
@@ -499,7 +495,7 @@ function allow_application_password_management( $result, $server, $request ) {
 		return $result;
 	}
 
-	add_filter( 'get_user_metadata', __NAMESPACE__ . '\spoof_blog_membership_for_current_user', 10, 3 );
+	add_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog', 10, 3 );
 
 	return $result;
 }
@@ -518,21 +514,14 @@ function allow_application_password_management( $result, $server, $request ) {
  * @param string $meta_key The meta key.
  * @return mixed A capabilities array for the current user's blog capabilities key, or $check unchanged.
  */
-function spoof_blog_membership_for_current_user( $check, $user_id, $meta_key ) {
+function treat_as_member_of_blog( $check, $user_id, $meta_key ) {
 	global $wpdb;
 
 	if ( $user_id !== get_current_user_id() ) {
 		return $check;
 	}
 
-	$blog_id          = get_current_blog_id();
-	$capabilities_key = $wpdb->base_prefix;
-	if ( 1 !== $blog_id ) {
-		$capabilities_key .= $blog_id . '_';
-	}
-	$capabilities_key .= 'capabilities';
-
-	if ( $meta_key !== $capabilities_key ) {
+	if ( $meta_key !== $wpdb->get_blog_prefix() . 'capabilities' ) {
 		return $check;
 	}
 
