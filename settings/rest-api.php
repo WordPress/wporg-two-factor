@@ -496,6 +496,10 @@ function allow_application_password_management( $result, $server, $request ) {
 	}
 
 	add_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog', 10, 3 );
+	add_filter( 'rest_post_dispatch', function( $response ) {
+		remove_filter( 'get_user_metadata', __NAMESPACE__ . '\treat_as_member_of_blog', 10 );
+		return $response;
+	} );
 
 	return $result;
 }
@@ -526,7 +530,8 @@ function treat_as_member_of_blog( $check, $user_id, $meta_key ) {
 	}
 
 	// Return a nested array: get_metadata() unwraps one level when $single is true.
-	return array( array( 'subscriber' => true ) );
+	// An empty capabilities array satisfies is_array() without granting any role.
+	return array( array() );
 }
 
 /**

@@ -170,7 +170,7 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 		);
 
 		// Remove the user from the current blog to simulate profiles.wordpress.org.
-		$remove_user_callback = function ( $check, $user_id, $meta_key ) {
+		$remove_user_callback = function( $check, $user_id, $meta_key ) {
 			global $wpdb;
 
 			if ( $user_id !== self::$regular_user->ID ) {
@@ -206,6 +206,15 @@ class Test_WPorg_Two_Factor_Application_Passwords extends WP_UnitTestCase {
 		remove_filter( 'get_user_metadata', $remove_user_callback, 9 );
 
 		$this->assertSame( 200, $response->get_status(), 'Non-member should be able to revoke their own application password.' );
+
+		$remaining_passwords = WP_Application_Passwords::get_user_application_passwords( self::$regular_user->ID );
+		$remaining_uuids     = wp_list_pluck( $remaining_passwords, 'uuid' );
+
+		$this->assertNotContains(
+			$item['uuid'],
+			$remaining_uuids,
+			'Application password should be removed after revocation.'
+		);
 	}
 
 	/**
