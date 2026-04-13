@@ -20,6 +20,7 @@ defined( 'WPINC' ) || die();
 require_once __DIR__ . '/settings/settings.php';
 require_once __DIR__ . '/stats.php';
 require_once __DIR__ . '/revalidation/index.php';
+require_once __DIR__ . '/recovery/recovery.php';
 
 /**
  * Load the WebAuthn plugin.

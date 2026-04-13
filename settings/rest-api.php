@@ -4,6 +4,7 @@ namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
+use WordPressdotorg\Two_Factor\Recovery;
 use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, get_svn_password_creation_date };
 
 defined( 'WPINC' ) || die();
@@ -410,6 +411,162 @@ function register_user_fields(): void {
 				'type'    => [ 'boolean', 'string' ],
 				'context' => [ 'edit' ],
 			]
+		]
+	);
+
+	// Recovery fields.
+	register_rest_field(
+		'user',
+		'2fa_recovery_email_enabled',
+		[
+			'get_callback' => function( $user ) {
+				return Recovery\is_recovery_email_enabled( $user['id'] );
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_contact',
+		[
+			'get_callback' => function( $user ) {
+				$contact = Recovery\get_designated_contact( $user['id'] );
+				if ( ! $contact ) {
+					return null;
+				}
+				return [
+					'id'           => $contact->ID,
+					'login'        => $contact->user_login,
+					'display_name' => $contact->display_name,
+				];
+			},
+			'schema' => [
+				'type'    => [ 'object', 'null' ],
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_contact_pending',
+		[
+			'get_callback' => function( $user ) {
+				$pending = Recovery\get_pending_contact_designation( $user['id'] );
+				if ( ! $pending ) {
+					return null;
+				}
+				$contact = get_userdata( $pending['contact_id'] );
+				return [
+					'contact_login' => $contact ? $contact->user_login : '',
+					'requested_at'  => $pending['requested_at'],
+				];
+			},
+			'schema' => [
+				'type'    => [ 'object', 'null' ],
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_pending_request',
+		[
+			'get_callback' => function( $user ) {
+				$request = Recovery\get_pending_recovery( $user['id'] );
+				if ( ! $request || 'cancelled' === $request['status'] ) {
+					return null;
+				}
+				return [
+					'type'         => $request['type'],
+					'requested_at' => $request['requested_at'],
+					'available_at' => $request['available_at'],
+					'status'       => $request['status'],
+				];
+			},
+			'schema' => [
+				'type'    => [ 'object', 'null' ],
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_allowed_methods',
+		[
+			'get_callback' => function( $user ) {
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\get_allowed_recovery_methods( $user_obj ) : [];
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_delay',
+		[
+			'get_callback' => function( $user ) {
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\get_recovery_delay( $user_obj ) : DAY_IN_SECONDS;
+			},
+			'schema' => [
+				'type'    => 'integer',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_designated_for',
+		[
+			'get_callback' => function( $user ) {
+				$ids = get_user_meta( $user['id'], Recovery\DESIGNATED_FOR_META, true );
+				if ( ! is_array( $ids ) ) {
+					return [];
+				}
+				$result = [];
+				foreach ( $ids as $for_user_id ) {
+					$for_user = get_userdata( $for_user_id );
+					if ( $for_user ) {
+						$result[] = [
+							'id'           => $for_user->ID,
+							'login'        => $for_user->user_login,
+							'display_name' => $for_user->display_name,
+						];
+					}
+				}
+				return $result;
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_prompt_needed',
+		[
+			'get_callback' => function( $user ) {
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\check_recovery_prompt_needed( $user_obj ) : false;
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			],
 		]
 	);
 
