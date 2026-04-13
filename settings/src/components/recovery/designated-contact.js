@@ -62,24 +62,27 @@ export default function DesignatedContact() {
 		setIsSaving( false );
 	}, [ contactLogin, record?.id, userRecord, setGlobalNotice ] );
 
-	const handleRemove = useCallback( async ( contactId ) => {
-		setRemovingId( contactId );
-		try {
-			await apiFetch( {
-				path: '/wporg-two-factor/1.0/recovery/remove-contact',
-				method: 'POST',
-				data: {
-					user_id: record.id,
-					contact_id: contactId,
-				},
-			} );
-			await refreshRecord( userRecord );
-			setGlobalNotice( 'Recovery contact has been removed.' );
-		} catch ( err ) {
-			setError( err );
-		}
-		setRemovingId( null );
-	}, [ record?.id, userRecord, setGlobalNotice, setError ] );
+	const handleRemove = useCallback(
+		async ( contactId ) => {
+			setRemovingId( contactId );
+			try {
+				await apiFetch( {
+					path: '/wporg-two-factor/1.0/recovery/remove-contact',
+					method: 'POST',
+					data: {
+						user_id: record.id,
+						contact_id: contactId,
+					},
+				} );
+				await refreshRecord( userRecord );
+				setGlobalNotice( 'Recovery contact has been removed.' );
+			} catch ( err ) {
+				setError( err );
+			}
+			setRemovingId( null );
+		},
+		[ record?.id, userRecord, setGlobalNotice, setError ]
+	);
 
 	return (
 		<div className="wporg-2fa__designated-contact">
@@ -89,8 +92,7 @@ export default function DesignatedContact() {
 					{ recoveryContacts.map( ( contact ) => (
 						<li key={ contact.id } className="wporg-2fa__contact-item">
 							<span>
-								<Icon icon={ check } size={ 16 } />
-								{ ' ' }
+								<Icon icon={ check } size={ 16 } />{ ' ' }
 								<strong>{ contact.display_name }</strong> ({ contact.login })
 							</span>
 							<Button

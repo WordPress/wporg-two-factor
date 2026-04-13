@@ -78,7 +78,16 @@ export default function RecoverySetup( { onSuccess } ) {
 
 		setIsSaving( false );
 		onSuccess();
-	}, [ emailEnabled, contactLogin, record?.id, canUseEmail, canUseContact, onSuccess, setGlobalNotice, userRecord ] );
+	}, [
+		emailEnabled,
+		contactLogin,
+		record?.id,
+		canUseEmail,
+		canUseContact,
+		onSuccess,
+		setGlobalNotice,
+		userRecord,
+	] );
 
 	// No recovery methods available (super admins).
 	if ( recoveryAllowedMethods.length === 0 ) {
@@ -86,8 +95,8 @@ export default function RecoverySetup( { onSuccess } ) {
 			<>
 				<div className="wporg-2fa__screen-intro">
 					<p>
-						Your account requires out-of-band recovery management. Please contact
-						the systems team if you ever lose access to your two-factor device.
+						Your account requires out-of-band recovery management. Please contact the
+						systems team if you ever lose access to your two-factor device.
 					</p>
 				</div>
 				<Button isPrimary onClick={ onSuccess }>
@@ -101,14 +110,15 @@ export default function RecoverySetup( { onSuccess } ) {
 		<>
 			<div className="wporg-2fa__screen-intro">
 				<p>
-					Set up recovery options so you can regain access to your account if you
-					lose your two-factor authentication device. This is optional but strongly recommended.
+					Set up recovery options so you can regain access to your account if you lose
+					your two-factor authentication device. This is optional but strongly
+					recommended.
 				</p>
 
 				<Notice status="warning" isDismissible={ false }>
 					<Icon icon={ warning } className="wporg-2fa__recovery-warning" />
-					Without a recovery option, you may be permanently locked out of your account
-					if you lose access to your two-factor device and backup codes.
+					Without a recovery option, you may be permanently locked out of your account if
+					you lose access to your two-factor device and backup codes.
 				</Notice>
 			</div>
 
@@ -144,18 +154,10 @@ export default function RecoverySetup( { onSuccess } ) {
 			) }
 
 			<div className="wporg-2fa__submit-actions">
-				<Button
-					isPrimary
-					onClick={ handleContinue }
-					disabled={ isSaving }
-				>
+				<Button isPrimary onClick={ handleContinue } disabled={ isSaving }>
 					{ isSaving ? <Spinner /> : 'Continue' }
 				</Button>
-				<Button
-					isSecondary
-					onClick={ onSuccess }
-					disabled={ isSaving }
-				>
+				<Button isSecondary onClick={ onSuccess } disabled={ isSaving }>
 					Skip
 				</Button>
 			</div>

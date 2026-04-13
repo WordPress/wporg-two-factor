@@ -119,15 +119,15 @@ export default function ContactApproval() {
 	return (
 		<div className="wporg-2fa__screen-intro">
 			<p>
-				A WordPress.org user has designated you as their two-factor authentication
-				recovery contact. If they ever lose access to their two-factor device, you may
-				be contacted to verify their identity and help them regain access.
+				A WordPress.org user has designated you as their two-factor authentication recovery
+				contact. If they ever lose access to their two-factor device, you may be contacted
+				to verify their identity and help them regain access.
 			</p>
 
 			<p>
-				By accepting, you agree to verify the identity of the user through out-of-band
-				means (such as in person, phone call, or video chat) before confirming any
-				recovery requests.
+				By accepting, you agree to verify the identity of the user through out-of-band means
+				(such as in person, phone call, or video chat) before confirming any recovery
+				requests.
 			</p>
 
 			{ error && (

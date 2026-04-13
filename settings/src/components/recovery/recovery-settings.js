@@ -39,29 +39,38 @@ export default function RecoverySettings() {
 
 	const delayText = formatDelay( recoveryDelay );
 
-	const handleEmailToggle = useCallback( async ( enabled ) => {
-		setIsSaving( true );
-		try {
-			await apiFetch( {
-				path: `/wporg-two-factor/1.0/recovery/${ enabled ? 'email-opt-in' : 'email-opt-out' }`,
-				method: 'POST',
-				data: { user_id: record.id },
-			} );
-			await refreshRecord( userRecord );
-			setGlobalNotice( enabled ? 'Email recovery has been enabled.' : 'Email recovery has been disabled.' );
-		} catch ( err ) {
-			setError( err );
-		}
-		setIsSaving( false );
-	}, [ record?.id, userRecord, setGlobalNotice, setError ] );
+	const handleEmailToggle = useCallback(
+		async ( enabled ) => {
+			setIsSaving( true );
+			try {
+				await apiFetch( {
+					path: `/wporg-two-factor/1.0/recovery/${
+						enabled ? 'email-opt-in' : 'email-opt-out'
+					}`,
+					method: 'POST',
+					data: { user_id: record.id },
+				} );
+				await refreshRecord( userRecord );
+				setGlobalNotice(
+					enabled
+						? 'Email recovery has been enabled.'
+						: 'Email recovery has been disabled.'
+				);
+			} catch ( err ) {
+				setError( err );
+			}
+			setIsSaving( false );
+		},
+		[ record?.id, userRecord, setGlobalNotice, setError ]
+	);
 
 	// Super admins / no recovery available.
 	if ( allowedMethods.length === 0 ) {
 		return (
 			<div className="wporg-2fa__screen-intro">
 				<p>
-					Your account requires out-of-band recovery management.
-					Please contact the systems team if you lose access to your two-factor device.
+					Your account requires out-of-band recovery management. Please contact the
+					systems team if you lose access to your two-factor device.
 				</p>
 			</div>
 		);
@@ -78,8 +87,9 @@ export default function RecoverySettings() {
 
 			{ pendingRequest && (
 				<Notice status="warning" isDismissible={ false }>
-					A { pendingRequest.type } recovery request is currently pending
-					(requested { new Date( pendingRequest.requested_at * 1000 ).toLocaleDateString() }).
+					A { pendingRequest.type } recovery request is currently pending (requested{ ' ' }
+					{ new Date( pendingRequest.requested_at * 1000 ).toLocaleDateString() }
+					).
 				</Notice>
 			) }
 
@@ -87,8 +97,8 @@ export default function RecoverySettings() {
 				<div className="wporg-2fa__recovery-section">
 					<h3>Email Recovery</h3>
 					<p>
-						If you lose access to your two-factor device, a recovery link will be
-						sent to your account email after a { delayText } waiting period.
+						If you lose access to your two-factor device, a recovery link will be sent
+						to your account email after a { delayText } waiting period.
 					</p>
 
 					<ToggleControl
@@ -104,9 +114,9 @@ export default function RecoverySettings() {
 				<div className="wporg-2fa__recovery-section">
 					<h3>Designated Recovery Contact</h3>
 					<p>
-						Designate another WordPress.org user who can verify your identity
-						and help you regain access to your account.
-						The contact must have two-factor authentication enabled.
+						Designate another WordPress.org user who can verify your identity and help
+						you regain access to your account. The contact must have two-factor
+						authentication enabled.
 					</p>
 
 					<DesignatedContact />
@@ -119,9 +129,8 @@ export default function RecoverySettings() {
 					<ul>
 						{ designatedFor.map( ( user ) => (
 							<li key={ user.id }>
-								<Icon icon={ check } size={ 16 } />
-								{ ' ' }
-								{ user.display_name } ({ user.login })
+								<Icon icon={ check } size={ 16 } /> { user.display_name } (
+								{ user.login })
 							</li>
 						) ) }
 					</ul>
@@ -134,7 +143,7 @@ export default function RecoverySettings() {
 /**
  * Format a delay in seconds to a human-readable string.
  *
- * @param {number} seconds The delay in seconds.
+ * @param {number} seconds
  * @return {string} Human-readable delay string.
  */
 function formatDelay( seconds ) {
