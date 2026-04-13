@@ -34,7 +34,7 @@ export default function ScreenLink( { screen, anchorText, buttonStyle = false, a
 
 			navigateToScreen( screen );
 		},
-		[ navigateToScreen ]
+		[ navigateToScreen, screen, setBackupCodesVerified ]
 	);
 
 	return (
