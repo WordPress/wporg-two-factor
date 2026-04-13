@@ -3,8 +3,8 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useState, useCallback } from '@wordpress/element';
-import { Button, Notice, ToggleControl, Spinner } from '@wordpress/components';
-import { Icon, cancelCircleFilled, check } from '@wordpress/icons';
+import { Notice, ToggleControl } from '@wordpress/components';
+import { Icon, check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -53,7 +53,7 @@ export default function RecoverySettings() {
 			setError( err );
 		}
 		setIsSaving( false );
-	}, [ record?.id ] );
+	}, [ record?.id, userRecord, setGlobalNotice, setError ] );
 
 	// Super admins / no recovery available.
 	if ( allowedMethods.length === 0 ) {
@@ -134,8 +134,8 @@ export default function RecoverySettings() {
 /**
  * Format a delay in seconds to a human-readable string.
  *
- * @param {number} seconds
- * @return {string}
+ * @param {number} seconds The delay in seconds.
+ * @return {string} Human-readable delay string.
  */
 function formatDelay( seconds ) {
 	const days = Math.floor( seconds / 86400 );

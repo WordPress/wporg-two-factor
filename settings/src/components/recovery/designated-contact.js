@@ -51,14 +51,16 @@ export default function DesignatedContact() {
 				},
 			} );
 			await refreshRecord( userRecord );
-			setGlobalNotice( 'A designation request has been sent to ' + contactLogin.trim() + '.' );
+			setGlobalNotice(
+				'A designation request has been sent to ' + contactLogin.trim() + '.'
+			);
 			setContactLogin( '' );
 		} catch ( err ) {
 			setLocalError( err.message || 'Failed to designate contact.' );
 		}
 
 		setIsSaving( false );
-	}, [ contactLogin, record?.id ] );
+	}, [ contactLogin, record?.id, userRecord, setGlobalNotice ] );
 
 	const handleRemove = useCallback( async ( contactId ) => {
 		setRemovingId( contactId );
@@ -77,7 +79,7 @@ export default function DesignatedContact() {
 			setError( err );
 		}
 		setRemovingId( null );
-	}, [ record?.id ] );
+	}, [ record?.id, userRecord, setGlobalNotice, setError ] );
 
 	return (
 		<div className="wporg-2fa__designated-contact">

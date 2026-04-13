@@ -35,15 +35,6 @@ export default function ContactApproval() {
 	const userId = parseInt( params.get( 'user_id' ), 10 );
 	const contactId = record?.id;
 
-	if ( ! token || ! userId ) {
-		return (
-			<Notice status="error" isDismissible={ false }>
-				<Icon icon={ cancelCircleFilled } />
-				Invalid approval link. Please check the link in your email.
-			</Notice>
-		);
-	}
-
 	const handleAccept = useCallback( async () => {
 		setIsSaving( true );
 		setError( '' );
@@ -64,7 +55,7 @@ export default function ContactApproval() {
 			setError( err.message || 'Failed to accept designation.' );
 		}
 		setIsSaving( false );
-	}, [ contactId, userId, token ] );
+	}, [ contactId, userId, token, userRecord, setGlobalNotice ] );
 
 	const handleDecline = useCallback( async () => {
 		setIsSaving( true );
@@ -86,15 +77,24 @@ export default function ContactApproval() {
 			setError( err.message || 'Failed to decline designation.' );
 		}
 		setIsSaving( false );
-	}, [ contactId, userId, token ] );
+	}, [ contactId, userId, token, userRecord, setGlobalNotice ] );
+
+	if ( ! token || ! userId ) {
+		return (
+			<Notice status="error" isDismissible={ false }>
+				<Icon icon={ cancelCircleFilled } />
+				Invalid approval link. Please check the link in your email.
+			</Notice>
+		);
+	}
 
 	if ( result === 'accepted' ) {
 		return (
 			<div className="wporg-2fa__screen-intro">
 				<Notice status="success" isDismissible={ false }>
 					<Icon icon={ check } />
-					You have accepted the recovery contact designation. If the user ever loses access
-					to their two-factor device, you may be asked to verify their identity.
+					You have accepted the recovery contact designation. If the user ever loses
+					access to their two-factor device, you may be asked to verify their identity.
 				</Notice>
 				<Button isSecondary onClick={ () => navigateToScreen( 'home' ) }>
 					Back to settings
@@ -120,14 +120,14 @@ export default function ContactApproval() {
 		<div className="wporg-2fa__screen-intro">
 			<p>
 				A WordPress.org user has designated you as their two-factor authentication
-				recovery contact. If they ever lose access to their two-factor device, you
-				may be contacted to verify their identity and help them regain access.
+				recovery contact. If they ever lose access to their two-factor device, you may
+				be contacted to verify their identity and help them regain access.
 			</p>
 
 			<p>
-				By accepting, you agree to verify the identity of the user through
-				out-of-band means (such as in person, phone call, or video chat) before
-				confirming any recovery requests.
+				By accepting, you agree to verify the identity of the user through out-of-band
+				means (such as in person, phone call, or video chat) before confirming any
+				recovery requests.
 			</p>
 
 			{ error && (
@@ -138,19 +138,10 @@ export default function ContactApproval() {
 			) }
 
 			<div className="wporg-2fa__submit-actions">
-				<Button
-					isPrimary
-					onClick={ handleAccept }
-					disabled={ isSaving }
-				>
+				<Button isPrimary onClick={ handleAccept } disabled={ isSaving }>
 					{ isSaving ? <Spinner /> : 'Accept' }
 				</Button>
-				<Button
-					isSecondary
-					isDestructive
-					onClick={ handleDecline }
-					disabled={ isSaving }
-				>
+				<Button isSecondary isDestructive onClick={ handleDecline } disabled={ isSaving }>
 					Decline
 				</Button>
 			</div>

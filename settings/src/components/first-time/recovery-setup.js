@@ -78,7 +78,7 @@ export default function RecoverySetup( { onSuccess } ) {
 
 		setIsSaving( false );
 		onSuccess();
-	}, [ emailEnabled, contactLogin, record?.id, canUseEmail, canUseContact ] );
+	}, [ emailEnabled, contactLogin, record?.id, canUseEmail, canUseContact, onSuccess, setGlobalNotice, userRecord ] );
 
 	// No recovery methods available (super admins).
 	if ( recoveryAllowedMethods.length === 0 ) {
@@ -86,8 +86,8 @@ export default function RecoverySetup( { onSuccess } ) {
 			<>
 				<div className="wporg-2fa__screen-intro">
 					<p>
-						Your account requires out-of-band recovery management.
-						Please contact the systems team if you ever lose access to your two-factor device.
+						Your account requires out-of-band recovery management. Please contact
+						the systems team if you ever lose access to your two-factor device.
 					</p>
 				</div>
 				<Button isPrimary onClick={ onSuccess }>
@@ -166,8 +166,8 @@ export default function RecoverySetup( { onSuccess } ) {
 /**
  * Format a delay in seconds to a human-readable string.
  *
- * @param {number} seconds
- * @return {string}
+ * @param {number} seconds The delay in seconds.
+ * @return {string} Human-readable delay string.
  */
 function formatDelay( seconds ) {
 	const days = Math.floor( seconds / 86400 );
