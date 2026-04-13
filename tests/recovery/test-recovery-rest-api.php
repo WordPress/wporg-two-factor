@@ -31,8 +31,8 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		foreach ( [ self::$privileged_user, self::$regular_user, self::$contact_user ] as $user ) {
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_EMAIL_ENABLED_META );
-			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACT_META );
-			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACT_PENDING_META );
+			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META );
+			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_PENDING_META );
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_REQUEST_META );
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\DESIGNATED_FOR_META );
 			delete_user_meta( $user->ID, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY );
@@ -214,17 +214,18 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_remove_contact
 	 */
 	public function test_remove_contact_via_api() : void {
-		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACT_META, self::$contact_user->ID );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 
 		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/remove-contact', [
-			'user_id' => self::$regular_user->ID,
+			'user_id'    => self::$regular_user->ID,
+			'contact_id' => self::$contact_user->ID,
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );
 		$this->assertTrue( $actual['success'] );
-		$this->assertNull( WordPressdotorg\Two_Factor\Recovery\get_designated_contact( self::$regular_user->ID ) );
+		$this->assertEmpty( WordPressdotorg\Two_Factor\Recovery\get_designated_contacts( self::$regular_user->ID ) );
 	}
 
 	/**

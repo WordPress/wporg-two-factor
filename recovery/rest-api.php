@@ -97,6 +97,11 @@ function register_recovery_routes() : void {
 					'type'              => 'integer',
 					'sanitize_callback' => 'absint',
 				],
+				'contact_id' => [
+					'required'          => true,
+					'type'              => 'integer',
+					'sanitize_callback' => 'absint',
+				],
 			],
 		]
 	);
@@ -311,7 +316,7 @@ function rest_designate_contact( WP_REST_Request $request ) {
  * Remove a designated contact.
  */
 function rest_remove_contact( WP_REST_Request $request ) {
-	remove_contact( $request['user_id'] );
+	remove_contact( $request['user_id'], $request['contact_id'] );
 
 	return [ 'success' => true ];
 }

@@ -33,11 +33,11 @@ export default function AccountStatus() {
 			webAuthnEnabled,
 			applicationPasswords,
 			recoveryEmailEnabled,
-			recoveryContact,
+			recoveryContacts,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
-	const recoveryConfigured = recoveryEmailEnabled || !! recoveryContact;
+	const recoveryConfigured = recoveryEmailEnabled || recoveryContacts.length > 0;
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider

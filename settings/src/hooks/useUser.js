@@ -23,7 +23,8 @@ export function useUser( userId ) {
 
 	// Recovery fields.
 	const recoveryEmailEnabled = userRecord.record?.[ '2fa_recovery_email_enabled' ] ?? false;
-	const recoveryContact = userRecord.record?.[ '2fa_recovery_contact' ] ?? null;
+	const recoveryContacts = userRecord.record?.[ '2fa_recovery_contacts' ] ?? [];
+	const recoveryContactsPending = userRecord.record?.[ '2fa_recovery_contacts_pending' ] ?? [];
 	const recoveryAllowedMethods = userRecord.record?.[ '2fa_recovery_allowed_methods' ] ?? [];
 	const designatedFor = userRecord.record?.[ '2fa_designated_for' ] ?? [];
 
@@ -38,7 +39,8 @@ export function useUser( userId ) {
 		backupCodesRemaining,
 		applicationPasswords,
 		recoveryEmailEnabled,
-		recoveryContact,
+		recoveryContacts,
+		recoveryContactsPending,
 		recoveryAllowedMethods,
 		designatedFor,
 	};

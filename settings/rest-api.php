@@ -431,21 +431,20 @@ function register_user_fields(): void {
 
 	register_rest_field(
 		'user',
-		'2fa_recovery_contact',
+		'2fa_recovery_contacts',
 		[
 			'get_callback' => function( $user ) {
-				$contact = Recovery\get_designated_contact( $user['id'] );
-				if ( ! $contact ) {
-					return null;
-				}
-				return [
-					'id'           => $contact->ID,
-					'login'        => $contact->user_login,
-					'display_name' => $contact->display_name,
-				];
+				$contacts = Recovery\get_designated_contacts( $user['id'] );
+				return array_map( function( $contact ) {
+					return [
+						'id'           => $contact->ID,
+						'login'        => $contact->user_login,
+						'display_name' => $contact->display_name,
+					];
+				}, $contacts );
 			},
 			'schema' => [
-				'type'    => [ 'object', 'null' ],
+				'type'    => 'array',
 				'context' => [ 'edit' ],
 			],
 		]
@@ -453,21 +452,25 @@ function register_user_fields(): void {
 
 	register_rest_field(
 		'user',
-		'2fa_recovery_contact_pending',
+		'2fa_recovery_contacts_pending',
 		[
 			'get_callback' => function( $user ) {
-				$pending = Recovery\get_pending_contact_designation( $user['id'] );
-				if ( ! $pending ) {
-					return null;
+				$pending_list = Recovery\get_pending_contact_designations( $user['id'] );
+				$result = [];
+				foreach ( $pending_list as $pending ) {
+					$contact = get_userdata( $pending['contact_id'] );
+					if ( $contact ) {
+						$result[] = [
+							'contact_id'    => $contact->ID,
+							'contact_login' => $contact->user_login,
+							'requested_at'  => $pending['requested_at'],
+						];
+					}
 				}
-				$contact = get_userdata( $pending['contact_id'] );
-				return [
-					'contact_login' => $contact ? $contact->user_login : '',
-					'requested_at'  => $pending['requested_at'],
-				];
+				return $result;
 			},
 			'schema' => [
-				'type'    => [ 'object', 'null' ],
+				'type'    => 'array',
 				'context' => [ 'edit' ],
 			],
 		]
