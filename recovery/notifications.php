@@ -27,65 +27,22 @@ function send_recovery_requested_email( int $user_id, array $request, string $to
 		'token'   => $token,
 	], home_url( '/' ) );
 
-	$available_date = wp_date( 'F j, Y \a\t g:i A T', $request['available_at'] );
-
 	$message = sprintf(
 		"Hi %s,\n\n" .
 		"A two-factor authentication recovery was requested for your WordPress.org account.\n\n" .
-		"Recovery type: %s\n" .
-		"Requested from IP: %s\n" .
-		"Recovery will be available: %s\n\n" .
+		"Requested from IP: %s\n\n" .
+		"Your designated recovery contacts have been notified. Once one of them confirms, you will receive another email with a link to complete the recovery.\n\n" .
 		"If you did not request this, you can cancel it immediately:\n%s\n\n" .
 		"If you still have access to your two-factor device, simply log in normally and the request will be automatically cancelled.\n\n" .
 		"-- The WordPress.org Team",
 		$user->display_name,
-		'email' === $request['type'] ? 'Email recovery' : 'Designated contact recovery',
 		$request['ip'],
-		$available_date,
 		esc_url_raw( $cancel_url )
 	);
 
 	wp_mail(
 		$user->user_email,
 		'[WordPress.org] Two-Factor Recovery Requested',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
-	);
-}
-
-/**
- * Send an email when the recovery waiting period has elapsed and recovery is available.
- *
- * @param int    $user_id The user ID.
- * @param array  $request The recovery request data.
- * @param string $token   The raw (unhashed) recovery token for completion link.
- */
-function send_recovery_available_email( int $user_id, array $request, string $token ) : void {
-	$user = get_userdata( $user_id );
-	if ( ! $user ) {
-		return;
-	}
-
-	$complete_url = add_query_arg( [
-		'action'  => 'wporg-2fa-recovery-complete',
-		'user_id' => $user_id,
-		'token'   => $token,
-	], home_url( '/' ) );
-
-	$message = sprintf(
-		"Hi %s,\n\n" .
-		"The waiting period for your two-factor authentication recovery has elapsed.\n\n" .
-		"You can now complete the recovery and regain access to your account:\n%s\n\n" .
-		"This will disable two-factor authentication on your account. You will be required to set it up again after logging in.\n\n" .
-		"If you did not request this recovery, your account may be compromised. Please log in immediately to cancel this request.\n\n" .
-		"-- The WordPress.org Team",
-		$user->display_name,
-		esc_url_raw( $complete_url )
-	);
-
-	wp_mail(
-		$user->user_email,
-		'[WordPress.org] Two-Factor Recovery Available',
 		$message,
 		[ 'From: WordPress.org <noreply@wordpress.org>' ]
 	);
@@ -135,12 +92,10 @@ function send_recovery_requested_slack( int $user_id, array $request ) : void {
 	}
 
 	$message = sprintf(
-		'2FA recovery requested for %s (ID: %d) via %s from IP %s. Available at %s.',
+		'2FA recovery requested for %s (ID: %d) via designated contact from IP %s.',
 		$user->user_login,
 		$user_id,
-		$request['type'],
-		$request['ip'],
-		wp_date( 'Y-m-d H:i:s T', $request['available_at'] )
+		$request['ip']
 	);
 
 	/**

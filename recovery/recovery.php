@@ -3,8 +3,9 @@
 /**
  * Account Recovery for WordPress.org Two-Factor Authentication.
  *
- * Provides email-based and designated-contact-based recovery flows
- * for users locked out of their 2FA devices.
+ * Provides designated-contact-based recovery for users locked out of their 2FA devices.
+ * Users designate one or more "Backup Buddies" who can verify their identity out-of-band
+ * and confirm a recovery request.
  */
 
 namespace WordPressdotorg\Two_Factor\Recovery;
@@ -14,10 +15,8 @@ use WP_User, WP_Error;
 defined( 'WPINC' ) || die();
 
 require_once __DIR__ . '/notifications.php';
-require_once __DIR__ . '/cron.php';
 require_once __DIR__ . '/rest-api.php';
 
-const RECOVERY_EMAIL_ENABLED_META     = '_wporg_2fa_recovery_email_enabled';
 const RECOVERY_CONTACTS_META          = '_wporg_2fa_recovery_contacts';
 const RECOVERY_CONTACTS_PENDING_META  = '_wporg_2fa_recovery_contacts_pending';
 const RECOVERY_REQUEST_META           = '_wporg_2fa_recovery_request';
@@ -27,103 +26,23 @@ const DESIGNATED_FOR_META             = '_wporg_2fa_designated_for';
 add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\invalidate_recovery_on_login' );
 
 /**
- * Get the recovery delay in seconds for a given user based on their privilege level.
+ * Check if recovery is available for a given user.
+ *
+ * Super admins have no automated recovery (out-of-band management only).
+ * All other users can use designated recovery contacts.
  *
  * @param WP_User $user The user to check.
- * @return int Delay in seconds.
+ * @return bool Whether the user can use recovery contacts.
  */
-function get_recovery_delay( WP_User $user ) : int {
-	// High-usage plugin committers: 7 days.
-	if ( $user->has_plugins && has_high_active_installs( $user ) ) {
-		return 7 * DAY_IN_SECONDS;
-	}
-
-	// Plugin committers: 3 days.
-	if ( $user->has_plugins ) {
-		return 3 * DAY_IN_SECONDS;
-	}
-
-	// Everyone else: 24 hours.
-	return DAY_IN_SECONDS;
-}
-
-/**
- * Check if a plugin committer has high active installs.
- *
- * For MVP, this checks if the user has any plugins with >= 100,000 active installs.
- * This can be refined later to use more granular data.
- *
- * @param WP_User $user The user to check.
- * @return bool
- */
-function has_high_active_installs( WP_User $user ) : bool {
-	/**
-	 * Filter whether a user has high active installs.
-	 *
-	 * @param bool    $has_high_installs Whether the user has high active installs. Default false.
-	 * @param WP_User $user             The user being checked.
-	 */
-	return (bool) apply_filters( 'wporg_2fa_user_has_high_active_installs', false, $user );
-}
-
-/**
- * Get the recovery methods allowed for a given user based on their privilege level.
- *
- * @param WP_User $user The user to check.
- * @return array Array of allowed method strings: 'email', 'contact'.
- */
-function get_allowed_recovery_methods( WP_User $user ) : array {
+function is_recovery_available( WP_User $user ) : bool {
 	$is_special = function_exists( 'is_special_user' ) && is_special_user( $user->ID );
 
 	// Super admins: no automated recovery (out-of-band management only).
 	if ( $is_special && is_super_admin( $user->ID ) ) {
-		return [];
-	}
-
-	// Core committers (special users who aren't super admins): contact only.
-	if ( $is_special ) {
-		return [ 'contact' ];
-	}
-
-	// Everyone else: both methods.
-	return [ 'email', 'contact' ];
-}
-
-/**
- * Check if email recovery is enabled for a user.
- *
- * @param int $user_id The user ID.
- * @return bool
- */
-function is_recovery_email_enabled( int $user_id ) : bool {
-	return (bool) get_user_meta( $user_id, RECOVERY_EMAIL_ENABLED_META, true );
-}
-
-/**
- * Enable email recovery for a user.
- *
- * @param int $user_id The user ID.
- * @return bool
- */
-function enable_recovery_email( int $user_id ) : bool {
-	$user    = get_userdata( $user_id );
-	$allowed = get_allowed_recovery_methods( $user );
-
-	if ( ! in_array( 'email', $allowed, true ) ) {
 		return false;
 	}
 
-	return (bool) update_user_meta( $user_id, RECOVERY_EMAIL_ENABLED_META, '1' );
-}
-
-/**
- * Disable email recovery for a user.
- *
- * @param int $user_id The user ID.
- * @return bool
- */
-function disable_recovery_email( int $user_id ) : bool {
-	return delete_user_meta( $user_id, RECOVERY_EMAIL_ENABLED_META );
+	return true;
 }
 
 /**
@@ -186,11 +105,10 @@ function designate_contact( int $user_id, string $contact_login ) {
 		return new WP_Error( 'contact_no_2fa', 'The designated contact must have two-factor authentication enabled.' );
 	}
 
-	$user    = get_userdata( $user_id );
-	$allowed = get_allowed_recovery_methods( $user );
+	$user = get_userdata( $user_id );
 
-	if ( ! in_array( 'contact', $allowed, true ) ) {
-		return new WP_Error( 'method_not_allowed', 'Contact recovery is not available for your account.' );
+	if ( ! is_recovery_available( $user ) ) {
+		return new WP_Error( 'method_not_allowed', 'Recovery contacts are not available for your account.' );
 	}
 
 	// Check if this contact is already confirmed.
@@ -416,32 +334,21 @@ function get_pending_recovery( int $user_id ) : ?array {
 /**
  * Create a recovery request for a locked-out user.
  *
- * @param int    $user_id The user ID.
- * @param string $type    Recovery type: 'email' or 'contact'.
+ * @param int $user_id The user ID.
  * @return array|WP_Error The recovery request data, or error.
  */
-function create_recovery_request( int $user_id, string $type ) {
+function create_recovery_request( int $user_id ) {
 	$user = get_userdata( $user_id );
 
 	if ( ! $user ) {
 		return new WP_Error( 'invalid_user', 'Invalid user.' );
 	}
 
-	$allowed = get_allowed_recovery_methods( $user );
-
-	if ( empty( $allowed ) ) {
-		return new WP_Error( 'no_recovery', 'No automated recovery methods are available for your account. Please contact the systems team.' );
+	if ( ! is_recovery_available( $user ) ) {
+		return new WP_Error( 'no_recovery', 'No automated recovery is available for your account. Please contact the systems team.' );
 	}
 
-	if ( ! in_array( $type, $allowed, true ) ) {
-		return new WP_Error( 'method_not_allowed', "The '{$type}' recovery method is not available for your account." );
-	}
-
-	if ( 'email' === $type && ! is_recovery_email_enabled( $user_id ) ) {
-		return new WP_Error( 'email_not_enabled', 'Email recovery is not enabled for this account.' );
-	}
-
-	if ( 'contact' === $type && empty( get_designated_contacts( $user_id ) ) ) {
+	if ( empty( get_designated_contacts( $user_id ) ) ) {
 		return new WP_Error( 'no_contact', 'No designated recovery contacts have been configured for this account.' );
 	}
 
@@ -452,26 +359,22 @@ function create_recovery_request( int $user_id, string $type ) {
 	$token = wp_generate_password( 32, false );
 
 	$request = [
-		'type'         => $type,
 		'token'        => wp_hash_password( $token ),
 		'requested_at' => time(),
-		'available_at' => time() + get_recovery_delay( $user ),
 		'status'       => 'pending',
 		'ip'           => $_SERVER['REMOTE_ADDR'] ?? '',
 	];
 
 	update_user_meta( $user_id, RECOVERY_REQUEST_META, $request );
 
-	// Send notifications.
+	// Notify the account owner.
 	send_recovery_requested_email( $user_id, $request, $token );
 	send_recovery_requested_slack( $user_id, $request );
 
-	if ( 'contact' === $type ) {
-		// Notify all designated contacts.
-		$contacts = get_designated_contacts( $user_id );
-		foreach ( $contacts as $contact ) {
-			send_contact_recovery_request_email( $contact->ID, $user_id, $token );
-		}
+	// Notify all designated contacts.
+	$contacts = get_designated_contacts( $user_id );
+	foreach ( $contacts as $contact ) {
+		send_contact_recovery_request_email( $contact->ID, $user_id, $token );
 	}
 
 	return array_merge( $request, [ 'raw_token' => $token ] );
@@ -513,8 +416,8 @@ function cancel_recovery_request( int $user_id, string $token ) {
 function confirm_contact_recovery( int $user_id, string $token, int $contact_id ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request || 'contact' !== $request['type'] ) {
-		return new WP_Error( 'no_pending', 'No pending contact recovery request found.' );
+	if ( ! $request ) {
+		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
 	if ( ! wp_check_password( $token, $request['token'] ) ) {
@@ -542,7 +445,7 @@ function confirm_contact_recovery( int $user_id, string $token, int $contact_id 
  * Complete a recovery request, disabling 2FA for the user.
  *
  * @param int    $user_id The user ID.
- * @param string $token   The recovery token (original or completion token).
+ * @param string $token   The recovery token.
  * @return true|WP_Error
  */
 function complete_recovery( int $user_id, string $token ) {
@@ -552,22 +455,12 @@ function complete_recovery( int $user_id, string $token ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
-	// Accept either the original token or the completion token (generated by cron).
-	$valid_token = wp_check_password( $token, $request['token'] );
-	if ( ! $valid_token && ! empty( $request['completion_token'] ) ) {
-		$valid_token = wp_check_password( $token, $request['completion_token'] );
-	}
-
-	if ( ! $valid_token ) {
+	if ( ! wp_check_password( $token, $request['token'] ) ) {
 		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
 	}
 
-	if ( 'email' === $request['type'] && time() < $request['available_at'] ) {
-		return new WP_Error( 'too_early', 'The recovery waiting period has not elapsed yet.' );
-	}
-
-	if ( 'contact' === $request['type'] && 'confirmed_by_contact' !== $request['status'] ) {
-		return new WP_Error( 'not_confirmed', 'The recovery request has not been confirmed by your designated contact.' );
+	if ( 'confirmed_by_contact' !== $request['status'] ) {
+		return new WP_Error( 'not_confirmed', 'The recovery request has not been confirmed by a designated contact.' );
 	}
 
 	// Disable all 2FA providers for this user.
@@ -606,7 +499,7 @@ function invalidate_recovery_on_login( $user ) : void {
 }
 
 /**
- * Check if a user has 2FA enabled but no recovery options configured.
+ * Check if a user has 2FA enabled but no recovery contacts configured.
  *
  * @param WP_User $user The user to check.
  * @return bool True if recovery setup should be prompted.
@@ -616,22 +509,11 @@ function check_recovery_prompt_needed( WP_User $user ) : bool {
 		return false;
 	}
 
-	$allowed = get_allowed_recovery_methods( $user );
-
-	if ( empty( $allowed ) ) {
+	if ( ! is_recovery_available( $user ) ) {
 		return false;
 	}
 
-	// Check if any recovery option is configured.
-	if ( is_recovery_email_enabled( $user->ID ) ) {
-		return false;
-	}
-
-	if ( ! empty( get_designated_contacts( $user->ID ) ) ) {
-		return false;
-	}
-
-	return true;
+	return empty( get_designated_contacts( $user->ID ) );
 }
 
 /**
@@ -670,9 +552,7 @@ function get_recovery_status( int $user_id ) : array {
 	$request_data = null;
 	if ( $request && 'cancelled' !== $request['status'] ) {
 		$request_data = [
-			'type'         => $request['type'],
 			'requested_at' => $request['requested_at'],
-			'available_at' => $request['available_at'],
 			'status'       => $request['status'],
 		];
 	}
@@ -694,13 +574,11 @@ function get_recovery_status( int $user_id ) : array {
 	}
 
 	return [
-		'email_enabled'    => is_recovery_email_enabled( $user_id ),
-		'contacts'         => $contacts_data,
-		'contacts_pending' => $pending_contacts_data,
-		'pending_request'  => $request_data,
-		'allowed_methods'  => $user ? get_allowed_recovery_methods( $user ) : [],
-		'designated_for'   => $designated_for,
-		'recovery_delay'   => $user ? get_recovery_delay( $user ) : DAY_IN_SECONDS,
-		'prompt_needed'    => $user ? check_recovery_prompt_needed( $user ) : false,
+		'recovery_available' => $user ? is_recovery_available( $user ) : false,
+		'contacts'           => $contacts_data,
+		'contacts_pending'   => $pending_contacts_data,
+		'pending_request'    => $request_data,
+		'designated_for'     => $designated_for,
+		'prompt_needed'      => $user ? check_recovery_prompt_needed( $user ) : false,
 	];
 }

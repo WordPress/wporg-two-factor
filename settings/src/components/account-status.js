@@ -32,12 +32,11 @@ export default function AccountStatus() {
 			backupCodesEnabled,
 			webAuthnEnabled,
 			applicationPasswords,
-			recoveryEmailEnabled,
 			recoveryContacts,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
-	const recoveryConfigured = recoveryEmailEnabled || recoveryContacts.length > 0;
+	const recoveryConfigured = recoveryContacts.length > 0;
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider

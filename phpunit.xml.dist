@@ -34,7 +34,6 @@
 			<file>settings/rest-api.php</file>
 			<file>recovery/recovery.php</file>
 			<file>recovery/rest-api.php</file>
-			<file>recovery/cron.php</file>
 		</include>
 
 		<report>

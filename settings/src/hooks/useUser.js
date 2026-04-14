@@ -22,10 +22,9 @@ export function useUser( userId ) {
 	const hasPrimaryProvider = totpEnabled || webAuthnEnabled;
 
 	// Recovery fields.
-	const recoveryEmailEnabled = userRecord.record?.[ '2fa_recovery_email_enabled' ] ?? false;
+	const recoveryAvailable = userRecord.record?.[ '2fa_recovery_available' ] ?? true;
 	const recoveryContacts = userRecord.record?.[ '2fa_recovery_contacts' ] ?? [];
 	const recoveryContactsPending = userRecord.record?.[ '2fa_recovery_contacts_pending' ] ?? [];
-	const recoveryAllowedMethods = userRecord.record?.[ '2fa_recovery_allowed_methods' ] ?? [];
 	const designatedFor = userRecord.record?.[ '2fa_designated_for' ] ?? [];
 
 	return {
@@ -38,10 +37,9 @@ export function useUser( userId ) {
 		webAuthnEnabled,
 		backupCodesRemaining,
 		applicationPasswords,
-		recoveryEmailEnabled,
+		recoveryAvailable,
 		recoveryContacts,
 		recoveryContactsPending,
-		recoveryAllowedMethods,
 		designatedFor,
 	};
 }

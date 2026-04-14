@@ -1,11 +1,7 @@
 <?php
 
 use function WordPressdotorg\Two_Factor\Recovery\{
-	get_recovery_delay,
-	get_allowed_recovery_methods,
-	is_recovery_email_enabled,
-	enable_recovery_email,
-	disable_recovery_email,
+	is_recovery_available,
 	get_designated_contacts,
 	designate_contact,
 	accept_designation,
@@ -54,9 +50,7 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$GLOBALS['super_admins']         = [];
 		$GLOBALS['mock_is_special_user'] = [];
 
-		// Clean up recovery meta for all test users.
 		foreach ( [ self::$privileged_user, self::$regular_user, self::$contact_user, self::$contact_user_2, self::$plugin_user ] as $user ) {
-			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_EMAIL_ENABLED_META );
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META );
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_PENDING_META );
 			delete_user_meta( $user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_REQUEST_META );
@@ -66,9 +60,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		}
 	}
 
-	/**
-	 * Enable 2FA for a user.
-	 */
 	protected function enable_2fa_for_user( int $user_id ) : void {
 		update_user_meta( $user_id, Two_Factor_Core::ENABLED_PROVIDERS_USER_META_KEY, [ 1 => 'Two_Factor_Totp' ] );
 		update_user_meta( $user_id, Two_Factor_Core::PROVIDER_USER_META_KEY, 'Two_Factor_Totp' );
@@ -79,96 +70,35 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->assertTrue( Two_Factor_Core::is_user_using_two_factor( $user_id ) );
 	}
 
-	// --- Recovery Delay Tests ---
+	// --- Recovery Availability Tests ---
 
 	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_recovery_delay
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_available
 	 */
-	public function test_get_recovery_delay_regular_user() : void {
-		$this->assertSame( DAY_IN_SECONDS, get_recovery_delay( self::$regular_user ) );
+	public function test_recovery_available_for_regular_user() : void {
+		$this->assertTrue( is_recovery_available( self::$regular_user ) );
 	}
 
 	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_recovery_delay
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_available
 	 */
-	public function test_get_recovery_delay_plugin_committer() : void {
-		self::$plugin_user->has_plugins = true;
-
-		$this->assertSame( 3 * DAY_IN_SECONDS, get_recovery_delay( self::$plugin_user ) );
-
-		unset( self::$plugin_user->has_plugins );
-	}
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_recovery_delay
-	 */
-	public function test_get_recovery_delay_high_usage_plugin_committer() : void {
-		self::$plugin_user->has_plugins = true;
-
-		add_filter( 'wporg_2fa_user_has_high_active_installs', '__return_true' );
-		$this->assertSame( 7 * DAY_IN_SECONDS, get_recovery_delay( self::$plugin_user ) );
-		remove_filter( 'wporg_2fa_user_has_high_active_installs', '__return_true' );
-
-		unset( self::$plugin_user->has_plugins );
-	}
-
-	// --- Allowed Methods Tests ---
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_allowed_recovery_methods
-	 */
-	public function test_get_allowed_methods_regular_user() : void {
-		$this->assertSame( [ 'email', 'contact' ], get_allowed_recovery_methods( self::$regular_user ) );
-	}
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_allowed_recovery_methods
-	 */
-	public function test_get_allowed_methods_super_admin() : void {
+	public function test_recovery_not_available_for_super_admin() : void {
 		global $super_admins, $mock_is_special_user;
 		$mock_is_special_user = [ self::$privileged_user->ID ];
 		$super_admins[]       = self::$privileged_user->user_login;
 
-		$this->assertSame( [], get_allowed_recovery_methods( self::$privileged_user ) );
+		$this->assertFalse( is_recovery_available( self::$privileged_user ) );
 	}
 
 	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\get_allowed_recovery_methods
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_available
 	 */
-	public function test_get_allowed_methods_core_committer() : void {
+	public function test_recovery_available_for_core_committer() : void {
 		global $mock_is_special_user;
 		$mock_is_special_user = [ self::$privileged_user->ID ];
 
-		// Special user but NOT super admin => contact only.
-		$this->assertSame( [ 'contact' ], get_allowed_recovery_methods( self::$privileged_user ) );
-	}
-
-	// --- Email Recovery Toggle Tests ---
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\enable_recovery_email
-	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_email_enabled
-	 * @covers WordPressdotorg\Two_Factor\Recovery\disable_recovery_email
-	 */
-	public function test_email_recovery_toggle() : void {
-		$this->assertFalse( is_recovery_email_enabled( self::$regular_user->ID ) );
-
-		$this->assertTrue( enable_recovery_email( self::$regular_user->ID ) );
-		$this->assertTrue( is_recovery_email_enabled( self::$regular_user->ID ) );
-
-		$this->assertTrue( disable_recovery_email( self::$regular_user->ID ) );
-		$this->assertFalse( is_recovery_email_enabled( self::$regular_user->ID ) );
-	}
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\enable_recovery_email
-	 */
-	public function test_email_recovery_blocked_for_special_user() : void {
-		global $mock_is_special_user;
-		$mock_is_special_user = [ self::$privileged_user->ID ];
-
-		// Core committers can only use contact, not email.
-		$this->assertFalse( enable_recovery_email( self::$privileged_user->ID ) );
+		// Special user but NOT super admin => recovery available.
+		$this->assertTrue( is_recovery_available( self::$privileged_user ) );
 	}
 
 	// --- Designated Contact Tests ---
@@ -200,14 +130,11 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	public function test_designate_contact_creates_pending() : void {
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 
-		// Designate contact.
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
 		$this->assertTrue( $result );
 
-		// Should not be confirmed yet.
 		$this->assertEmpty( get_designated_contacts( self::$regular_user->ID ) );
 
-		// Should have a pending entry.
 		$pending = WordPressdotorg\Two_Factor\Recovery\get_pending_contact_designations( self::$regular_user->ID );
 		$this->assertCount( 1, $pending );
 		$this->assertSame( self::$contact_user->ID, $pending[0]['contact_id'] );
@@ -243,7 +170,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\remove_contact
 	 */
 	public function test_remove_specific_contact() : void {
-		// Set up two confirmed contacts directly via meta.
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [
 			self::$contact_user->ID,
 			self::$contact_user_2->ID,
@@ -254,20 +180,11 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$contacts = get_designated_contacts( self::$regular_user->ID );
 		$this->assertCount( 2, $contacts );
 
-		// Remove only the first contact.
 		remove_contact( self::$regular_user->ID, self::$contact_user->ID );
 
 		$contacts = get_designated_contacts( self::$regular_user->ID );
 		$this->assertCount( 1, $contacts );
 		$this->assertSame( self::$contact_user_2->ID, $contacts[0]->ID );
-
-		// First contact's designated_for should be cleaned up.
-		$designated_for = get_user_meta( self::$contact_user->ID, WordPressdotorg\Two_Factor\Recovery\DESIGNATED_FOR_META, true );
-		$this->assertEmpty( $designated_for );
-
-		// Second contact's designated_for should remain.
-		$designated_for = get_user_meta( self::$contact_user_2->ID, WordPressdotorg\Two_Factor\Recovery\DESIGNATED_FOR_META, true );
-		$this->assertContains( self::$regular_user->ID, $designated_for );
 	}
 
 	/**
@@ -278,15 +195,11 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 			self::$contact_user->ID,
 			self::$contact_user_2->ID,
 		] );
-		update_user_meta( self::$contact_user->ID, WordPressdotorg\Two_Factor\Recovery\DESIGNATED_FOR_META, [ self::$regular_user->ID ] );
-		update_user_meta( self::$contact_user_2->ID, WordPressdotorg\Two_Factor\Recovery\DESIGNATED_FOR_META, [ self::$regular_user->ID ] );
 
 		remove_contact( self::$regular_user->ID );
 
 		$this->assertEmpty( get_designated_contacts( self::$regular_user->ID ) );
 	}
-
-	// --- Multiple Contact Designation ---
 
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
@@ -295,11 +208,8 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 		$this->enable_2fa_for_user( self::$contact_user_2->ID );
 
-		$result1 = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
-		$this->assertTrue( $result1 );
-
-		$result2 = designate_contact( self::$regular_user->ID, self::$contact_user_2->user_login );
-		$this->assertTrue( $result2 );
+		$this->assertTrue( designate_contact( self::$regular_user->ID, self::$contact_user->user_login ) );
+		$this->assertTrue( designate_contact( self::$regular_user->ID, self::$contact_user_2->user_login ) );
 
 		$pending = WordPressdotorg\Two_Factor\Recovery\get_pending_contact_designations( self::$regular_user->ID );
 		$this->assertCount( 2, $pending );
@@ -311,7 +221,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	public function test_designate_already_confirmed_contact() : void {
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 
-		// Directly set as confirmed.
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
@@ -324,25 +233,14 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\create_recovery_request
 	 */
-	public function test_create_email_recovery_request() : void {
-		enable_recovery_email( self::$regular_user->ID );
+	public function test_create_recovery_request() : void {
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 
-		$result = create_recovery_request( self::$regular_user->ID, 'email' );
+		$result = create_recovery_request( self::$regular_user->ID );
 
 		$this->assertIsArray( $result );
-		$this->assertSame( 'email', $result['type'] );
 		$this->assertSame( 'pending', $result['status'] );
 		$this->assertArrayHasKey( 'raw_token', $result );
-		$this->assertSame( $result['available_at'], $result['requested_at'] + DAY_IN_SECONDS );
-	}
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\create_recovery_request
-	 */
-	public function test_create_recovery_request_email_not_enabled() : void {
-		$result = create_recovery_request( self::$regular_user->ID, 'email' );
-		$this->assertWPError( $result );
-		$this->assertSame( 'email_not_enabled', $result->get_error_code() );
 	}
 
 	/**
@@ -353,7 +251,7 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$mock_is_special_user = [ self::$privileged_user->ID ];
 		$super_admins[]       = self::$privileged_user->user_login;
 
-		$result = create_recovery_request( self::$privileged_user->ID, 'email' );
+		$result = create_recovery_request( self::$privileged_user->ID );
 		$this->assertWPError( $result );
 		$this->assertSame( 'no_recovery', $result->get_error_code() );
 	}
@@ -361,24 +259,24 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\create_recovery_request
 	 */
-	public function test_create_duplicate_recovery_request() : void {
-		enable_recovery_email( self::$regular_user->ID );
-
-		$result1 = create_recovery_request( self::$regular_user->ID, 'email' );
-		$this->assertIsArray( $result1 );
-
-		$result2 = create_recovery_request( self::$regular_user->ID, 'email' );
-		$this->assertWPError( $result2 );
-		$this->assertSame( 'already_pending', $result2->get_error_code() );
+	public function test_create_recovery_request_no_contacts() : void {
+		$result = create_recovery_request( self::$regular_user->ID );
+		$this->assertWPError( $result );
+		$this->assertSame( 'no_contact', $result->get_error_code() );
 	}
 
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\create_recovery_request
 	 */
-	public function test_create_contact_recovery_request_no_contacts() : void {
-		$result = create_recovery_request( self::$regular_user->ID, 'contact' );
-		$this->assertWPError( $result );
-		$this->assertSame( 'no_contact', $result->get_error_code() );
+	public function test_create_duplicate_recovery_request() : void {
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+
+		$result1 = create_recovery_request( self::$regular_user->ID );
+		$this->assertIsArray( $result1 );
+
+		$result2 = create_recovery_request( self::$regular_user->ID );
+		$this->assertWPError( $result2 );
+		$this->assertSame( 'already_pending', $result2->get_error_code() );
 	}
 
 	// --- Cancel Recovery Tests ---
@@ -387,8 +285,8 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\cancel_recovery_request
 	 */
 	public function test_cancel_recovery_request() : void {
-		enable_recovery_email( self::$regular_user->ID );
-		$request = create_recovery_request( self::$regular_user->ID, 'email' );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+		$request = create_recovery_request( self::$regular_user->ID );
 
 		$result = cancel_recovery_request( self::$regular_user->ID, $request['raw_token'] );
 		$this->assertTrue( $result );
@@ -399,8 +297,8 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\cancel_recovery_request
 	 */
 	public function test_cancel_recovery_request_invalid_token() : void {
-		enable_recovery_email( self::$regular_user->ID );
-		create_recovery_request( self::$regular_user->ID, 'email' );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+		create_recovery_request( self::$regular_user->ID );
 
 		$result = cancel_recovery_request( self::$regular_user->ID, 'wrong_token' );
 		$this->assertWPError( $result );
@@ -412,36 +310,29 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\complete_recovery
 	 */
-	public function test_complete_recovery_before_delay() : void {
-		enable_recovery_email( self::$regular_user->ID );
-		$request = create_recovery_request( self::$regular_user->ID, 'email' );
+	public function test_complete_recovery_not_confirmed() : void {
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+		$request = create_recovery_request( self::$regular_user->ID );
 
-		// Should fail - delay hasn't elapsed.
 		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
 		$this->assertWPError( $result );
-		$this->assertSame( 'too_early', $result->get_error_code() );
+		$this->assertSame( 'not_confirmed', $result->get_error_code() );
 	}
 
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\complete_recovery
 	 */
-	public function test_complete_recovery_after_delay() : void {
+	public function test_complete_recovery_after_confirmation() : void {
 		$this->enable_2fa_for_user( self::$regular_user->ID );
-		enable_recovery_email( self::$regular_user->ID );
-		$request = create_recovery_request( self::$regular_user->ID, 'email' );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 
-		// Manually set available_at to the past.
-		$stored = get_pending_recovery( self::$regular_user->ID );
-		$stored['available_at'] = time() - 1;
-		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_REQUEST_META, $stored );
+		$request = create_recovery_request( self::$regular_user->ID );
+
+		confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID );
 
 		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
 		$this->assertTrue( $result );
-
-		// 2FA should be disabled.
 		$this->assertFalse( Two_Factor_Core::is_user_using_two_factor( self::$regular_user->ID ) );
-
-		// Recovery request should be cleaned up.
 		$this->assertNull( get_pending_recovery( self::$regular_user->ID ) );
 	}
 
@@ -449,8 +340,8 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\complete_recovery
 	 */
 	public function test_complete_recovery_invalid_token() : void {
-		enable_recovery_email( self::$regular_user->ID );
-		create_recovery_request( self::$regular_user->ID, 'email' );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+		create_recovery_request( self::$regular_user->ID );
 
 		$result = complete_recovery( self::$regular_user->ID, 'wrong_token' );
 		$this->assertWPError( $result );
@@ -463,12 +354,11 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\invalidate_recovery_on_login
 	 */
 	public function test_invalidate_recovery_on_login() : void {
-		enable_recovery_email( self::$regular_user->ID );
-		create_recovery_request( self::$regular_user->ID, 'email' );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+		create_recovery_request( self::$regular_user->ID );
 
 		$this->assertTrue( has_pending_recovery( self::$regular_user->ID ) );
 
-		// Simulate successful 2FA login.
 		invalidate_recovery_on_login( self::$regular_user );
 
 		$this->assertFalse( has_pending_recovery( self::$regular_user->ID ) );
@@ -479,7 +369,7 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\check_recovery_prompt_needed
 	 */
-	public function test_recovery_prompt_needed_with_2fa_no_recovery() : void {
+	public function test_recovery_prompt_needed_with_2fa_no_contacts() : void {
 		$this->enable_2fa_for_user( self::$regular_user->ID );
 
 		$this->assertTrue( check_recovery_prompt_needed( self::$regular_user ) );
@@ -489,16 +379,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\check_recovery_prompt_needed
 	 */
 	public function test_recovery_prompt_not_needed_without_2fa() : void {
-		$this->assertFalse( check_recovery_prompt_needed( self::$regular_user ) );
-	}
-
-	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\check_recovery_prompt_needed
-	 */
-	public function test_recovery_prompt_not_needed_with_email_recovery() : void {
-		$this->enable_2fa_for_user( self::$regular_user->ID );
-		enable_recovery_email( self::$regular_user->ID );
-
 		$this->assertFalse( check_recovery_prompt_needed( self::$regular_user ) );
 	}
 
@@ -523,15 +403,12 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->enable_2fa_for_user( self::$regular_user->ID );
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 
-		// Set up confirmed contacts directly.
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [
 			self::$contact_user->ID,
 		] );
 
-		// Create contact recovery request.
-		$request = create_recovery_request( self::$regular_user->ID, 'contact' );
+		$request = create_recovery_request( self::$regular_user->ID );
 		$this->assertIsArray( $request );
-		$this->assertSame( 'contact', $request['type'] );
 
 		// Confirm by wrong contact should fail.
 		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$plugin_user->ID );
@@ -542,19 +419,15 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID );
 		$this->assertTrue( $result );
 
-		// Check status is updated.
 		$pending = get_pending_recovery( self::$regular_user->ID );
 		$this->assertSame( 'confirmed_by_contact', $pending['status'] );
 
-		// Complete recovery.
 		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
 		$this->assertTrue( $result );
 		$this->assertFalse( Two_Factor_Core::is_user_using_two_factor( self::$regular_user->ID ) );
 	}
 
 	/**
-	 * Test that any one of multiple contacts can confirm a recovery.
-	 *
 	 * @covers WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery
 	 */
 	public function test_any_contact_can_confirm_recovery() : void {
@@ -562,16 +435,15 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 		$this->enable_2fa_for_user( self::$contact_user_2->ID );
 
-		// Set up two confirmed contacts.
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [
 			self::$contact_user->ID,
 			self::$contact_user_2->ID,
 		] );
 
-		$request = create_recovery_request( self::$regular_user->ID, 'contact' );
+		$request = create_recovery_request( self::$regular_user->ID );
 		$this->assertIsArray( $request );
 
-		// The second contact confirms (not the first).
+		// The second contact confirms.
 		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user_2->ID );
 		$this->assertTrue( $result );
 
@@ -581,21 +453,17 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery
+	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
 	 */
-	public function test_contact_recovery_not_confirmed_cannot_complete() : void {
-		$this->enable_2fa_for_user( self::$regular_user->ID );
+	public function test_designate_blocked_for_super_admin() : void {
+		global $super_admins, $mock_is_special_user;
+		$mock_is_special_user = [ self::$privileged_user->ID ];
+		$super_admins[]       = self::$privileged_user->user_login;
+
 		$this->enable_2fa_for_user( self::$contact_user->ID );
 
-		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [
-			self::$contact_user->ID,
-		] );
-
-		$request = create_recovery_request( self::$regular_user->ID, 'contact' );
-
-		// Try to complete without contact confirmation.
-		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
+		$result = designate_contact( self::$privileged_user->ID, self::$contact_user->user_login );
 		$this->assertWPError( $result );
-		$this->assertSame( 'not_confirmed', $result->get_error_code() );
+		$this->assertSame( 'method_not_allowed', $result->get_error_code() );
 	}
 }

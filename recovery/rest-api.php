@@ -22,44 +22,6 @@ function register_recovery_routes() : void {
 
 	register_rest_route(
 		$namespace,
-		'/recovery/email-opt-in',
-		[
-			'methods'             => WP_REST_Server::EDITABLE,
-			'callback'            => __NAMESPACE__ . '\rest_email_opt_in',
-			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['user_id'] );
-			},
-			'args'                => [
-				'user_id' => [
-					'required'          => true,
-					'type'              => 'integer',
-					'sanitize_callback' => 'absint',
-				],
-			],
-		]
-	);
-
-	register_rest_route(
-		$namespace,
-		'/recovery/email-opt-out',
-		[
-			'methods'             => WP_REST_Server::EDITABLE,
-			'callback'            => __NAMESPACE__ . '\rest_email_opt_out',
-			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['user_id'] );
-			},
-			'args'                => [
-				'user_id' => [
-					'required'          => true,
-					'type'              => 'integer',
-					'sanitize_callback' => 'absint',
-				],
-			],
-		]
-	);
-
-	register_rest_route(
-		$namespace,
 		'/recovery/designate-contact',
 		[
 			'methods'             => WP_REST_Server::EDITABLE,
@@ -177,13 +139,6 @@ function register_recovery_routes() : void {
 					'type'     => 'string',
 					'sanitize_callback' => 'sanitize_user',
 				],
-				'type' => [
-					'required' => true,
-					'type'     => 'string',
-					'validate_callback' => function( $type ) {
-						return in_array( $type, [ 'email', 'contact' ], true );
-					},
-				],
 			],
 		]
 	);
@@ -277,28 +232,6 @@ function register_recovery_routes() : void {
 }
 
 /**
- * Enable email recovery for a user.
- */
-function rest_email_opt_in( WP_REST_Request $request ) {
-	$result = enable_recovery_email( $request['user_id'] );
-
-	if ( ! $result ) {
-		return new WP_Error( 'email_opt_in_failed', 'Email recovery could not be enabled for your account.', [ 'status' => 400 ] );
-	}
-
-	return [ 'success' => true ];
-}
-
-/**
- * Disable email recovery for a user.
- */
-function rest_email_opt_out( WP_REST_Request $request ) {
-	disable_recovery_email( $request['user_id'] );
-
-	return [ 'success' => true ];
-}
-
-/**
  * Designate a recovery contact.
  */
 function rest_designate_contact( WP_REST_Request $request ) {
@@ -366,7 +299,7 @@ function rest_create_recovery_request( WP_REST_Request $request ) {
 		return new WP_Error( 'rate_limited', 'A recovery request was recently submitted. Please wait before trying again.', [ 'status' => 429 ] );
 	}
 
-	$result = create_recovery_request( $user->ID, $request['type'] );
+	$result = create_recovery_request( $user->ID );
 
 	if ( is_wp_error( $result ) ) {
 		// Return vague error for public endpoint.
@@ -374,11 +307,9 @@ function rest_create_recovery_request( WP_REST_Request $request ) {
 	}
 
 	return [
-		'success'      => true,
-		'available_at' => $result['available_at'],
-		'type'         => $result['type'],
+		'success' => true,
 		// Return the raw token so the caller can use it for cancel/status/complete.
-		'token'        => $result['raw_token'],
+		'token'   => $result['raw_token'],
 	];
 }
 
@@ -428,22 +359,13 @@ function rest_recovery_status( WP_REST_Request $request ) {
 	}
 
 	if ( ! wp_check_password( $request['token'], $recovery['token'] ) ) {
-		// Also check completion token.
-		$valid = ! empty( $recovery['completion_token'] ) && wp_check_password( $request['token'], $recovery['completion_token'] );
-		if ( ! $valid ) {
-			return new WP_Error( 'invalid_token', 'Invalid recovery token.', [ 'status' => 403 ] );
-		}
+		return new WP_Error( 'invalid_token', 'Invalid recovery token.', [ 'status' => 403 ] );
 	}
 
 	return [
-		'type'         => $recovery['type'],
 		'status'       => $recovery['status'],
 		'requested_at' => $recovery['requested_at'],
-		'available_at' => $recovery['available_at'],
-		'is_ready'     => (
-			( 'email' === $recovery['type'] && time() >= $recovery['available_at'] ) ||
-			( 'contact' === $recovery['type'] && 'confirmed_by_contact' === $recovery['status'] )
-		),
+		'is_ready'     => 'confirmed_by_contact' === $recovery['status'],
 	];
 }
 

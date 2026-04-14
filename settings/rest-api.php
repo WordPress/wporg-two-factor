@@ -417,10 +417,11 @@ function register_user_fields(): void {
 	// Recovery fields.
 	register_rest_field(
 		'user',
-		'2fa_recovery_email_enabled',
+		'2fa_recovery_available',
 		[
 			'get_callback' => function( $user ) {
-				return Recovery\is_recovery_email_enabled( $user['id'] );
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\is_recovery_available( $user_obj ) : false;
 			},
 			'schema' => [
 				'type'    => 'boolean',
@@ -486,44 +487,12 @@ function register_user_fields(): void {
 					return null;
 				}
 				return [
-					'type'         => $request['type'],
 					'requested_at' => $request['requested_at'],
-					'available_at' => $request['available_at'],
 					'status'       => $request['status'],
 				];
 			},
 			'schema' => [
 				'type'    => [ 'object', 'null' ],
-				'context' => [ 'edit' ],
-			],
-		]
-	);
-
-	register_rest_field(
-		'user',
-		'2fa_recovery_allowed_methods',
-		[
-			'get_callback' => function( $user ) {
-				$user_obj = get_userdata( $user['id'] );
-				return $user_obj ? Recovery\get_allowed_recovery_methods( $user_obj ) : [];
-			},
-			'schema' => [
-				'type'    => 'array',
-				'context' => [ 'edit' ],
-			],
-		]
-	);
-
-	register_rest_field(
-		'user',
-		'2fa_recovery_delay',
-		[
-			'get_callback' => function( $user ) {
-				$user_obj = get_userdata( $user['id'] );
-				return $user_obj ? Recovery\get_recovery_delay( $user_obj ) : DAY_IN_SECONDS;
-			},
-			'schema' => [
-				'type'    => 'integer',
 				'context' => [ 'edit' ],
 			],
 		]
