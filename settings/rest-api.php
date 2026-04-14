@@ -579,13 +579,6 @@ function redirect_wpadmin_profile() {
 		return;
 	}
 
-	$redirect_to = 'https://profiles.wordpress.org/' . wp_get_current_user()->user_nicename . '/';
-
-	// TODO: This is temporary, and only needed for a few days in July 2024.
-	if ( isset( $_GET['newuseremail'] ) ) {
-		$redirect_to .= 'profile/edit/group/3/?screen=email&newuseremail=' . $_GET['newuseremail'];
-	}
-
-	wp_safe_redirect( $redirect_to );
+	wp_safe_redirect( 'https://profiles.wordpress.org/' . wp_get_current_user()->user_nicename . '/' );
 	die();
 }
