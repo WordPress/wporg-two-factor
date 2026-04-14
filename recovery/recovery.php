@@ -423,7 +423,10 @@ function cancel_recovery_compromised( int $user_id, string $token ) {
 	}
 
 	// Reset the password to a random value, forcing the user to use password reset.
+	// Suppress the last-password-change tracker since this is a system reset, not a user action.
+	add_filter( 'wporg_record_last_password_change', '__return_false' );
 	wp_set_password( wp_generate_password( 32, true, true ), $user_id );
+	remove_filter( 'wporg_record_last_password_change', '__return_false' );
 
 	// Destroy all sessions for this user.
 	$sessions = \WP_Session_Tokens::get_instance( $user_id );
