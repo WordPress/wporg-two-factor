@@ -375,6 +375,11 @@ function register_user_fields(): void {
 					return true;
 				}
 
+				// If it's a proxied request, show the UI although the user may not need a password.
+				if ( defined( 'WPORG_PROXIED_REQUEST' ) && WPORG_PROXIED_REQUEST ) {
+					return true;
+				}
+
 				// Plugin committers & Theme authors have this user meta set.
 				if ( $user->has_plugins || $user->has_themes ) {
 					return true;
