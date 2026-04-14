@@ -1,0 +1,78 @@
+name: "Copilot Setup Steps"
+
+on: workflow_dispatch
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+            settings/node_modules
+          key: node-modules-${{ hashFiles('package-lock.json', 'settings/package-lock.json') }}
+
+      - name: Install NPM dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Cache Docker images
+        uses: actions/cache@v4
+        id: cache-docker
+        with:
+          path: /tmp/wp-env-docker
+          key: docker-wp-env-${{ hashFiles('.wp-env.json') }}
+
+      - name: Load cached Docker images
+        if: steps.cache-docker.outputs.cache-hit == 'true'
+        run: |
+          shopt -s nullglob
+          for f in /tmp/wp-env-docker/*.tar; do
+            docker load < "$f"
+          done
+
+      # Docker is pre-installed on ubuntu-latest runners.
+      # wp-env uses Docker to run WordPress + MySQL containers.
+      - name: Start wp-env
+        run: npx wp-env start --xdebug=coverage
+
+      - name: Save Docker images to cache
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/wp-env-docker
+          images=$(docker ps -a --format '{{.Image}} {{.Names}}' | awk '$2 ~ /^wp-env/ {print $1}' | sort -u)
+          for image in $images; do
+            filename=$(echo "$image" | tr '/:' '_')
+            docker save "$image" -o "/tmp/wp-env-docker/${filename}.tar"
+          done
+
+      - name: Verify environment is healthy
+        run: |
+          # Verify WordPress is responding
+          curl -sf http://localhost:8888/ > /dev/null
+          curl -sf http://localhost:8889/ > /dev/null
+          # Run test suites to confirm everything works
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/wporg-two-factor vendor/bin/phpunit
+          npm run test:js
+          npm run lint:js

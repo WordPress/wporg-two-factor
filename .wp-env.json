@@ -1,10 +1,11 @@
 {
+	"core": "https://github.com/WordPress/WordPress/archive/refs/heads/master.zip",
 	"multisite": true,
 	"plugins": [
-		"https://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip",
-		"https://downloads.wordpress.org/plugin/bbpress.latest-stable.zip",
+		"WordPress/gutenberg",
+		"bbpress/bbPress",
 		"WordPress/two-factor",
-		"https://downloads.wordpress.org/plugin/two-factor-provider-webauthn.latest-stable.zip",
+		"https://github.com/sjinks/wp-two-factor-provider-webauthn/releases/latest/download/two-factor-provider-webauthn.zip",
 		"."
 	],
 	"mappings": {

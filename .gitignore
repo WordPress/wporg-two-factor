@@ -3,3 +3,4 @@ tests/.phpunit.result.cache
 tests/coverage
 vendor
 node_modules
+.claude/settings.local.json
