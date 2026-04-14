@@ -11,6 +11,9 @@ defined( 'WPINC' ) || die();
 /**
  * Send an email to the account owner when a recovery request is created.
  *
+ * This warns them that someone successfully logged in with their password and is
+ * attempting to disable 2FA.
+ *
  * @param int    $user_id The user ID.
  * @param array  $request The recovery request data.
  * @param string $token   The raw (unhashed) recovery token for cancel link.
@@ -27,24 +30,35 @@ function send_recovery_requested_email( int $user_id, array $request, string $to
 		'token'   => $token,
 	], home_url( '/' ) );
 
+	$compromised_url = add_query_arg( [
+		'action'  => 'wporg-2fa-recovery-compromised',
+		'user_id' => $user_id,
+		'token'   => $token,
+	], home_url( '/' ) );
+
 	$message = sprintf(
 		"Hi %s,\n\n" .
-		"A two-factor authentication recovery was requested for your WordPress.org account.\n\n" .
+		"A two-factor authentication recovery was requested for your WordPress.org account. " .
+		"This means someone successfully logged in with your password and is attempting to " .
+		"disable two-factor authentication.\n\n" .
 		"Requested from IP: %s\n\n" .
-		"Your designated recovery contacts have been notified. Once one of them confirms, you will receive another email with a link to complete the recovery.\n\n" .
-		"If you did not request this, you can cancel it immediately:\n%s\n\n" .
-		"If you still have access to your two-factor device, simply log in normally and the request will be automatically cancelled.\n\n" .
+		"Your designated recovery contacts have been notified. Once one of them confirms, " .
+		"two-factor authentication will be disabled on your account.\n\n" .
+		"If you did not request this, take action immediately:\n\n" .
+		"Cancel the request:\n%s\n\n" .
+		"If you believe your password is compromised, use this link to cancel the request, " .
+		"reset your password, and log out all sessions:\n%s\n\n" .
 		"-- The WordPress.org Team",
 		$user->display_name,
 		$request['ip'],
-		esc_url_raw( $cancel_url )
+		esc_url_raw( $cancel_url ),
+		esc_url_raw( $compromised_url )
 	);
 
 	wp_mail(
 		$user->user_email,
-		'[WordPress.org] Two-Factor Recovery Requested',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		'[WordPress.org] Two-Factor Recovery Requested - Action Required',
+		$message
 	);
 }
 
@@ -70,13 +84,49 @@ function send_recovery_cancelled_email( int $user_id ) : void {
 	wp_mail(
 		$user->user_email,
 		'[WordPress.org] Two-Factor Recovery Cancelled',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		$message
 	);
 }
 
 /**
- * Send a Slack notification when a recovery request is created.
+ * Send an email when the user reports their password as compromised.
+ *
+ * @param int $user_id The user ID.
+ */
+function send_password_compromised_email( int $user_id ) : void {
+	$user = get_userdata( $user_id );
+	if ( ! $user ) {
+		return;
+	}
+
+	$reset_url = network_site_url( 'wp-login.php?action=lostpassword', 'login' );
+
+	$message = sprintf(
+		"Hi %s,\n\n" .
+		"You reported that your WordPress.org account password may be compromised. " .
+		"The following actions have been taken:\n\n" .
+		"- The pending recovery request has been cancelled\n" .
+		"- Your password has been reset\n" .
+		"- All active sessions have been terminated\n\n" .
+		"To regain access, please reset your password:\n%s\n\n" .
+		"Your two-factor authentication settings remain unchanged.\n\n" .
+		"-- The WordPress.org Team",
+		$user->display_name,
+		esc_url_raw( $reset_url )
+	);
+
+	wp_mail(
+		$user->user_email,
+		'[WordPress.org] Password Reset - Compromised Account',
+		$message
+	);
+}
+
+/**
+ * Send Slack notifications when a recovery request is created.
+ *
+ * Notifies the recovery channel and sends DMs to the account owner and all
+ * designated contacts (if they have linked Slack accounts).
  *
  * @param int   $user_id The user ID.
  * @param array $request The recovery request data.
@@ -91,8 +141,8 @@ function send_recovery_requested_slack( int $user_id, array $request ) : void {
 		return;
 	}
 
-	$message = sprintf(
-		'2FA recovery requested for %s (ID: %d) via designated contact from IP %s.',
+	$channel_message = sprintf(
+		'2FA recovery requested for %s (ID: %d) from IP %s.',
 		$user->user_login,
 		$user_id,
 		$request['ip']
@@ -106,8 +156,53 @@ function send_recovery_requested_slack( int $user_id, array $request ) : void {
 	$channel = apply_filters( 'wporg_2fa_recovery_slack_channel', '' );
 
 	if ( $channel ) {
-		notify_slack( $channel, $message );
+		notify_slack( $channel, $channel_message );
 	}
+
+	// DM the account owner.
+	$owner_slack_id = _get_user_slack_id( $user_id );
+	if ( $owner_slack_id ) {
+		notify_slack(
+			$owner_slack_id,
+			sprintf(
+				'A 2FA recovery was requested for your WordPress.org account from IP %s. ' .
+				'If this was not you, check your email for instructions to cancel the request and secure your account.',
+				$request['ip']
+			)
+		);
+	}
+
+	// DM each designated contact.
+	$contacts = get_designated_contacts( $user_id );
+	foreach ( $contacts as $contact ) {
+		$contact_slack_id = _get_user_slack_id( $contact->ID );
+		if ( $contact_slack_id ) {
+			notify_slack(
+				$contact_slack_id,
+				sprintf(
+					'%s (%s) has requested a 2FA recovery on WordPress.org and needs your help. Check your email for a confirmation link.',
+					$user->display_name,
+					$user->user_login
+				)
+			);
+		}
+	}
+}
+
+/**
+ * Get a user's Slack member ID if available.
+ *
+ * @param int $user_id The user ID.
+ * @return string|null The Slack member ID, or null if not available.
+ */
+function _get_user_slack_id( int $user_id ) : ?string {
+	/**
+	 * Filter to retrieve a user's Slack member ID.
+	 *
+	 * @param string|null $slack_id The Slack member ID. Default null.
+	 * @param int         $user_id  The WordPress user ID.
+	 */
+	return apply_filters( 'wporg_2fa_user_slack_id', null, $user_id );
 }
 
 /**
@@ -145,7 +240,7 @@ function send_contact_designation_request( int $contact_id, int $user_id, string
 		"If they ever lose access to their two-factor device, you may be contacted to verify their identity and help them regain access.\n\n" .
 		"To accept this designation:\n%s\n\n" .
 		"To decline:\n%s\n\n" .
-		"Note: You must have two-factor authentication enabled on your own account to be a recovery contact.\n\n" .
+		"Note: You must have two-factor authentication enabled on your own account to accept.\n\n" .
 		"-- The WordPress.org Team",
 		$contact->display_name,
 		$user->display_name,
@@ -157,8 +252,7 @@ function send_contact_designation_request( int $contact_id, int $user_id, string
 	wp_mail(
 		$contact->user_email,
 		'[WordPress.org] Recovery Contact Designation Request',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		$message
 	);
 }
 
@@ -190,8 +284,7 @@ function send_contact_designation_accepted( int $user_id, int $contact_id ) : vo
 	wp_mail(
 		$user->user_email,
 		'[WordPress.org] Recovery Contact Confirmed',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		$message
 	);
 }
 
@@ -233,8 +326,7 @@ function send_contact_recovery_request_email( int $contact_id, int $user_id, str
 	wp_mail(
 		$contact->user_email,
 		'[WordPress.org] Recovery Confirmation Needed',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		$message
 	);
 }
 
@@ -269,7 +361,6 @@ function send_contact_confirmed_recovery_email( int $user_id, string $token ) : 
 	wp_mail(
 		$user->user_email,
 		'[WordPress.org] Two-Factor Recovery Confirmed by Contact',
-		$message,
-		[ 'From: WordPress.org <noreply@wordpress.org>' ]
+		$message
 	);
 }

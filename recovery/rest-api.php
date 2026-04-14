@@ -166,6 +166,27 @@ function register_recovery_routes() : void {
 
 	register_rest_route(
 		$namespace,
+		'/recovery/cancel-compromised',
+		[
+			'methods'             => WP_REST_Server::EDITABLE,
+			'callback'            => __NAMESPACE__ . '\rest_cancel_recovery_compromised',
+			'permission_callback' => '__return_true', // Token-based auth.
+			'args'                => [
+				'user_id' => [
+					'required'          => true,
+					'type'              => 'integer',
+					'sanitize_callback' => 'absint',
+				],
+				'token' => [
+					'required' => true,
+					'type'     => 'string',
+				],
+			],
+		]
+	);
+
+	register_rest_route(
+		$namespace,
 		'/recovery/confirm-contact',
 		[
 			'methods'             => WP_REST_Server::EDITABLE,
@@ -318,6 +339,21 @@ function rest_create_recovery_request( WP_REST_Request $request ) {
  */
 function rest_cancel_recovery( WP_REST_Request $request ) {
 	$result = cancel_recovery_request( $request['user_id'], $request['token'] );
+
+	if ( is_wp_error( $result ) ) {
+		$result->add_data( [ 'status' => 400 ] );
+		return $result;
+	}
+
+	return [ 'success' => true ];
+}
+
+/**
+ * Cancel a recovery request and report password as compromised.
+ * Resets the password and destroys all sessions.
+ */
+function rest_cancel_recovery_compromised( WP_REST_Request $request ) {
+	$result = cancel_recovery_compromised( $request['user_id'], $request['token'] );
 
 	if ( is_wp_error( $result ) ) {
 		$result->add_data( [ 'status' => 400 ] );

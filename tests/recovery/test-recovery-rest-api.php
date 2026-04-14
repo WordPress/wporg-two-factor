@@ -136,7 +136,6 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_designate_contact
 	 */
 	public function test_designate_contact_via_api() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
 		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/designate-contact', [
@@ -149,9 +148,12 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Designating a contact should succeed even without 2FA on the contact.
+	 * The 2FA check is on acceptance, not designation.
+	 *
 	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_designate_contact
 	 */
-	public function test_designate_contact_no_2fa() : void {
+	public function test_designate_contact_without_2fa_succeeds() : void {
 		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/designate-contact', [
@@ -159,7 +161,8 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 			'contact_login' => self::$contact_user->user_login,
 		] );
 
-		$this->assertArrayHasKey( 'code', $actual );
+		$this->assertArrayHasKey( 'success', $actual );
+		$this->assertTrue( $actual['success'] );
 	}
 
 	/**

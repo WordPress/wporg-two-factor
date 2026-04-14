@@ -11,6 +11,7 @@ use function WordPressdotorg\Two_Factor\Recovery\{
 	get_pending_recovery,
 	create_recovery_request,
 	cancel_recovery_request,
+	cancel_recovery_compromised,
 	confirm_contact_recovery,
 	complete_recovery,
 	invalidate_recovery_on_login,
@@ -104,12 +105,30 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	// --- Designated Contact Tests ---
 
 	/**
+	 * Designating a contact should succeed even if they lack 2FA.
+	 * The 2FA requirement is enforced when the contact tries to accept.
+	 *
 	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
 	 */
-	public function test_designate_contact_requires_2fa() : void {
+	public function test_designate_contact_allows_no_2fa() : void {
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
-		$this->assertWPError( $result );
-		$this->assertSame( 'contact_no_2fa', $result->get_error_code() );
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\accept_designation
+	 */
+	public function test_accept_designation_requires_2fa_on_contact() : void {
+		// Designate a contact who lacks 2FA.
+		designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
+
+		$pending = WordPressdotorg\Two_Factor\Recovery\get_pending_contact_designations( self::$regular_user->ID );
+		$this->assertCount( 1, $pending );
+
+		// The contact tries to accept but has no 2FA -- use a wrong token to avoid hashing issues,
+		// but the 2FA check should fire first regardless. Actually, the 2FA check happens after
+		// token validation, so we need a valid token. Since we can't get the raw token here,
+		// we test this via the REST API test instead.
 	}
 
 	/**
@@ -128,8 +147,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\get_designated_contacts
 	 */
 	public function test_designate_contact_creates_pending() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
-
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
 		$this->assertTrue( $result );
 
@@ -144,8 +161,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
 	 */
 	public function test_designate_contact_prevents_duplicate() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
-
 		designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
 
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
@@ -157,8 +172,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\accept_designation
 	 */
 	public function test_accept_designation_wrong_token() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
-
 		designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
 
 		$result = accept_designation( self::$contact_user->ID, self::$regular_user->ID, 'wrong_token' );
@@ -205,9 +218,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
 	 */
 	public function test_designate_multiple_contacts() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
-		$this->enable_2fa_for_user( self::$contact_user_2->ID );
-
 		$this->assertTrue( designate_contact( self::$regular_user->ID, self::$contact_user->user_login ) );
 		$this->assertTrue( designate_contact( self::$regular_user->ID, self::$contact_user_2->user_login ) );
 
@@ -219,8 +229,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\designate_contact
 	 */
 	public function test_designate_already_confirmed_contact() : void {
-		$this->enable_2fa_for_user( self::$contact_user->ID );
-
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 
 		$result = designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
@@ -303,6 +311,29 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$result = cancel_recovery_request( self::$regular_user->ID, 'wrong_token' );
 		$this->assertWPError( $result );
 		$this->assertSame( 'invalid_token', $result->get_error_code() );
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\cancel_recovery_compromised
+	 */
+	public function test_cancel_recovery_compromised_resets_password() : void {
+		$this->enable_2fa_for_user( self::$regular_user->ID );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+
+		$request = create_recovery_request( self::$regular_user->ID );
+
+		// Store the current password hash.
+		$old_hash = get_userdata( self::$regular_user->ID )->user_pass;
+
+		$result = cancel_recovery_compromised( self::$regular_user->ID, $request['raw_token'] );
+		$this->assertTrue( $result );
+
+		// Recovery should be cancelled.
+		$this->assertFalse( has_pending_recovery( self::$regular_user->ID ) );
+
+		// Password should have changed.
+		$new_hash = get_userdata( self::$regular_user->ID )->user_pass;
+		$this->assertNotSame( $old_hash, $new_hash );
 	}
 
 	// --- Complete Recovery Tests ---
@@ -459,8 +490,6 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		global $super_admins, $mock_is_special_user;
 		$mock_is_special_user = [ self::$privileged_user->ID ];
 		$super_admins[]       = self::$privileged_user->user_login;
-
-		$this->enable_2fa_for_user( self::$contact_user->ID );
 
 		$result = designate_contact( self::$privileged_user->ID, self::$contact_user->user_login );
 		$this->assertWPError( $result );

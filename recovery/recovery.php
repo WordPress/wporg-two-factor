@@ -100,11 +100,6 @@ function designate_contact( int $user_id, string $contact_login ) {
 		return new WP_Error( 'self_designation', 'You cannot designate yourself as a recovery contact.' );
 	}
 
-	// Contact must have 2FA enabled.
-	if ( ! Two_Factor_Core::is_user_using_two_factor( $contact->ID ) ) {
-		return new WP_Error( 'contact_no_2fa', 'The designated contact must have two-factor authentication enabled.' );
-	}
-
 	$user = get_userdata( $user_id );
 
 	if ( ! is_recovery_available( $user ) ) {
@@ -166,6 +161,11 @@ function accept_designation( int $contact_id, int $user_id, string $token ) {
 
 	if ( null === $matched_index ) {
 		return new WP_Error( 'invalid_token', 'Invalid designation token or contact mismatch.' );
+	}
+
+	// Contact must have 2FA enabled on their own account to accept.
+	if ( ! Two_Factor_Core::is_user_using_two_factor( $contact_id ) ) {
+		return new WP_Error( 'contact_no_2fa', 'You must enable two-factor authentication on your account before you can be a recovery contact.' );
 	}
 
 	// Remove this entry from pending.
@@ -401,6 +401,35 @@ function cancel_recovery_request( int $user_id, string $token ) {
 	delete_user_meta( $user_id, RECOVERY_REQUEST_META );
 
 	send_recovery_cancelled_email( $user_id );
+
+	return true;
+}
+
+/**
+ * Cancel a recovery request and flag the account as having a compromised password.
+ *
+ * This resets the user's password and destroys all sessions, since a recovery request
+ * means someone successfully authenticated with the account password.
+ *
+ * @param int    $user_id The user ID.
+ * @param string $token   The recovery token.
+ * @return true|WP_Error
+ */
+function cancel_recovery_compromised( int $user_id, string $token ) {
+	$result = cancel_recovery_request( $user_id, $token );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	// Reset the password to a random value, forcing the user to use password reset.
+	wp_set_password( wp_generate_password( 32, true, true ), $user_id );
+
+	// Destroy all sessions for this user.
+	$sessions = \WP_Session_Tokens::get_instance( $user_id );
+	$sessions->destroy_all();
+
+	send_password_compromised_email( $user_id );
 
 	return true;
 }
