@@ -117,7 +117,7 @@ function send_password_compromised_email( int $user_id ) : void {
 
 	wp_mail(
 		$user->user_email,
-		'[WordPress.org] Password Reset - Compromised Account',
+		'[WordPress.org] Forced Password Reset',
 		$message
 	);
 }
