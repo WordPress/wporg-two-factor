@@ -119,16 +119,32 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\accept_designation
 	 */
 	public function test_accept_designation_requires_2fa_on_contact() : void {
-		// Designate a contact who lacks 2FA.
-		designate_contact( self::$regular_user->ID, self::$contact_user->user_login );
+		// Inject a pending designation with a token we know, since designate_contact()
+		// only stores the hash and emails the raw token out of band.
+		$raw_token = 'known-raw-token-for-test';
+		update_user_meta(
+			self::$regular_user->ID,
+			WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_PENDING_META,
+			[
+				[
+					'contact_id'   => self::$contact_user->ID,
+					'token'        => wp_hash_password( $raw_token ),
+					'requested_at' => time(),
+				],
+			]
+		);
 
-		$pending = WordPressdotorg\Two_Factor\Recovery\get_pending_contact_designations( self::$regular_user->ID );
-		$this->assertCount( 1, $pending );
+		// Contact has no 2FA enabled -- accept must fail with contact_no_2fa.
+		$result = accept_designation( self::$contact_user->ID, self::$regular_user->ID, $raw_token );
+		$this->assertWPError( $result );
+		$this->assertSame( 'contact_no_2fa', $result->get_error_code() );
 
-		// The contact tries to accept but has no 2FA -- use a wrong token to avoid hashing issues,
-		// but the 2FA check should fire first regardless. Actually, the 2FA check happens after
-		// token validation, so we need a valid token. Since we can't get the raw token here,
-		// we test this via the REST API test instead.
+		// Once the contact enables 2FA, acceptance succeeds.
+		$this->enable_2fa_for_user( self::$contact_user->ID );
+
+		$result = accept_designation( self::$contact_user->ID, self::$regular_user->ID, $raw_token );
+		$this->assertTrue( $result );
+		$this->assertCount( 1, get_designated_contacts( self::$regular_user->ID ) );
 	}
 
 	/**
