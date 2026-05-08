@@ -25,6 +25,8 @@ export function useUser( userId ) {
 	const recoveryAvailable = userRecord.record?.[ '2fa_recovery_available' ] ?? true;
 	const recoveryContacts = userRecord.record?.[ '2fa_recovery_contacts' ] ?? [];
 	const recoveryContactsPending = userRecord.record?.[ '2fa_recovery_contacts_pending' ] ?? [];
+	const recoveryPendingRequest = userRecord.record?.[ '2fa_recovery_pending_request' ] ?? null;
+	const recoveryPromptNeeded = userRecord.record?.[ '2fa_recovery_prompt_needed' ] ?? false;
 	const designatedFor = userRecord.record?.[ '2fa_designated_for' ] ?? [];
 
 	return {
@@ -40,6 +42,8 @@ export function useUser( userId ) {
 		recoveryAvailable,
 		recoveryContacts,
 		recoveryContactsPending,
+		recoveryPendingRequest,
+		recoveryPromptNeeded,
 		designatedFor,
 	};
 }

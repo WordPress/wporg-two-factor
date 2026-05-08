@@ -361,11 +361,12 @@ function block_webauthn_settings_page() {
  * @return array Modified links array.
  */
 function add_recovery_link_to_2fa_prompt( array $links ) : array {
-	// The user ID is available from the hidden field in the 2FA form.
+	// The user ID and login nonce are available from the hidden fields in the 2FA form.
 	$user_id = isset( $_REQUEST['wp-auth-id'] ) ? (int) $_REQUEST['wp-auth-id'] : 0;
+	$nonce   = isset( $_REQUEST['wp-auth-nonce'] ) ? wp_unslash( $_REQUEST['wp-auth-nonce'] ) : '';
 	$user    = $user_id ? get_userdata( $user_id ) : null;
 
-	if ( ! $user ) {
+	if ( ! $user || ! $nonce ) {
 		return $links;
 	}
 
@@ -374,8 +375,15 @@ function add_recovery_link_to_2fa_prompt( array $links ) : array {
 		return $links;
 	}
 
+	// Forward the interim 2FA credentials so the recovery flow can authenticate the user.
 	$links[] = [
-		'url'   => add_query_arg( 'user_login', rawurlencode( $user->user_login ), home_url( '/recovery/' ) ),
+		'url'   => add_query_arg(
+			[
+				'wp-auth-id'    => $user_id,
+				'wp-auth-nonce' => rawurlencode( $nonce ),
+			],
+			home_url( '/recovery/' )
+		),
 		'label' => __( 'Lost access to your device? Start account recovery', 'wporg' ),
 	];
 

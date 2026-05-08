@@ -383,11 +383,17 @@ function create_recovery_request( int $user_id ) {
 /**
  * Cancel a pending recovery request.
  *
- * @param int    $user_id The user ID.
- * @param string $token   The recovery token.
+ * The request meta is preserved with status 'cancelled' so that any in-flight
+ * tokens (e.g. a contact's confirm link) become inert rather than re-creating
+ * a fresh request.
+ *
+ * @param int    $user_id    The user ID.
+ * @param string $token      The recovery token.
+ * @param bool   $send_email Whether to send the cancellation email. Compromised-path callers
+ *                           suppress this so only the compromised email is sent.
  * @return true|WP_Error
  */
-function cancel_recovery_request( int $user_id, string $token ) {
+function cancel_recovery_request( int $user_id, string $token, bool $send_email = true ) {
 	$request = get_pending_recovery( $user_id );
 
 	if ( ! $request || 'cancelled' === $request['status'] ) {
@@ -398,9 +404,13 @@ function cancel_recovery_request( int $user_id, string $token ) {
 		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
 	}
 
-	delete_user_meta( $user_id, RECOVERY_REQUEST_META );
+	$request['status']       = 'cancelled';
+	$request['cancelled_at'] = time();
+	update_user_meta( $user_id, RECOVERY_REQUEST_META, $request );
 
-	send_recovery_cancelled_email( $user_id );
+	if ( $send_email ) {
+		send_recovery_cancelled_email( $user_id );
+	}
 
 	return true;
 }
@@ -416,7 +426,8 @@ function cancel_recovery_request( int $user_id, string $token ) {
  * @return true|WP_Error
  */
 function cancel_recovery_compromised( int $user_id, string $token ) {
-	$result = cancel_recovery_request( $user_id, $token );
+	// Suppress the cancellation email -- the compromised email below covers it.
+	$result = cancel_recovery_request( $user_id, $token, false );
 
 	if ( is_wp_error( $result ) ) {
 		return $result;
@@ -448,7 +459,7 @@ function cancel_recovery_compromised( int $user_id, string $token ) {
 function confirm_contact_recovery( int $user_id, string $token, int $contact_id ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request ) {
+	if ( ! $request || 'cancelled' === $request['status'] ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
@@ -483,7 +494,7 @@ function confirm_contact_recovery( int $user_id, string $token, int $contact_id 
 function complete_recovery( int $user_id, string $token ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request ) {
+	if ( ! $request || 'cancelled' === $request['status'] ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 

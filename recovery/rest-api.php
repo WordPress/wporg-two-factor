@@ -132,12 +132,19 @@ function register_recovery_routes() : void {
 		[
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => __NAMESPACE__ . '\rest_create_recovery_request',
-			'permission_callback' => '__return_true', // Public endpoint, user is locked out.
+			// Caller authenticates with the interim 2FA login nonce issued after
+			// successful password validation, so the request is only reachable
+			// to someone who has just signed in with the account password.
+			'permission_callback' => '__return_true',
 			'args'                => [
-				'user_login' => [
+				'wp-auth-id' => [
+					'required'          => true,
+					'type'              => 'integer',
+					'sanitize_callback' => 'absint',
+				],
+				'wp-auth-nonce' => [
 					'required' => true,
 					'type'     => 'string',
-					'sanitize_callback' => 'sanitize_user',
 				],
 			],
 		]
@@ -268,6 +275,9 @@ function rest_designate_contact( WP_REST_Request $request ) {
 
 /**
  * Remove a designated contact.
+ *
+ * remove_contact() returns bool, not WP_Error -- removing a non-existent
+ * contact is intentionally a no-op, so there is no error path to check.
  */
 function rest_remove_contact( WP_REST_Request $request ) {
 	remove_contact( $request['user_id'], $request['contact_id'] );
@@ -305,33 +315,38 @@ function rest_decline_designation( WP_REST_Request $request ) {
 
 /**
  * Create a recovery request.
+ *
+ * Requires the interim 2FA login nonce that Two_Factor_Core issues after a
+ * successful password check, so only the holder of the account password can
+ * trigger the flow.
  */
 function rest_create_recovery_request( WP_REST_Request $request ) {
-	$user = get_user_by( 'login', $request['user_login'] );
+	$user_id = (int) $request['wp-auth-id'];
+	$nonce   = (string) $request['wp-auth-nonce'];
 
+	if ( ! $user_id || ! $nonce || true !== Two_Factor_Core::verify_login_nonce( $user_id, $nonce ) ) {
+		return new WP_Error( 'recovery_failed', 'Recovery request could not be processed.', [ 'status' => 400 ] );
+	}
+
+	$user = get_userdata( $user_id );
 	if ( ! $user ) {
-		// Intentionally vague for security.
 		return new WP_Error( 'recovery_failed', 'Recovery request could not be processed.', [ 'status' => 400 ] );
 	}
 
 	// Rate limiting: one request per user per hour.
-	$existing = get_pending_recovery( $user->ID );
+	$existing = get_pending_recovery( $user_id );
 	if ( $existing && ( time() - $existing['requested_at'] ) < HOUR_IN_SECONDS ) {
 		return new WP_Error( 'rate_limited', 'A recovery request was recently submitted. Please wait before trying again.', [ 'status' => 429 ] );
 	}
 
-	$result = create_recovery_request( $user->ID );
+	$result = create_recovery_request( $user_id );
 
 	if ( is_wp_error( $result ) ) {
 		// Return vague error for public endpoint.
 		return new WP_Error( 'recovery_failed', 'Recovery request could not be processed.', [ 'status' => 400 ] );
 	}
 
-	return [
-		'success' => true,
-		// Return the raw token so the caller can use it for cancel/status/complete.
-		'token'   => $result['raw_token'],
-	];
+	return [ 'success' => true ];
 }
 
 /**

@@ -67,23 +67,28 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
+		$nonce = Two_Factor_Core::create_login_nonce( self::$regular_user->ID );
+
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/request', [
-			'user_login' => self::$regular_user->user_login,
+			'wp-auth-id'    => self::$regular_user->ID,
+			'wp-auth-nonce' => $nonce['key'],
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );
 		$this->assertTrue( $actual['success'] );
-		$this->assertArrayHasKey( 'token', $actual );
+		// Token must not be exposed in the response -- it is delivered only via email.
+		$this->assertArrayNotHasKey( 'token', $actual );
 	}
 
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_create_recovery_request
 	 */
-	public function test_create_recovery_request_invalid_user() : void {
+	public function test_create_recovery_request_rejects_missing_nonce() : void {
 		wp_set_current_user( 0 );
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/request', [
-			'user_login' => 'nonexistent_user_xyz',
+			'wp-auth-id'    => self::$regular_user->ID,
+			'wp-auth-nonce' => 'not-a-real-nonce',
 		] );
 
 		$this->assertArrayHasKey( 'code', $actual );
@@ -98,17 +103,19 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
-		$create = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/request', [
-			'user_login' => self::$regular_user->user_login,
-		] );
+		$create = WordPressdotorg\Two_Factor\Recovery\create_recovery_request( self::$regular_user->ID );
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/cancel', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['token'],
+			'token'   => $create['raw_token'],
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );
 		$this->assertTrue( $actual['success'] );
+
+		// Cancelled state should be preserved (not deleted).
+		$pending = WordPressdotorg\Two_Factor\Recovery\get_pending_recovery( self::$regular_user->ID );
+		$this->assertSame( 'cancelled', $pending['status'] );
 	}
 
 	/**
@@ -119,13 +126,11 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
-		$create = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/request', [
-			'user_login' => self::$regular_user->user_login,
-		] );
+		$create = WordPressdotorg\Two_Factor\Recovery\create_recovery_request( self::$regular_user->ID );
 
 		$actual = $this->api_request( 'GET', '/wporg-two-factor/1.0/recovery/status', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['token'],
+			'token'   => $create['raw_token'],
 		] );
 
 		$this->assertSame( 'pending', $actual['status'] );
@@ -192,20 +197,18 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
-		$create = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/request', [
-			'user_login' => self::$regular_user->user_login,
-		] );
+		$create = WordPressdotorg\Two_Factor\Recovery\create_recovery_request( self::$regular_user->ID );
 
 		// Simulate contact confirmation directly.
 		WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery(
 			self::$regular_user->ID,
-			$create['token'],
+			$create['raw_token'],
 			self::$contact_user->ID
 		);
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/complete', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['token'],
+			'token'   => $create['raw_token'],
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );

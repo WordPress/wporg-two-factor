@@ -16,15 +16,10 @@ import ScreenLink from '../screen-link';
  */
 export default function RecoveryPrompt() {
 	const {
-		user: {
-			userRecord: { record },
-			hasPrimaryProvider,
-		},
+		user: { recoveryPromptNeeded },
 	} = useContext( GlobalContext );
 
-	const promptNeeded = record?.[ '2fa_recovery_prompt_needed' ] ?? false;
-
-	if ( ! hasPrimaryProvider || ! promptNeeded ) {
+	if ( ! recoveryPromptNeeded ) {
 		return null;
 	}
 
