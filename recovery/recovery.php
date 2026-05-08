@@ -22,6 +22,10 @@ const RECOVERY_CONTACTS_PENDING_META  = '_wporg_2fa_recovery_contacts_pending';
 const RECOVERY_REQUEST_META           = '_wporg_2fa_recovery_request';
 const DESIGNATED_FOR_META             = '_wporg_2fa_designated_for';
 
+// A recovery request is valid for 7 days after creation. After that the token
+// stops working and the user must initiate a new request.
+const RECOVERY_REQUEST_TTL = 7 * DAY_IN_SECONDS;
+
 // Auto-invalidate pending recovery when user authenticates with 2FA.
 add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\invalidate_recovery_on_login' );
 
@@ -310,13 +314,31 @@ function _remove_designated_for_entry( int $contact_id, int $user_id ) : void {
 /**
  * Check if a user has a pending recovery request.
  *
+ * Cancelled or expired requests do not count.
+ *
  * @param int $user_id The user ID.
  * @return bool
  */
 function has_pending_recovery( int $user_id ) : bool {
 	$request = get_pending_recovery( $user_id );
 
-	return null !== $request && 'cancelled' !== $request['status'];
+	if ( null === $request || 'cancelled' === $request['status'] ) {
+		return false;
+	}
+
+	return ! is_recovery_expired( $request );
+}
+
+/**
+ * Check whether a recovery request has passed its TTL.
+ *
+ * @param array $request The recovery request data.
+ * @return bool
+ */
+function is_recovery_expired( array $request ) : bool {
+	$requested_at = (int) ( $request['requested_at'] ?? 0 );
+
+	return $requested_at > 0 && ( time() - $requested_at ) > RECOVERY_REQUEST_TTL;
 }
 
 /**
@@ -396,7 +418,7 @@ function create_recovery_request( int $user_id ) {
 function cancel_recovery_request( int $user_id, string $token, bool $send_email = true ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request || 'cancelled' === $request['status'] ) {
+	if ( ! $request || 'cancelled' === $request['status'] || is_recovery_expired( $request ) ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
@@ -459,7 +481,7 @@ function cancel_recovery_compromised( int $user_id, string $token ) {
 function confirm_contact_recovery( int $user_id, string $token, int $contact_id ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request || 'cancelled' === $request['status'] ) {
+	if ( ! $request || 'cancelled' === $request['status'] || is_recovery_expired( $request ) ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
@@ -494,7 +516,7 @@ function confirm_contact_recovery( int $user_id, string $token, int $contact_id 
 function complete_recovery( int $user_id, string $token ) {
 	$request = get_pending_recovery( $user_id );
 
-	if ( ! $request || 'cancelled' === $request['status'] ) {
+	if ( ! $request || 'cancelled' === $request['status'] || is_recovery_expired( $request ) ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
@@ -593,9 +615,10 @@ function get_recovery_status( int $user_id ) : array {
 
 	$request = get_pending_recovery( $user_id );
 	$request_data = null;
-	if ( $request && 'cancelled' !== $request['status'] ) {
+	if ( $request && 'cancelled' !== $request['status'] && ! is_recovery_expired( $request ) ) {
 		$request_data = [
 			'requested_at' => $request['requested_at'],
+			'expires_at'   => (int) $request['requested_at'] + RECOVERY_REQUEST_TTL,
 			'status'       => $request['status'],
 		];
 	}

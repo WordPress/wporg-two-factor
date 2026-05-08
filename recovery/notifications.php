@@ -43,7 +43,7 @@ function send_recovery_requested_email( int $user_id, array $request, string $to
 		"disable two-factor authentication.\n\n" .
 		"Requested from IP: %s\n\n" .
 		"Your designated recovery contacts have been notified. Once one of them confirms, " .
-		"two-factor authentication will be disabled on your account.\n\n" .
+		"two-factor authentication will be disabled on your account. This request expires in %d days.\n\n" .
 		"If you did not request this, take action immediately:\n\n" .
 		"Cancel the request:\n%s\n\n" .
 		"If you believe your password is compromised, use this link to cancel the request, " .
@@ -51,6 +51,7 @@ function send_recovery_requested_email( int $user_id, array $request, string $to
 		"-- The WordPress.org Team",
 		$user->display_name,
 		$request['ip'],
+		(int) ( RECOVERY_REQUEST_TTL / DAY_IN_SECONDS ),
 		esc_url_raw( $cancel_url ),
 		esc_url_raw( $compromised_url )
 	);
@@ -314,13 +315,14 @@ function send_contact_recovery_request_email( int $contact_id, int $user_id, str
 		"Hi %s,\n\n" .
 		"%s (%s) says they have lost access to their two-factor authentication device and is requesting account recovery on WordPress.org.\n\n" .
 		"If you can verify (out-of-band, such as in person, phone call, or video chat) that this request is legitimate, please confirm it:\n%s\n\n" .
-		"You must be logged in with two-factor authentication to confirm this request.\n\n" .
+		"This link expires in %d days. You must be logged in with two-factor authentication to confirm this request.\n\n" .
 		"If you are unsure whether this request is legitimate, do NOT confirm it. The account owner can contact support instead.\n\n" .
 		"-- The WordPress.org Team",
 		$contact->display_name,
 		$user->display_name,
 		$user->user_login,
-		esc_url_raw( $confirm_url )
+		esc_url_raw( $confirm_url ),
+		(int) ( RECOVERY_REQUEST_TTL / DAY_IN_SECONDS )
 	);
 
 	wp_mail(

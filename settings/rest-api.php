@@ -483,11 +483,12 @@ function register_user_fields(): void {
 		[
 			'get_callback' => function( $user ) {
 				$request = Recovery\get_pending_recovery( $user['id'] );
-				if ( ! $request || 'cancelled' === $request['status'] ) {
+				if ( ! $request || 'cancelled' === $request['status'] || Recovery\is_recovery_expired( $request ) ) {
 					return null;
 				}
 				return [
 					'requested_at' => $request['requested_at'],
+					'expires_at'   => (int) $request['requested_at'] + Recovery\RECOVERY_REQUEST_TTL,
 					'status'       => $request['status'],
 				];
 			},

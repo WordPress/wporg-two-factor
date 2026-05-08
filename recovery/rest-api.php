@@ -413,9 +413,14 @@ function rest_recovery_status( WP_REST_Request $request ) {
 		return new WP_Error( 'invalid_token', 'Invalid recovery token.', [ 'status' => 403 ] );
 	}
 
+	if ( is_recovery_expired( $recovery ) ) {
+		return new WP_Error( 'expired', 'Recovery request has expired. Please initiate a new request.', [ 'status' => 410 ] );
+	}
+
 	return [
 		'status'       => $recovery['status'],
 		'requested_at' => $recovery['requested_at'],
+		'expires_at'   => (int) $recovery['requested_at'] + RECOVERY_REQUEST_TTL,
 		'is_ready'     => 'confirmed_by_contact' === $recovery['status'],
 	];
 }

@@ -395,6 +395,47 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->assertSame( 'invalid_token', $result->get_error_code() );
 	}
 
+	// --- Expiry ---
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_expired
+	 * @covers WordPressdotorg\Two_Factor\Recovery\has_pending_recovery
+	 * @covers WordPressdotorg\Two_Factor\Recovery\cancel_recovery_request
+	 * @covers WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery
+	 * @covers WordPressdotorg\Two_Factor\Recovery\complete_recovery
+	 */
+	public function test_expired_recovery_request_is_inert() : void {
+		$this->enable_2fa_for_user( self::$regular_user->ID );
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
+
+		$request = create_recovery_request( self::$regular_user->ID );
+
+		// Backdate the request past the 7-day TTL.
+		$stored = get_pending_recovery( self::$regular_user->ID );
+		$stored['requested_at'] = time() - WordPressdotorg\Two_Factor\Recovery\RECOVERY_REQUEST_TTL - 60;
+		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_REQUEST_META, $stored );
+
+		// has_pending_recovery treats expired as not pending.
+		$this->assertFalse( has_pending_recovery( self::$regular_user->ID ) );
+
+		// All three token-driven actions reject the expired request as no_pending,
+		// even with the correct raw token.
+		foreach ( [ 'cancel', 'confirm', 'complete' ] as $action ) {
+			$result = match ( $action ) {
+				'cancel'   => cancel_recovery_request( self::$regular_user->ID, $request['raw_token'] ),
+				'confirm'  => confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID ),
+				'complete' => complete_recovery( self::$regular_user->ID, $request['raw_token'] ),
+			};
+			$this->assertWPError( $result, "$action should reject expired request" );
+			$this->assertSame( 'no_pending', $result->get_error_code(), "$action error code" );
+		}
+
+		// A fresh request can be created once the old one is expired.
+		$new = create_recovery_request( self::$regular_user->ID );
+		$this->assertIsArray( $new );
+		$this->assertSame( 'pending', $new['status'] );
+	}
+
 	// --- Invalidation on Login ---
 
 	/**
