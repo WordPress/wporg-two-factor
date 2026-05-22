@@ -14,11 +14,11 @@ defined( 'WPINC' ) || die();
  * This warns them that someone successfully logged in with their password and is
  * attempting to disable 2FA.
  *
- * @param int    $user_id The user ID.
- * @param array  $request The recovery request data.
- * @param string $token   The raw (unhashed) recovery token for cancel link.
+ * @param int    $user_id     The user ID.
+ * @param array  $request     The recovery request data.
+ * @param string $owner_token The raw (unhashed) owner_token, used to cancel or mark compromised.
  */
-function send_recovery_requested_email( int $user_id, array $request, string $token ) : void {
+function send_recovery_requested_email( int $user_id, array $request, string $owner_token ) : void {
 	$user = get_userdata( $user_id );
 	if ( ! $user ) {
 		return;
@@ -27,13 +27,13 @@ function send_recovery_requested_email( int $user_id, array $request, string $to
 	$cancel_url = add_query_arg( [
 		'action'  => 'wporg-2fa-recovery-cancel',
 		'user_id' => $user_id,
-		'token'   => $token,
+		'token'   => $owner_token,
 	], home_url( '/' ) );
 
 	$compromised_url = add_query_arg( [
 		'action'  => 'wporg-2fa-recovery-compromised',
 		'user_id' => $user_id,
-		'token'   => $token,
+		'token'   => $owner_token,
 	], home_url( '/' ) );
 
 	$message = sprintf(
@@ -335,10 +335,10 @@ function send_contact_recovery_request_email( int $contact_id, int $user_id, str
 /**
  * Send an email to the locked-out user when their contact has confirmed the recovery.
  *
- * @param int    $user_id The locked-out user ID.
- * @param string $token   The raw recovery token for completion.
+ * @param int    $user_id          The locked-out user ID.
+ * @param string $completion_token The raw completion_token, valid only for /recovery/complete.
  */
-function send_contact_confirmed_recovery_email( int $user_id, string $token ) : void {
+function send_contact_confirmed_recovery_email( int $user_id, string $completion_token ) : void {
 	$user = get_userdata( $user_id );
 	if ( ! $user ) {
 		return;
@@ -347,7 +347,7 @@ function send_contact_confirmed_recovery_email( int $user_id, string $token ) : 
 	$complete_url = add_query_arg( [
 		'action'  => 'wporg-2fa-recovery-complete',
 		'user_id' => $user_id,
-		'token'   => $token,
+		'token'   => $completion_token,
 	], home_url( '/' ) );
 
 	$message = sprintf(
@@ -363,6 +363,36 @@ function send_contact_confirmed_recovery_email( int $user_id, string $token ) : 
 	wp_mail(
 		$user->user_email,
 		'[WordPress.org] Two-Factor Recovery Confirmed by Contact',
+		$message
+	);
+}
+
+/**
+ * Send an email to the user when their recovery has completed and 2FA has been disabled.
+ *
+ * @param int $user_id The user ID.
+ */
+function send_recovery_completed_email( int $user_id ) : void {
+	$user = get_userdata( $user_id );
+	if ( ! $user ) {
+		return;
+	}
+
+	$message = sprintf(
+		"Hi %s,\n\n" .
+		"Two-factor authentication has been disabled on your WordPress.org account through " .
+		"the account recovery flow. You can now log in with just your password.\n\n" .
+		"For your account's security, please re-enable two-factor authentication as soon as " .
+		"you have access to a new authentication device.\n\n" .
+		"If you did not request this recovery, your password may be compromised. Please reset " .
+		"your password immediately and contact the WordPress.org systems team.\n\n" .
+		"-- The WordPress.org Team",
+		$user->display_name
+	);
+
+	wp_mail(
+		$user->user_email,
+		'[WordPress.org] Two-Factor Authentication Disabled (Recovery Complete)',
 		$message
 	);
 }

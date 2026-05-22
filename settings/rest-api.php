@@ -459,6 +459,9 @@ function register_user_fields(): void {
 				$pending_list = Recovery\get_pending_contact_designations( $user['id'] );
 				$result = [];
 				foreach ( $pending_list as $pending ) {
+					if ( Recovery\is_designation_expired( $pending ) ) {
+						continue;
+					}
 					$contact = get_userdata( $pending['contact_id'] );
 					if ( $contact ) {
 						$result[] = [

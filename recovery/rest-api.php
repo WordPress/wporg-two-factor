@@ -27,7 +27,7 @@ function register_recovery_routes() : void {
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => __NAMESPACE__ . '\rest_designate_contact',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['user_id'] );
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( (int) $request['user_id'] );
 			},
 			'args'                => [
 				'user_id' => [
@@ -51,7 +51,7 @@ function register_recovery_routes() : void {
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => __NAMESPACE__ . '\rest_remove_contact',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['user_id'] );
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( (int) $request['user_id'] );
 			},
 			'args'                => [
 				'user_id' => [
@@ -75,7 +75,7 @@ function register_recovery_routes() : void {
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => __NAMESPACE__ . '\rest_accept_designation',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['contact_id'] );
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( (int) $request['contact_id'] );
 			},
 			'args'                => [
 				'contact_id' => [
@@ -103,7 +103,7 @@ function register_recovery_routes() : void {
 			'methods'             => WP_REST_Server::EDITABLE,
 			'callback'            => __NAMESPACE__ . '\rest_decline_designation',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['contact_id'] );
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( (int) $request['contact_id'] );
 			},
 			'args'                => [
 				'contact_id' => [
@@ -405,16 +405,20 @@ function rest_confirm_contact_recovery( WP_REST_Request $request ) {
 function rest_recovery_status( WP_REST_Request $request ) {
 	$recovery = get_pending_recovery( $request['user_id'] );
 
-	if ( ! $recovery ) {
-		return new WP_Error( 'no_pending', 'No pending recovery request found.', [ 'status' => 404 ] );
+	// Unified failure response: avoids leaking whether a user has a pending request
+	// (or what state it is in) to unauthenticated callers probing user_id + token.
+	$unauthorized = new WP_Error(
+		'unauthorized',
+		'Unable to look up recovery request.',
+		[ 'status' => 401 ]
+	);
+
+	if ( ! $recovery || 'cancelled' === $recovery['status'] || is_recovery_expired( $recovery ) ) {
+		return $unauthorized;
 	}
 
-	if ( ! wp_check_password( $request['token'], $recovery['token'] ) ) {
-		return new WP_Error( 'invalid_token', 'Invalid recovery token.', [ 'status' => 403 ] );
-	}
-
-	if ( is_recovery_expired( $recovery ) ) {
-		return new WP_Error( 'expired', 'Recovery request has expired. Please initiate a new request.', [ 'status' => 410 ] );
+	if ( ! wp_check_password( $request['token'], $recovery['owner_token'] ) ) {
+		return $unauthorized;
 	}
 
 	return [

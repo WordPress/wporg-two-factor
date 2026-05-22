@@ -94,12 +94,12 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\is_recovery_available
 	 */
-	public function test_recovery_available_for_core_committer() : void {
+	public function test_recovery_not_available_for_special_user() : void {
 		global $mock_is_special_user;
 		$mock_is_special_user = [ self::$privileged_user->ID ];
 
-		// Special user but NOT super admin => recovery available.
-		$this->assertTrue( is_recovery_available( self::$privileged_user ) );
+		// Special user (core committer etc) -- no automated recovery, even without super-admin.
+		$this->assertFalse( is_recovery_available( self::$privileged_user ) );
 	}
 
 	// --- Designated Contact Tests ---
@@ -196,6 +196,34 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\accept_designation
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_designation_expired
+	 */
+	public function test_accept_designation_rejects_expired_invite() : void {
+		$raw_token = 'known-raw-token-for-expiry-test';
+		// Insert a pending entry timestamped past the 30-day TTL.
+		update_user_meta(
+			self::$regular_user->ID,
+			WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_PENDING_META,
+			[
+				[
+					'contact_id'   => self::$contact_user->ID,
+					'token'        => wp_hash_password( $raw_token ),
+					'requested_at' => time() - WordPressdotorg\Two_Factor\Recovery\DESIGNATION_TTL - 60,
+				],
+			]
+		);
+		$this->enable_2fa_for_user( self::$contact_user->ID );
+
+		$result = accept_designation( self::$contact_user->ID, self::$regular_user->ID, $raw_token );
+		$this->assertWPError( $result );
+		$this->assertSame( 'expired', $result->get_error_code() );
+
+		// And the requester can re-designate -- the expired entry no longer blocks.
+		$this->assertTrue( designate_contact( self::$regular_user->ID, self::$contact_user->user_login ) );
+	}
+
+	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\remove_contact
 	 */
 	public function test_remove_specific_contact() : void {
@@ -264,7 +292,9 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 
 		$this->assertIsArray( $result );
 		$this->assertSame( 'pending', $result['status'] );
-		$this->assertArrayHasKey( 'raw_token', $result );
+		$this->assertArrayHasKey( 'owner_token_raw', $result );
+		$this->assertArrayHasKey( 'contact_tokens_raw', $result );
+		$this->assertArrayHasKey( self::$contact_user->ID, $result['contact_tokens_raw'] );
 	}
 
 	/**
@@ -312,7 +342,7 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
 		$request = create_recovery_request( self::$regular_user->ID );
 
-		$result = cancel_recovery_request( self::$regular_user->ID, $request['raw_token'] );
+		$result = cancel_recovery_request( self::$regular_user->ID, $request['owner_token_raw'] );
 		$this->assertTrue( $result );
 		$this->assertFalse( has_pending_recovery( self::$regular_user->ID ) );
 	}
@@ -341,7 +371,7 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		// Store the current password hash.
 		$old_hash = get_userdata( self::$regular_user->ID )->user_pass;
 
-		$result = cancel_recovery_compromised( self::$regular_user->ID, $request['raw_token'] );
+		$result = cancel_recovery_compromised( self::$regular_user->ID, $request['owner_token_raw'] );
 		$this->assertTrue( $result );
 
 		// Recovery should be cancelled.
@@ -359,9 +389,10 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 */
 	public function test_complete_recovery_not_confirmed() : void {
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
-		$request = create_recovery_request( self::$regular_user->ID );
+		create_recovery_request( self::$regular_user->ID );
 
-		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
+		// Use any token -- the not_confirmed check fires before the token check.
+		$result = complete_recovery( self::$regular_user->ID, 'anything' );
 		$this->assertWPError( $result );
 		$this->assertSame( 'not_confirmed', $result->get_error_code() );
 	}
@@ -375,9 +406,21 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 
 		$request = create_recovery_request( self::$regular_user->ID );
 
-		confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID );
+		$confirm = confirm_contact_recovery(
+			self::$regular_user->ID,
+			$request['contact_tokens_raw'][ self::$contact_user->ID ],
+			self::$contact_user->ID
+		);
+		$this->assertIsArray( $confirm );
+		$this->assertArrayHasKey( 'completion_token_raw', $confirm );
 
-		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
+		// Critical: the contact's token must NOT be able to complete the recovery.
+		// Only the freshly-minted completion_token (emailed to the owner) does.
+		$result = complete_recovery( self::$regular_user->ID, $request['contact_tokens_raw'][ self::$contact_user->ID ] );
+		$this->assertWPError( $result );
+		$this->assertSame( 'invalid_token', $result->get_error_code() );
+
+		$result = complete_recovery( self::$regular_user->ID, $confirm['completion_token_raw'] );
 		$this->assertTrue( $result );
 		$this->assertFalse( Two_Factor_Core::is_user_using_two_factor( self::$regular_user->ID ) );
 		$this->assertNull( get_pending_recovery( self::$regular_user->ID ) );
@@ -387,8 +430,17 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	 * @covers WordPressdotorg\Two_Factor\Recovery\complete_recovery
 	 */
 	public function test_complete_recovery_invalid_token() : void {
+		$this->enable_2fa_for_user( self::$regular_user->ID );
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [ self::$contact_user->ID ] );
-		create_recovery_request( self::$regular_user->ID );
+
+		$request = create_recovery_request( self::$regular_user->ID );
+		// Move the request to confirmed_by_contact state so the test exercises the
+		// token check rather than the not_confirmed gate.
+		confirm_contact_recovery(
+			self::$regular_user->ID,
+			$request['contact_tokens_raw'][ self::$contact_user->ID ],
+			self::$contact_user->ID
+		);
 
 		$result = complete_recovery( self::$regular_user->ID, 'wrong_token' );
 		$this->assertWPError( $result );
@@ -422,9 +474,9 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		// even with the correct raw token.
 		foreach ( [ 'cancel', 'confirm', 'complete' ] as $action ) {
 			$result = match ( $action ) {
-				'cancel'   => cancel_recovery_request( self::$regular_user->ID, $request['raw_token'] ),
-				'confirm'  => confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID ),
-				'complete' => complete_recovery( self::$regular_user->ID, $request['raw_token'] ),
+				'cancel'   => cancel_recovery_request( self::$regular_user->ID, $request['owner_token_raw'] ),
+				'confirm'  => confirm_contact_recovery( self::$regular_user->ID, $request['contact_tokens_raw'][ self::$contact_user->ID ], self::$contact_user->ID ),
+				'complete' => complete_recovery( self::$regular_user->ID, $request['owner_token_raw'] ),
 			};
 			$this->assertWPError( $result, "$action should reject expired request" );
 			$this->assertSame( 'no_pending', $result->get_error_code(), "$action error code" );
@@ -498,19 +550,21 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$request = create_recovery_request( self::$regular_user->ID );
 		$this->assertIsArray( $request );
 
+		$contact_token = $request['contact_tokens_raw'][ self::$contact_user->ID ];
+
 		// Confirm by wrong contact should fail.
-		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$plugin_user->ID );
+		$result = confirm_contact_recovery( self::$regular_user->ID, $contact_token, self::$plugin_user->ID );
 		$this->assertWPError( $result );
 		$this->assertSame( 'wrong_contact', $result->get_error_code() );
 
 		// Confirm by correct contact.
-		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user->ID );
-		$this->assertTrue( $result );
+		$confirm = confirm_contact_recovery( self::$regular_user->ID, $contact_token, self::$contact_user->ID );
+		$this->assertIsArray( $confirm );
 
 		$pending = get_pending_recovery( self::$regular_user->ID );
 		$this->assertSame( 'confirmed_by_contact', $pending['status'] );
 
-		$result = complete_recovery( self::$regular_user->ID, $request['raw_token'] );
+		$result = complete_recovery( self::$regular_user->ID, $confirm['completion_token_raw'] );
 		$this->assertTrue( $result );
 		$this->assertFalse( Two_Factor_Core::is_user_using_two_factor( self::$regular_user->ID ) );
 	}
@@ -531,10 +585,18 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$request = create_recovery_request( self::$regular_user->ID );
 		$this->assertIsArray( $request );
 
-		// The second contact confirms.
-		$result = confirm_contact_recovery( self::$regular_user->ID, $request['raw_token'], self::$contact_user_2->ID );
-		$this->assertTrue( $result );
+		// The second contact confirms with their own token.
+		$result = confirm_contact_recovery(
+			self::$regular_user->ID,
+			$request['contact_tokens_raw'][ self::$contact_user_2->ID ],
+			self::$contact_user_2->ID
+		);
+		$this->assertIsArray( $result );
 
+		// Sanity check: contact_1's token must not be usable to confirm as contact_1 either,
+		// because the request is already in confirmed_by_contact state and
+		// has_pending_recovery still passes -- but the per-contact-token check should still
+		// hold for any new confirm attempt by another contact.
 		$pending = get_pending_recovery( self::$regular_user->ID );
 		$this->assertSame( 'confirmed_by_contact', $pending['status'] );
 		$this->assertSame( self::$contact_user_2->ID, $pending['confirmed_by'] );

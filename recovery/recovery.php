@@ -26,14 +26,105 @@ const DESIGNATED_FOR_META             = '_wporg_2fa_designated_for';
 // stops working and the user must initiate a new request.
 const RECOVERY_REQUEST_TTL = 7 * DAY_IN_SECONDS;
 
+// A pending designation invite is valid for 30 days. After that the contact's
+// accept/decline link stops working and the requesting user must re-designate.
+const DESIGNATION_TTL = 30 * DAY_IN_SECONDS;
+
 // Auto-invalidate pending recovery when user authenticates with 2FA.
 add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\invalidate_recovery_on_login' );
+
+// Route the email-link actions used by the recovery notification emails.
+add_action( 'init', __NAMESPACE__ . '\handle_email_link_action' );
+
+/**
+ * Dispatch the `?action=wporg-2fa-*` URLs that the notification emails point at.
+ *
+ * Contact-side actions (accept/decline/confirm) require a logged-in contact and are
+ * forwarded to the settings UI with the relevant params. Owner-side actions
+ * (cancel/compromised/complete) are processed inline -- the locked-out user cannot
+ * log in -- and a result page is rendered via wp_die().
+ */
+function handle_email_link_action() : void {
+	if ( empty( $_GET['action'] ) || 0 !== strpos( sanitize_key( $_GET['action'] ), 'wporg-2fa-' ) ) {
+		return;
+	}
+
+	$action     = sanitize_key( $_GET['action'] );
+	$user_id    = isset( $_GET['user_id'] ) ? absint( $_GET['user_id'] ) : 0;
+	$token      = isset( $_GET['token'] ) ? wp_unslash( $_GET['token'] ) : '';
+	$contact_id = isset( $_GET['contact_id'] ) ? absint( $_GET['contact_id'] ) : 0;
+
+	if ( ! $user_id || ! $token ) {
+		return;
+	}
+
+	switch ( $action ) {
+		case 'wporg-2fa-accept-designation':
+		case 'wporg-2fa-decline-designation':
+		case 'wporg-2fa-confirm-contact-recovery':
+			$current = wp_get_current_user();
+			if ( ! $current->ID ) {
+				auth_redirect();
+				exit;
+			}
+			$screen = 'wporg-2fa-confirm-contact-recovery' === $action ? 'recovery' : 'contact-approval';
+			$url    = add_query_arg(
+				[
+					'screen'     => $screen,
+					'user_id'    => $user_id,
+					'token'      => rawurlencode( $token ),
+					'contact_id' => $contact_id,
+					'action'     => $action,
+				],
+				\WordPressdotorg\Two_Factor\get_edit_account_url( $current )
+			);
+			wp_safe_redirect( $url );
+			exit;
+
+		case 'wporg-2fa-recovery-cancel':
+			$result = cancel_recovery_request( $user_id, $token );
+			_render_recovery_action_result( $result, 'Your pending recovery request has been cancelled. No changes were made to your account.' );
+			exit;
+
+		case 'wporg-2fa-recovery-compromised':
+			$result = cancel_recovery_compromised( $user_id, $token );
+			_render_recovery_action_result( $result, 'Your pending recovery has been cancelled, your password has been reset, and all sessions have been terminated. Please use the "Lost your password?" link to log back in.' );
+			exit;
+
+		case 'wporg-2fa-recovery-complete':
+			$result = complete_recovery( $user_id, $token );
+			_render_recovery_action_result( $result, 'Recovery complete. Two-factor authentication has been disabled on your account; you can now log in with just your password.' );
+			exit;
+	}
+}
+
+/**
+ * Render a server-side result page for the owner-side email actions.
+ *
+ * @param true|WP_Error $result  The action's return value.
+ * @param string        $success Success message to display.
+ */
+function _render_recovery_action_result( $result, string $success ) : void {
+	if ( is_wp_error( $result ) ) {
+		wp_die(
+			esc_html( $result->get_error_message() ),
+			'WordPress.org Account Recovery',
+			[ 'response' => 400, 'back_link' => true ]
+		);
+	}
+
+	wp_die(
+		esc_html( $success ),
+		'WordPress.org Account Recovery',
+		[ 'response' => 200, 'back_link' => false ]
+	);
+}
 
 /**
  * Check if recovery is available for a given user.
  *
- * Super admins have no automated recovery (out-of-band management only).
- * All other users can use designated recovery contacts.
+ * Super admins and special users (core committers etc) have no automated recovery --
+ * those accounts are managed out-of-band. Everyone else can use designated contacts.
  *
  * @param WP_User $user The user to check.
  * @return bool Whether the user can use recovery contacts.
@@ -41,8 +132,8 @@ add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\invalidate_recove
 function is_recovery_available( WP_User $user ) : bool {
 	$is_special = function_exists( 'is_special_user' ) && is_special_user( $user->ID );
 
-	// Super admins: no automated recovery (out-of-band management only).
-	if ( $is_special && is_super_admin( $user->ID ) ) {
+	// Super admins and special users: no automated recovery (out-of-band management only).
+	if ( $is_special || is_super_admin( $user->ID ) ) {
 		return false;
 	}
 
@@ -116,10 +207,12 @@ function designate_contact( int $user_id, string $contact_login ) {
 		return new WP_Error( 'already_designated', 'This user is already a designated recovery contact.' );
 	}
 
-	// Check if there is already a pending request for this contact.
+	// Check if there is already a non-expired pending request for this contact.
+	// TODO: After ~7 days, surface a "resend invite" path here instead of blocking;
+	// the contact may have lost the original email but the designation is still valid.
 	$pending_list = get_pending_contact_designations( $user_id );
 	foreach ( $pending_list as $pending ) {
-		if ( (int) $pending['contact_id'] === $contact->ID ) {
+		if ( (int) $pending['contact_id'] === $contact->ID && ! is_designation_expired( $pending ) ) {
 			return new WP_Error( 'already_pending', 'A designation request is already pending for this user.' );
 		}
 	}
@@ -165,6 +258,10 @@ function accept_designation( int $contact_id, int $user_id, string $token ) {
 
 	if ( null === $matched_index ) {
 		return new WP_Error( 'invalid_token', 'Invalid designation token or contact mismatch.' );
+	}
+
+	if ( is_designation_expired( $pending_list[ $matched_index ] ) ) {
+		return new WP_Error( 'expired', 'This designation invitation has expired. Please ask the requesting user to send a new invite.' );
 	}
 
 	// Contact must have 2FA enabled on their own account to accept.
@@ -233,6 +330,10 @@ function decline_designation( int $contact_id, int $user_id, string $token ) {
 		return new WP_Error( 'invalid_token', 'Invalid designation token or contact mismatch.' );
 	}
 
+	if ( is_designation_expired( $pending_list[ $matched_index ] ) ) {
+		return new WP_Error( 'expired', 'This designation invitation has expired.' );
+	}
+
 	// Remove this entry from pending.
 	array_splice( $pending_list, $matched_index, 1 );
 	if ( empty( $pending_list ) ) {
@@ -242,6 +343,18 @@ function decline_designation( int $contact_id, int $user_id, string $token ) {
 	}
 
 	return true;
+}
+
+/**
+ * Check whether a pending designation invite has passed its TTL.
+ *
+ * @param array $pending The pending designation entry.
+ * @return bool
+ */
+function is_designation_expired( array $pending ) : bool {
+	$requested_at = (int) ( $pending['requested_at'] ?? 0 );
+
+	return $requested_at > 0 && ( time() - $requested_at ) > DESIGNATION_TTL;
 }
 
 /**
@@ -370,7 +483,8 @@ function create_recovery_request( int $user_id ) {
 		return new WP_Error( 'no_recovery', 'No automated recovery is available for your account. Please contact the systems team.' );
 	}
 
-	if ( empty( get_designated_contacts( $user_id ) ) ) {
+	$contacts = get_designated_contacts( $user_id );
+	if ( empty( $contacts ) ) {
 		return new WP_Error( 'no_contact', 'No designated recovery contacts have been configured for this account.' );
 	}
 
@@ -378,28 +492,47 @@ function create_recovery_request( int $user_id ) {
 		return new WP_Error( 'already_pending', 'A recovery request is already pending for this account.' );
 	}
 
-	$token = wp_generate_password( 32, false );
+	// Tokens are split by role so that no single party holds the power to disable 2FA:
+	//   owner_token       -- held by the account owner; cancels or marks compromised.
+	//   contact_tokens    -- per-contact; only confirms (does not complete).
+	//   completion_token  -- minted after a contact confirms and emailed only to the
+	//                        owner; the only token that completes the recovery.
+	$owner_token        = wp_generate_password( 32, false );
+	$contact_tokens     = [];
+	$contact_tokens_raw = [];
+	foreach ( $contacts as $contact ) {
+		$raw                                = wp_generate_password( 32, false );
+		$contact_tokens[ $contact->ID ]     = wp_hash_password( $raw );
+		$contact_tokens_raw[ $contact->ID ] = $raw;
+	}
 
 	$request = [
-		'token'        => wp_hash_password( $token ),
-		'requested_at' => time(),
-		'status'       => 'pending',
-		'ip'           => $_SERVER['REMOTE_ADDR'] ?? '',
+		'owner_token'      => wp_hash_password( $owner_token ),
+		'contact_tokens'   => $contact_tokens,
+		'completion_token' => null,
+		'requested_at'     => time(),
+		'status'           => 'pending',
+		'ip'               => $_SERVER['REMOTE_ADDR'] ?? '',
 	];
 
 	update_user_meta( $user_id, RECOVERY_REQUEST_META, $request );
 
-	// Notify the account owner.
-	send_recovery_requested_email( $user_id, $request, $token );
+	// Notify the account owner -- cancel/compromised links use the owner_token.
+	send_recovery_requested_email( $user_id, $request, $owner_token );
 	send_recovery_requested_slack( $user_id, $request );
 
-	// Notify all designated contacts.
-	$contacts = get_designated_contacts( $user_id );
+	// Notify each designated contact -- each gets their own contact_token.
 	foreach ( $contacts as $contact ) {
-		send_contact_recovery_request_email( $contact->ID, $user_id, $token );
+		send_contact_recovery_request_email( $contact->ID, $user_id, $contact_tokens_raw[ $contact->ID ] );
 	}
 
-	return array_merge( $request, [ 'raw_token' => $token ] );
+	return array_merge(
+		$request,
+		[
+			'owner_token_raw'    => $owner_token,
+			'contact_tokens_raw' => $contact_tokens_raw,
+		]
+	);
 }
 
 /**
@@ -422,7 +555,7 @@ function cancel_recovery_request( int $user_id, string $token, bool $send_email 
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
-	if ( ! wp_check_password( $token, $request['token'] ) ) {
+	if ( ! wp_check_password( $token, $request['owner_token'] ) ) {
 		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
 	}
 
@@ -473,10 +606,14 @@ function cancel_recovery_compromised( int $user_id, string $token ) {
 /**
  * Confirm a recovery request (any designated contact confirms the request is legitimate).
  *
+ * On success, mints a fresh completion_token, emails it to the account owner, and
+ * also returns it to the caller so internal flows / tests can chain through to
+ * complete_recovery without re-reading from the mailbox.
+ *
  * @param int    $user_id    The locked-out user ID.
- * @param string $token      The recovery token.
+ * @param string $token      The contact's recovery token.
  * @param int    $contact_id The contact user ID confirming.
- * @return true|WP_Error
+ * @return array|WP_Error    [ 'completion_token_raw' => string ] on success.
  */
 function confirm_contact_recovery( int $user_id, string $token, int $contact_id ) {
 	$request = get_pending_recovery( $user_id );
@@ -485,11 +622,9 @@ function confirm_contact_recovery( int $user_id, string $token, int $contact_id 
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
-	if ( ! wp_check_password( $token, $request['token'] ) ) {
-		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
-	}
+	$contact_tokens = $request['contact_tokens'] ?? [];
 
-	// Check that this contact is one of the designated contacts.
+	// Check that this contact is one of the designated contacts AND holds the token issued to them.
 	$contacts    = get_designated_contacts( $user_id );
 	$contact_ids = array_map( function( $c ) { return $c->ID; }, $contacts );
 
@@ -497,13 +632,22 @@ function confirm_contact_recovery( int $user_id, string $token, int $contact_id 
 		return new WP_Error( 'wrong_contact', 'You are not a designated recovery contact for this user.' );
 	}
 
-	$request['status']       = 'confirmed_by_contact';
-	$request['confirmed_by'] = $contact_id;
+	if ( ! isset( $contact_tokens[ $contact_id ] ) || ! wp_check_password( $token, $contact_tokens[ $contact_id ] ) ) {
+		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
+	}
+
+	// Mint a completion token. Only the account owner ever receives the raw value --
+	// the contact's token cannot itself complete the recovery.
+	$completion_token = wp_generate_password( 32, false );
+
+	$request['status']           = 'confirmed_by_contact';
+	$request['confirmed_by']     = $contact_id;
+	$request['completion_token'] = wp_hash_password( $completion_token );
 	update_user_meta( $user_id, RECOVERY_REQUEST_META, $request );
 
-	send_contact_confirmed_recovery_email( $user_id, $token );
+	send_contact_confirmed_recovery_email( $user_id, $completion_token );
 
-	return true;
+	return [ 'completion_token_raw' => $completion_token ];
 }
 
 /**
@@ -520,12 +664,14 @@ function complete_recovery( int $user_id, string $token ) {
 		return new WP_Error( 'no_pending', 'No pending recovery request found.' );
 	}
 
-	if ( ! wp_check_password( $token, $request['token'] ) ) {
-		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
-	}
-
 	if ( 'confirmed_by_contact' !== $request['status'] ) {
 		return new WP_Error( 'not_confirmed', 'The recovery request has not been confirmed by a designated contact.' );
+	}
+
+	// The completion_token is minted at confirm time and sent only to the account
+	// owner. Contacts never see this value.
+	if ( empty( $request['completion_token'] ) || ! wp_check_password( $token, $request['completion_token'] ) ) {
+		return new WP_Error( 'invalid_token', 'Invalid recovery token.' );
 	}
 
 	// Disable all 2FA providers for this user.
@@ -542,6 +688,8 @@ function complete_recovery( int $user_id, string $token ) {
 
 	// Remove the recovery request.
 	delete_user_meta( $user_id, RECOVERY_REQUEST_META );
+
+	send_recovery_completed_email( $user_id );
 
 	return true;
 }
@@ -603,6 +751,9 @@ function get_recovery_status( int $user_id ) : array {
 
 	$pending_contacts_data = [];
 	foreach ( $pending as $p ) {
+		if ( is_designation_expired( $p ) ) {
+			continue;
+		}
 		$pending_contact = get_userdata( $p['contact_id'] );
 		if ( $pending_contact ) {
 			$pending_contacts_data[] = [

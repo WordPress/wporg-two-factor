@@ -107,7 +107,7 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/cancel', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['raw_token'],
+			'token'   => $create['owner_token_raw'],
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );
@@ -130,7 +130,7 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		$actual = $this->api_request( 'GET', '/wporg-two-factor/1.0/recovery/status', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['raw_token'],
+			'token'   => $create['owner_token_raw'],
 		] );
 
 		$this->assertSame( 'pending', $actual['status'] );
@@ -199,16 +199,16 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 
 		$create = WordPressdotorg\Two_Factor\Recovery\create_recovery_request( self::$regular_user->ID );
 
-		// Simulate contact confirmation directly.
-		WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery(
+		// Simulate contact confirmation directly to obtain the completion token.
+		$confirm = WordPressdotorg\Two_Factor\Recovery\confirm_contact_recovery(
 			self::$regular_user->ID,
-			$create['raw_token'],
+			$create['contact_tokens_raw'][ self::$contact_user->ID ],
 			self::$contact_user->ID
 		);
 
 		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/complete', [
 			'user_id' => self::$regular_user->ID,
-			'token'   => $create['raw_token'],
+			'token'   => $confirm['completion_token_raw'],
 		] );
 
 		$this->assertArrayHasKey( 'success', $actual );

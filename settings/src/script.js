@@ -73,6 +73,8 @@ function Main( { userId, isOnboarding } ) {
 		'backup-codes',
 		'svn-password',
 		'application-passwords',
+		'recovery',
+		'contact-approval',
 	];
 
 	// Listen for back/forward button clicks.
