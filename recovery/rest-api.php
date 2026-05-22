@@ -276,11 +276,20 @@ function rest_designate_contact( WP_REST_Request $request ) {
 /**
  * Remove a designated contact.
  *
- * remove_contact() returns bool, not WP_Error -- removing a non-existent
- * contact is intentionally a no-op, so there is no error path to check.
+ * Returns 404 when the contact_id isn't actually one of the user's contacts so the
+ * client can distinguish a real removal from a stale-state no-op (e.g. two tabs
+ * racing to remove the same contact).
  */
 function rest_remove_contact( WP_REST_Request $request ) {
-	remove_contact( $request['user_id'], $request['contact_id'] );
+	$removed = remove_contact( $request['user_id'], $request['contact_id'] );
+
+	if ( ! $removed ) {
+		return new WP_Error(
+			'contact_not_found',
+			'That user is not a designated recovery contact for this account.',
+			[ 'status' => 404 ]
+		);
+	}
 
 	return [ 'success' => true ];
 }

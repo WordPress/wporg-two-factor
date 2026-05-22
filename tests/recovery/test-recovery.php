@@ -247,6 +247,39 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\remove_contact
 	 */
+	public function test_remove_nonexistent_contact_returns_false() : void {
+		// No contacts set up.
+		$result = remove_contact( self::$regular_user->ID, self::$contact_user->ID );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\get_designated_contacts
+	 * @covers WordPressdotorg\Two_Factor\Recovery\is_user_eligible_as_contact
+	 */
+	public function test_blocked_contact_is_filtered() : void {
+		update_user_meta(
+			self::$regular_user->ID,
+			WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META,
+			[ self::$contact_user->ID ]
+		);
+
+		// Sanity: contact is listed.
+		$this->assertCount( 1, get_designated_contacts( self::$regular_user->ID ) );
+
+		// Mark the contact as a network spammer (multisite flag).
+		wp_update_user_status( self::$contact_user->ID, 'spam', 1 );
+
+		try {
+			$this->assertEmpty( get_designated_contacts( self::$regular_user->ID ) );
+		} finally {
+			wp_update_user_status( self::$contact_user->ID, 'spam', 0 );
+		}
+	}
+
+	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\remove_contact
+	 */
 	public function test_remove_all_contacts() : void {
 		update_user_meta( self::$regular_user->ID, WordPressdotorg\Two_Factor\Recovery\RECOVERY_CONTACTS_META, [
 			self::$contact_user->ID,

@@ -189,6 +189,22 @@ class Test_WPorg_Two_Factor_Recovery_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_remove_contact
+	 */
+	public function test_remove_contact_via_api_404_for_nonexistent() : void {
+		wp_set_current_user( self::$regular_user->ID, self::$regular_user->user_login );
+
+		// No contact ever designated -- remove should return 404.
+		$actual = $this->api_request( 'POST', '/wporg-two-factor/1.0/recovery/remove-contact', [
+			'user_id'    => self::$regular_user->ID,
+			'contact_id' => self::$contact_user->ID,
+		] );
+
+		$this->assertArrayHasKey( 'code', $actual );
+		$this->assertSame( 'contact_not_found', $actual['code'] );
+	}
+
+	/**
 	 * @covers WordPressdotorg\Two_Factor\Recovery\rest_complete_recovery
 	 */
 	public function test_complete_recovery_via_api() : void {

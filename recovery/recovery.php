@@ -83,17 +83,17 @@ function handle_email_link_action() : void {
 
 		case 'wporg-2fa-recovery-cancel':
 			$result = cancel_recovery_request( $user_id, $token );
-			_render_recovery_action_result( $result, 'Your pending recovery request has been cancelled. No changes were made to your account.' );
+			render_recovery_action_result( $result, 'Your pending recovery request has been cancelled. No changes were made to your account.' );
 			exit;
 
 		case 'wporg-2fa-recovery-compromised':
 			$result = cancel_recovery_compromised( $user_id, $token );
-			_render_recovery_action_result( $result, 'Your pending recovery has been cancelled, your password has been reset, and all sessions have been terminated. Please use the "Lost your password?" link to log back in.' );
+			render_recovery_action_result( $result, 'Your pending recovery has been cancelled, your password has been reset, and all sessions have been terminated. Please use the "Lost your password?" link to log back in.' );
 			exit;
 
 		case 'wporg-2fa-recovery-complete':
 			$result = complete_recovery( $user_id, $token );
-			_render_recovery_action_result( $result, 'Recovery complete. Two-factor authentication has been disabled on your account; you can now log in with just your password.' );
+			render_recovery_action_result( $result, 'Recovery complete. Two-factor authentication has been disabled on your account; you can now log in with just your password.' );
 			exit;
 	}
 }
@@ -104,7 +104,7 @@ function handle_email_link_action() : void {
  * @param true|WP_Error $result  The action's return value.
  * @param string        $success Success message to display.
  */
-function _render_recovery_action_result( $result, string $success ) : void {
+function render_recovery_action_result( $result, string $success ) : void {
 	if ( is_wp_error( $result ) ) {
 		wp_die(
 			esc_html( $result->get_error_message() ),
@@ -143,6 +143,10 @@ function is_recovery_available( WP_User $user ) : bool {
 /**
  * Get all designated recovery contacts for a user.
  *
+ * Silently skips contacts that have been deleted or are no longer eligible
+ * (blocked/spammer/bbPress-inactive) so stale references in the user's meta do
+ * not surface in the UI or unlock the recovery flow.
+ *
  * @param int $user_id The user ID.
  * @return WP_User[] Array of contact users.
  */
@@ -156,12 +160,42 @@ function get_designated_contacts( int $user_id ) : array {
 	$contacts = [];
 	foreach ( $contact_ids as $contact_id ) {
 		$contact = get_userdata( (int) $contact_id );
-		if ( $contact instanceof WP_User ) {
+		if ( $contact instanceof WP_User && is_user_eligible_as_contact( $contact ) ) {
 			$contacts[] = $contact;
 		}
 	}
 
 	return $contacts;
+}
+
+/**
+ * Check whether a user is currently eligible to serve as a recovery contact.
+ *
+ * Filters out users who have been blocked, marked as spammers, deleted on the
+ * network, or set inactive in bbPress -- treating them the same as a hard-deleted
+ * user so they can no longer be designated, accept a designation, or confirm a
+ * recovery.
+ *
+ * @param WP_User $user The user to check.
+ * @return bool
+ */
+function is_user_eligible_as_contact( WP_User $user ) : bool {
+	// wporg-specific block list (set by wporg-mu-plugins on production).
+	if ( function_exists( 'wporg_is_user_blocked' ) && wporg_is_user_blocked( $user->ID ) ) {
+		return false;
+	}
+
+	// Multisite spam / deleted flags.
+	if ( ! empty( $user->spam ) || ! empty( $user->deleted ) ) {
+		return false;
+	}
+
+	// bbPress-suspended accounts.
+	if ( function_exists( 'bbp_is_user_inactive' ) && bbp_is_user_inactive( $user->ID ) ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -189,6 +223,10 @@ function designate_contact( int $user_id, string $contact_login ) {
 
 	if ( ! $contact ) {
 		return new WP_Error( 'invalid_contact', 'The specified user does not exist.' );
+	}
+
+	if ( ! is_user_eligible_as_contact( $contact ) ) {
+		return new WP_Error( 'invalid_contact', 'The specified user cannot be designated as a recovery contact.' );
 	}
 
 	if ( $contact->ID === $user_id ) {
@@ -262,6 +300,11 @@ function accept_designation( int $contact_id, int $user_id, string $token ) {
 
 	if ( is_designation_expired( $pending_list[ $matched_index ] ) ) {
 		return new WP_Error( 'expired', 'This designation invitation has expired. Please ask the requesting user to send a new invite.' );
+	}
+
+	$contact = get_userdata( $contact_id );
+	if ( ! $contact instanceof WP_User || ! is_user_eligible_as_contact( $contact ) ) {
+		return new WP_Error( 'invalid_contact', 'You are not eligible to be a recovery contact.' );
 	}
 
 	// Contact must have 2FA enabled on their own account to accept.
@@ -362,48 +405,58 @@ function is_designation_expired( array $pending ) : bool {
  *
  * @param int      $user_id    The user whose contact to remove.
  * @param int|null $contact_id The specific contact to remove, or null to remove all.
- * @return bool
+ * @return bool   True if something was removed; false if the contact_id wasn't in
+ *                either the confirmed or pending list (no-op).
  */
 function remove_contact( int $user_id, ?int $contact_id = null ) : bool {
 	if ( null === $contact_id ) {
-		// Remove all contacts.
+		// Remove all contacts -- always reported as successful even if empty.
 		$contact_ids = get_user_meta( $user_id, RECOVERY_CONTACTS_META, true );
 		if ( is_array( $contact_ids ) ) {
 			foreach ( $contact_ids as $cid ) {
-				_remove_designated_for_entry( (int) $cid, $user_id );
+				remove_designated_for_entry( (int) $cid, $user_id );
 			}
 		}
 		delete_user_meta( $user_id, RECOVERY_CONTACTS_META );
 		delete_user_meta( $user_id, RECOVERY_CONTACTS_PENDING_META );
-	} else {
-		// Remove specific contact from confirmed list.
-		$contact_ids = get_user_meta( $user_id, RECOVERY_CONTACTS_META, true );
-		if ( is_array( $contact_ids ) ) {
-			$contact_ids = array_values( array_filter( $contact_ids, function( $cid ) use ( $contact_id ) {
-				return (int) $cid !== $contact_id;
-			} ) );
-			if ( empty( $contact_ids ) ) {
-				delete_user_meta( $user_id, RECOVERY_CONTACTS_META );
-			} else {
-				update_user_meta( $user_id, RECOVERY_CONTACTS_META, $contact_ids );
-			}
-		}
-
-		// Also remove from pending list if present.
-		$pending_list = get_pending_contact_designations( $user_id );
-		$pending_list = array_values( array_filter( $pending_list, function( $p ) use ( $contact_id ) {
-			return (int) $p['contact_id'] !== $contact_id;
-		} ) );
-		if ( empty( $pending_list ) ) {
-			delete_user_meta( $user_id, RECOVERY_CONTACTS_PENDING_META );
-		} else {
-			update_user_meta( $user_id, RECOVERY_CONTACTS_PENDING_META, $pending_list );
-		}
-
-		_remove_designated_for_entry( $contact_id, $user_id );
+		return true;
 	}
 
-	return true;
+	$removed = false;
+
+	// Remove specific contact from confirmed list.
+	$contact_ids = get_user_meta( $user_id, RECOVERY_CONTACTS_META, true );
+	if ( is_array( $contact_ids ) && in_array( $contact_id, array_map( 'intval', $contact_ids ), true ) ) {
+		$contact_ids = array_values( array_filter( $contact_ids, function( $cid ) use ( $contact_id ) {
+			return (int) $cid !== $contact_id;
+		} ) );
+		if ( empty( $contact_ids ) ) {
+			delete_user_meta( $user_id, RECOVERY_CONTACTS_META );
+		} else {
+			update_user_meta( $user_id, RECOVERY_CONTACTS_META, $contact_ids );
+		}
+		$removed = true;
+	}
+
+	// Also remove from pending list if present.
+	$pending_list      = get_pending_contact_designations( $user_id );
+	$filtered_pending  = array_values( array_filter( $pending_list, function( $p ) use ( $contact_id ) {
+		return (int) $p['contact_id'] !== $contact_id;
+	} ) );
+	if ( count( $filtered_pending ) !== count( $pending_list ) ) {
+		if ( empty( $filtered_pending ) ) {
+			delete_user_meta( $user_id, RECOVERY_CONTACTS_PENDING_META );
+		} else {
+			update_user_meta( $user_id, RECOVERY_CONTACTS_PENDING_META, $filtered_pending );
+		}
+		$removed = true;
+	}
+
+	if ( $removed ) {
+		remove_designated_for_entry( $contact_id, $user_id );
+	}
+
+	return $removed;
 }
 
 /**
@@ -412,7 +465,7 @@ function remove_contact( int $user_id, ?int $contact_id = null ) : bool {
  * @param int $contact_id The contact user ID.
  * @param int $user_id    The user to remove from the list.
  */
-function _remove_designated_for_entry( int $contact_id, int $user_id ) : void {
+function remove_designated_for_entry( int $contact_id, int $user_id ) : void {
 	$designated_for = get_user_meta( $contact_id, DESIGNATED_FOR_META, true );
 	if ( is_array( $designated_for ) ) {
 		$designated_for = array_values( array_diff( $designated_for, [ $user_id ] ) );
@@ -591,8 +644,11 @@ function cancel_recovery_compromised( int $user_id, string $token ) {
 	// Reset the password to a random value, forcing the user to use password reset.
 	// Suppress the last-password-change tracker since this is a system reset, not a user action.
 	add_filter( 'wporg_record_last_password_change', '__return_false' );
-	wp_set_password( wp_generate_password( 32, true, true ), $user_id );
-	remove_filter( 'wporg_record_last_password_change', '__return_false' );
+	try {
+		wp_set_password( wp_generate_password( 32, true, true ), $user_id );
+	} finally {
+		remove_filter( 'wporg_record_last_password_change', '__return_false' );
+	}
 
 	// Destroy all sessions for this user.
 	$sessions = \WP_Session_Tokens::get_instance( $user_id );
