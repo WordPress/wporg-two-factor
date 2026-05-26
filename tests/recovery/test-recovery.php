@@ -268,12 +268,12 @@ class Test_WPorg_Two_Factor_Recovery extends WP_UnitTestCase {
 		$this->assertCount( 1, get_designated_contacts( self::$regular_user->ID ) );
 
 		// Mark the contact as a network spammer (multisite flag).
-		wp_update_user_status( self::$contact_user->ID, 'spam', 1 );
+		wp_update_user( [ 'ID' => self::$contact_user->ID, 'spam' => 1 ] );
 
 		try {
 			$this->assertEmpty( get_designated_contacts( self::$regular_user->ID ) );
 		} finally {
-			wp_update_user_status( self::$contact_user->ID, 'spam', 0 );
+			wp_update_user( [ 'ID' => self::$contact_user->ID, 'spam' => 0 ] );
 		}
 	}
 
