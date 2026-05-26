@@ -9,7 +9,7 @@
 		"build": "wp-scripts build --webpack-copy-php",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
+		"lint:js": "wp-scripts lint-js --max-warnings=0",
 		"packages-update": "wp-scripts packages-update",
 		"start": "wp-scripts start --webpack-copy-php",
 		"test:unit": "wp-scripts test-unit-js",

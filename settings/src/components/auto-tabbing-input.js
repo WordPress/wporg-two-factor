@@ -11,19 +11,22 @@ import NumericControl from './numeric-control';
 const AutoTabbingInput = ( props ) => {
 	const { inputs, setInputs, error, setError } = props;
 
-	const handleChange = useCallback( ( value, event, index, inputRef ) => {
-		setInputs( ( prevInputs ) => {
-			const newInputs = [ ...prevInputs ];
+	const handleChange = useCallback(
+		( value, event, index, inputRef ) => {
+			setInputs( ( prevInputs ) => {
+				const newInputs = [ ...prevInputs ];
 
-			newInputs[ index ] = value.trim() === '' ? '' : value;
+				newInputs[ index ] = value.trim() === '' ? '' : value;
 
-			return newInputs;
-		} );
+				return newInputs;
+			} );
 
-		if ( value && '' !== value.trim() && inputRef.current.nextElementSibling ) {
-			inputRef.current.nextElementSibling.focus();
-		}
-	}, [] );
+			if ( value && '' !== value.trim() && inputRef.current.nextElementSibling ) {
+				inputRef.current.nextElementSibling.focus();
+			}
+		},
+		[ setInputs ]
+	);
 
 	const handleKeyDown = useCallback( ( value, event, index, inputRef ) => {
 		if ( event.key === 'Backspace' && ! value && inputRef.current.previousElementSibling ) {
@@ -31,20 +34,23 @@ const AutoTabbingInput = ( props ) => {
 		}
 	}, [] );
 
-	const handlePaste = useCallback( ( event ) => {
-		event.preventDefault();
+	const handlePaste = useCallback(
+		( event ) => {
+			event.preventDefault();
 
-		const newInputs = event.clipboardData
-			.getData( 'Text' )
-			.replace( /[^0-9]/g, '' )
-			.split( '' );
+			const newInputs = event.clipboardData
+				.getData( 'Text' )
+				.replace( /[^0-9]/g, '' )
+				.split( '' );
 
-		if ( inputs.length === newInputs.length ) {
-			setInputs( newInputs );
-		} else {
-			setError( 'The code you pasted is not the correct length.' );
-		}
-	}, [] );
+			if ( inputs.length === newInputs.length ) {
+				setInputs( newInputs );
+			} else {
+				setError( 'The code you pasted is not the correct length.' );
+			}
+		},
+		[ inputs.length, setInputs, setError ]
+	);
 
 	return (
 		<div
