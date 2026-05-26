@@ -51,7 +51,7 @@ export default function EmailAddress() {
 
 			setEmailError( message );
 		}
-	}, [] );
+	}, [ save ] );
 
 	const handleDiscard = useCallback( async () => {
 		try {
@@ -60,7 +60,7 @@ export default function EmailAddress() {
 		} catch ( error ) {
 			setEmailError( error.message );
 		}
-	}, [] );
+	}, [ edit, save ] );
 
 	return (
 		<>

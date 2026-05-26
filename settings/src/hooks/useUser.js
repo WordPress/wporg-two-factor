@@ -30,7 +30,7 @@ export function useUser( userId ) {
 	const designatedFor = userRecord.record?.[ '2fa_designated_for' ] ?? [];
 
 	return {
-		userRecord: { ...userRecord },
+		userRecord,
 		isSaving,
 		hasPrimaryProvider,
 		primaryProvider,

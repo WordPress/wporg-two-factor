@@ -81,7 +81,7 @@ export default function RegisterKey( { onSuccess, onCancel } ) {
 				setRegisterCeremonyActive( false );
 			}
 		},
-		[ keyName ]
+		[ keyName, record, userRecord ]
 	);
 
 	if ( 'waiting' === step ) {

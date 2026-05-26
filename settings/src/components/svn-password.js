@@ -47,7 +47,7 @@ export default function SVNPassword() {
 		} catch ( apiFetchError ) {
 			setError( apiFetchError );
 		}
-	} );
+	}, [ userRecord, setError ] );
 
 	const getButtonText = useMemo( () => {
 		if ( isGenerating ) {

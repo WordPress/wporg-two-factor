@@ -47,7 +47,7 @@ export default function ListKeys() {
 		} finally {
 			setDeleting( false );
 		}
-	}, [ modalKey ] );
+	}, [ modalKey, setGlobalNotice, userRecord ] );
 
 	return (
 		<>

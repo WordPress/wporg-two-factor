@@ -376,6 +376,11 @@ function register_user_fields(): void {
 					return true;
 				}
 
+				// If it's a proxied request, show the UI although the user may not need a password.
+				if ( defined( 'WPORG_PROXIED_REQUEST' ) && WPORG_PROXIED_REQUEST ) {
+					return true;
+				}
+
 				// Plugin committers & Theme authors have this user meta set.
 				if ( $user->has_plugins || $user->has_themes ) {
 					return true;
@@ -712,13 +717,6 @@ function redirect_wpadmin_profile() {
 		return;
 	}
 
-	$redirect_to = 'https://profiles.wordpress.org/' . wp_get_current_user()->user_nicename . '/';
-
-	// TODO: This is temporary, and only needed for a few days in July 2024.
-	if ( isset( $_GET['newuseremail'] ) ) {
-		$redirect_to .= 'profile/edit/group/3/?screen=email&newuseremail=' . $_GET['newuseremail'];
-	}
-
-	wp_safe_redirect( $redirect_to );
+	wp_safe_redirect( 'https://profiles.wordpress.org/' . wp_get_current_user()->user_nicename . '/' );
 	die();
 }

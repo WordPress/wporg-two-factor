@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { useContext, useCallback, useEffect, useState } from '@wordpress/element';
+import { useContext, useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button, ButtonGroup, CheckboxControl, Flex, Notice, Spinner } from '@wordpress/components';
 import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
 
@@ -64,6 +64,8 @@ function Setup( { setGenerating, onSuccess } ) {
 	} = useContext( GlobalContext );
 	const [ backupCodes, setBackupCodes ] = useState( [] );
 	const [ hasPrinted, setHasPrinted ] = useState( false );
+	const userRecordRef = useRef( userRecord );
+	userRecordRef.current = userRecord;
 
 	// Generate new backup codes and save them in usermeta.
 	useEffect( () => {
@@ -78,7 +80,7 @@ function Setup( { setGenerating, onSuccess } ) {
 					path: '/two-factor/1.0/generate-backup-codes',
 					method: 'POST',
 					data: {
-						user_id: userRecord.record.id,
+						user_id: userRecordRef.current.record.id,
 						enable_provider: true,
 					},
 				} );
@@ -89,14 +91,14 @@ function Setup( { setGenerating, onSuccess } ) {
 				// don't redirect to the Manage screen yet. This is mainly due to the side-effects of
 				// `two-factor/#507`, so it will need to be modified or maybe removed when that is fixed upstream.
 				setBackupCodesVerified( false );
-				await refreshRecord( userRecord );
+				await refreshRecord( userRecordRef.current );
 			} catch ( apiFetchError ) {
 				setError( apiFetchError );
 			}
 		};
 
 		generateCodes();
-	}, [] );
+	}, [ setBackupCodesVerified, setError ] );
 
 	// Finish the setup process.
 	const handleFinished = useCallback( async () => {
@@ -106,7 +108,7 @@ function Setup( { setGenerating, onSuccess } ) {
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setGenerating( false );
 		onSuccess();
-	} );
+	}, [ setBackupCodesVerified, setGlobalNotice, setGenerating, onSuccess ] );
 
 	return (
 		<>

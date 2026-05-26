@@ -40,6 +40,10 @@ function RevalidateIframe() {
 	} = useContext( GlobalContext );
 	const { record } = userRecord;
 	const ref = useRef();
+	const userRecordRef = useRef( userRecord );
+	const recordRef = useRef( record );
+	userRecordRef.current = userRecord;
+	recordRef.current = record;
 
 	useEffect( () => {
 		async function maybeRefreshUser( { data: { type } = {} } ) {
@@ -49,11 +53,11 @@ function RevalidateIframe() {
 
 			// Pretend that the expires_at is in the future (+1hr), this provides a 'faster' UI.
 			// This intentionally doesn't use `edit()` to prevent it attempting to update it on the server.
-			record[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
+			recordRef.current[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
 			try {
-				await refreshRecord( userRecord );
+				await refreshRecord( userRecordRef.current );
 			} catch ( error ) {
 				// TODO: handle error more properly here, likely by showing a error notice
 				// eslint-disable-next-line no-console
