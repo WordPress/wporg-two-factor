@@ -161,49 +161,29 @@ function send_recovery_requested_slack( int $user_id, array $request ) : void {
 	}
 
 	// DM the account owner.
-	$owner_slack_id = _get_user_slack_id( $user_id );
-	if ( $owner_slack_id ) {
-		notify_slack(
-			$owner_slack_id,
-			sprintf(
-				'A 2FA recovery was requested for your WordPress.org account from IP %s. ' .
-				'If this was not you, check your email for instructions to cancel the request and secure your account.',
-				$request['ip']
-			)
-		);
-	}
+	notify_slack(
+		$user,
+		sprintf(
+			'A 2FA recovery was requested for your WordPress.org account from IP %s. ' .
+			'If this was not you, check your email for instructions to cancel the request and secure your account.',
+			$request['ip']
+		),
+		$user
+	);
 
 	// DM each designated contact.
 	$contacts = get_designated_contacts( $user_id );
 	foreach ( $contacts as $contact ) {
-		$contact_slack_id = _get_user_slack_id( $contact->ID );
-		if ( $contact_slack_id ) {
-			notify_slack(
-				$contact_slack_id,
-				sprintf(
-					'%s (%s) has requested a 2FA recovery on WordPress.org and needs your help. Check your email for a confirmation link.',
-					$user->display_name,
-					$user->user_login
-				)
-			);
-		}
+		notify_slack(
+			$contact,
+			sprintf(
+				'%s (%s) has requested a 2FA recovery on WordPress.org and needs your help. Check your email for a confirmation link.',
+				$user->display_name,
+				$user->user_login
+			),
+			$user
+		);
 	}
-}
-
-/**
- * Get a user's Slack member ID if available.
- *
- * @param int $user_id The user ID.
- * @return string|null The Slack member ID, or null if not available.
- */
-function _get_user_slack_id( int $user_id ) : ?string {
-	/**
-	 * Filter to retrieve a user's Slack member ID.
-	 *
-	 * @param string|null $slack_id The Slack member ID. Default null.
-	 * @param int         $user_id  The WordPress user ID.
-	 */
-	return apply_filters( 'wporg_2fa_user_slack_id', null, $user_id );
 }
 
 /**
