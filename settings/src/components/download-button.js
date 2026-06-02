@@ -4,7 +4,10 @@
 import { useCallback } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
-export default function DownloadTxtButton( { contents, fileName = 'wordpress-org-backup-codes.txt' } ) {
+export default function DownloadTxtButton( {
+	contents,
+	fileName = 'wordpress-org-backup-codes.txt',
+} ) {
 	const downloadTxtFile = useCallback( () => {
 		const element = document.createElement( 'a' );
 		const file = new Blob( [ contents ], { type: 'text/plain' } );

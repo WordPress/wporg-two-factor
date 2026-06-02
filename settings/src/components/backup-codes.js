@@ -197,7 +197,10 @@ function CodeList( { codes } ) {
 				<ButtonGroup>
 					<CopyToClipboardButton contents={ backupCodesText } />
 					<PrintButton />
-					<DownloadButton contents={ backupCodesText } fileName="wordpress-org-backup-codes.txt" />
+					<DownloadButton
+						contents={ backupCodesText }
+						fileName="wordpress-org-backup-codes.txt"
+					/>
 				</ButtonGroup>
 			) }
 		</>
