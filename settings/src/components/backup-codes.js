@@ -165,6 +165,14 @@ function Setup( { setGenerating, onSuccess } ) {
  */
 function CodeList( { codes } ) {
 	const hasCodes = !! codes.length;
+	const backupCodesText = [
+		'Two-Factor backup codes for your WordPress.org account:',
+		'',
+		...codes.map( ( code, index ) => `${ index + 1 }. ${ code }` ),
+		'',
+		'Each code can only be used once.',
+		'These codes are the only way to recover your WordPress.org account if you lose access to your phone, authentication app, or other two-factor method.',
+	].join( '\n' );
 
 	return (
 		<>
@@ -187,9 +195,12 @@ function CodeList( { codes } ) {
 			</div>
 			{ hasCodes && (
 				<ButtonGroup>
-					<CopyToClipboardButton contents={ codes } />
+					<CopyToClipboardButton contents={ backupCodesText } />
 					<PrintButton />
-					<DownloadButton codes={ codes } />
+					<DownloadButton
+						contents={ backupCodesText }
+						fileName="wordpress-org-backup-codes.txt"
+					/>
 				</ButtonGroup>
 			) }
 		</>
