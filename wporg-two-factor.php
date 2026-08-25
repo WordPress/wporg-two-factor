@@ -57,6 +57,7 @@ load_webauthn_plugin();
 add_filter( 'two_factor_providers', __NAMESPACE__ . '\two_factor_providers', 99 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_enabled_providers_for_user', __NAMESPACE__ . '\require_ordinary_provider', 99, 2 ); // Must run _after_ all other plugins.
 add_filter( 'two_factor_primary_provider_for_user', __NAMESPACE__ . '\set_primary_provider_for_user', 10, 2 );
+add_filter( 'two_factor_rest_api_can_edit_user', __NAMESPACE__ . '\deny_application_password_two_factor_changes', 10, 2 );
 add_filter( 'two_factor_totp_issuer', __NAMESPACE__ . '\set_totp_issuer' );
 add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_enabled', 1 ); // Must run _before_ all other plugins.
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
@@ -138,6 +139,28 @@ function set_primary_provider_for_user( string $provider, int $user_id ) : strin
 	}
 
 	return $provider;
+}
+
+/**
+ * Prevent Application Passwords from performing two-factor-protected account actions.
+ *
+ * They bypass the two-factor login prompt, so they must never pass the revalidation gate that guards
+ * `rest_api_can_edit_user_and_update_two_factor_options()`, even for users without 2FA enabled.
+ *
+ * @param bool|WP_Error $can_edit Whether the current user can edit the two-factor options.
+ * @param int           $user_id  The user ID being updated.
+ * @return bool|WP_Error
+ */
+function deny_application_password_two_factor_changes( $can_edit, int $user_id ) {
+	if ( rest_get_authenticated_app_password() ) {
+		return new WP_Error(
+			'application_password_forbidden',
+			__( 'Application Passwords cannot be used for this request.', 'wporg' ),
+			array( 'status' => 403 )
+		);
+	}
+
+	return $can_edit;
 }
 
 /**

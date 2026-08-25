@@ -101,7 +101,7 @@ function register_rest_routes() : void {
 			'methods'  => WP_REST_Server::EDITABLE,
 			'callback' => __NAMESPACE__ . '\rest_update_provider_status',
 			'permission_callback' => function( $request ) {
-				return current_user_can( 'edit_user', (int) $request['user_id'] );
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( $request['user_id'] );
 			},
 			'args' => array(
 				'user_id' => array(
