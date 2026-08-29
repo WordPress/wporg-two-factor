@@ -74,6 +74,8 @@ function Main( { userId, isOnboarding } ) {
 		'backup-codes',
 		'svn-password',
 		'application-passwords',
+		'recovery',
+		'contact-approval',
 	];
 
 	// Trigger a re-render when the back/forward buttons are clicked.

@@ -20,6 +20,7 @@ defined( 'WPINC' ) || die();
 require_once __DIR__ . '/settings/settings.php';
 require_once __DIR__ . '/stats.php';
 require_once __DIR__ . '/revalidation/index.php';
+require_once __DIR__ . '/recovery/recovery.php';
 
 /**
  * Load the WebAuthn plugin.
@@ -63,6 +64,7 @@ add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
 add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
+add_filter( 'two_factor_login_backup_links', __NAMESPACE__ . '\add_recovery_link_to_2fa_prompt' );
 
 /**
  * Determine which providers should be available to users.
@@ -373,6 +375,42 @@ function block_webauthn_settings_page() {
 	}
 
 	remove_submenu_page( 'options-general.php', '2fa-webauthn' );
+}
+
+/**
+ * Add a "Lost access to your device?" recovery link to the 2FA login prompt.
+ *
+ * @param array $links The existing backup method links.
+ * @return array Modified links array.
+ */
+function add_recovery_link_to_2fa_prompt( array $links ) : array {
+	// The user ID and login nonce are available from the hidden fields in the 2FA form.
+	$user_id = isset( $_REQUEST['wp-auth-id'] ) ? (int) $_REQUEST['wp-auth-id'] : 0;
+	$nonce   = isset( $_REQUEST['wp-auth-nonce'] ) ? wp_unslash( $_REQUEST['wp-auth-nonce'] ) : '';
+	$user    = $user_id ? get_userdata( $user_id ) : null;
+
+	if ( ! $user || ! $nonce ) {
+		return $links;
+	}
+
+	// Only show if the user has recovery contacts configured.
+	if ( ! Recovery\is_recovery_available( $user ) || empty( Recovery\get_designated_contacts( $user_id ) ) ) {
+		return $links;
+	}
+
+	// Forward the interim 2FA credentials so the recovery flow can authenticate the user.
+	$links[] = [
+		'url'   => add_query_arg(
+			[
+				'wp-auth-id'    => $user_id,
+				'wp-auth-nonce' => rawurlencode( $nonce ),
+			],
+			home_url( '/recovery/' )
+		),
+		'label' => __( 'Lost access to your device? Start account recovery', 'wporg' ),
+	];
+
+	return $links;
 }
 
 /**

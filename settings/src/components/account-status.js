@@ -10,6 +10,7 @@ import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpre
  */
 import { GlobalContext } from '../script';
 import ScreenLink from './screen-link';
+import RecoveryPrompt from './recovery/recovery-prompt';
 
 /**
  * Render the Account Status.
@@ -31,9 +32,11 @@ export default function AccountStatus() {
 			backupCodesEnabled,
 			webAuthnEnabled,
 			applicationPasswords,
+			recoveryContacts,
 		},
 	} = useContext( GlobalContext );
 	const emailStatus = pendingEmail ? 'pending' : 'ok';
+	const recoveryConfigured = recoveryContacts.length > 0;
 
 	const backupBodyText =
 		! backupCodesEnabled && ! hasPrimaryProvider
@@ -44,6 +47,8 @@ export default function AccountStatus() {
 
 	return (
 		<div className={ 'wporg-2fa__account-status' }>
+			<RecoveryPrompt />
+
 			<SettingStatusCard
 				screen="password"
 				status="enabled"
@@ -95,6 +100,19 @@ export default function AccountStatus() {
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
+
+			{ hasPrimaryProvider && (
+				<SettingStatusCard
+					screen="recovery"
+					status={ recoveryConfigured ? 'enabled' : 'disabled' }
+					headerText="Account recovery"
+					bodyText={
+						recoveryConfigured
+							? 'You have recovery options configured.'
+							: 'Set up recovery options in case you lose access.'
+					}
+				/>
+			) }
 
 			{ svnPasswordRequired || svnPasswordSet ? (
 				<SettingStatusCard
