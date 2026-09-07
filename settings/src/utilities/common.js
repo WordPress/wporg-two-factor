@@ -18,3 +18,65 @@ export function refreshRecord( userRecord ) {
 
 	return userRecord.save();
 }
+
+/**
+ * Return the URL if it points at wordpress.org, or one of its subdomains, over HTTPS.
+ *
+ * Both halves are required: the scheme must be `https:`, and the host must be `wordpress.org` itself or a
+ * subdomain of it (`profiles.wordpress.org`, not `notwordpress.org`). The value returned is the parser's
+ * normalised `href`, not the string that was passed in.
+ *
+ * @param  url The URL to check.
+ *
+ * @return {string|null} The normalised URL, or `null` when it is not an https wordpress.org URL.
+ */
+export function getWordPressOrgUrl( url ) {
+	let parsed;
+
+	try {
+		parsed = new URL( url );
+	} catch ( exception ) {
+		return null;
+	}
+
+	if ( 'https:' !== parsed.protocol ) {
+		return null;
+	}
+
+	if ( 'wordpress.org' !== parsed.hostname && ! parsed.hostname.endsWith( '.wordpress.org' ) ) {
+		return null;
+	}
+
+	return parsed.href;
+}
+
+// The screens each mode of the app can render. These must match the keys in `Settings` and `FirstTime`.
+const SETTINGS_SCREENS = [
+	'home',
+	'email',
+	'password',
+	'totp',
+	'backup-codes',
+	'webauthn',
+	'svn-password',
+	'application-passwords',
+];
+const ONBOARDING_SCREENS = [ 'home', 'totp', 'webauthn', 'backup-codes', 'congratulations' ];
+
+/**
+ * Read the screen from a URL's `screen` query parameter.
+ *
+ * Anything that is not a screen the current mode can render falls back to `home`, so a stale or mistyped link
+ * shows the overview instead of an unknown component.
+ *
+ * @param  url          The URL to read from.
+ * @param  isOnboarding Whether the app is in onboarding mode.
+ *
+ * @return {string} The screen slug.
+ */
+export function getScreenFromUrl( url, isOnboarding ) {
+	const screen = url.searchParams.get( 'screen' );
+	const knownScreens = isOnboarding ? ONBOARDING_SCREENS : SETTINGS_SCREENS;
+
+	return knownScreens.includes( screen ) ? screen : 'home';
+}

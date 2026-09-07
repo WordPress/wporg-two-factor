@@ -8,21 +8,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { GlobalContext } from '../../script';
-
-/**
- * Check if the URL is valid. Make sure it stays on wordpress.org.
- *
- * @param  url
- * @return {boolean} Whether it's a valid URL.
- */
-const isValidUrl = ( url ) => {
-	try {
-		const { hostname } = new URL( url );
-		return hostname.endsWith( 'wordpress.org' );
-	} catch ( exception ) {
-		return false;
-	}
-};
+import { getWordPressOrgUrl } from '../../utilities/common';
 
 export default function Congratulations() {
 	const {
@@ -80,11 +66,8 @@ export default function Congratulations() {
 							'redirect_to'
 						);
 
-						if ( redirectTo && isValidUrl( redirectTo ) ) {
-							window.location.href = redirectTo;
-						} else {
-							window.location.href = profileURL;
-						}
+						// Only follow a `redirect_to` that is an https wordpress.org URL.
+						window.location.href = getWordPressOrgUrl( redirectTo ) || profileURL;
 					} }
 					isPrimary
 				>
