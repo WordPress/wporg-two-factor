@@ -16,6 +16,7 @@ import { Spinner } from '@wordpress/components';
  * Internal dependencies
  */
 import { useUser } from './hooks/useUser';
+import { getScreenFromUrl } from './utilities/common';
 import GlobalNotice from './components/global-notice';
 import RevalidateModal from './components/revalidate-modal';
 import Settings from './components/settings';
@@ -64,8 +65,9 @@ function Main( { userId, isOnboarding } ) {
 	const [ backupCodesVerified, setBackupCodesVerified ] = useState( true );
 
 	const currentUrl = useRef( new URL( document.location.href ) );
-	const initialScreen = currentUrl.current.searchParams.get( 'screen' );
-	const [ screen, setScreen ] = useState( initialScreen === null ? 'home' : initialScreen );
+	const [ screen, setScreen ] = useState( () =>
+		getScreenFromUrl( currentUrl.current, isOnboarding )
+	);
 
 	// The screens where a recent two factor challenge is required.
 	const twoFactorRequiredScreens = [
@@ -79,12 +81,8 @@ function Main( { userId, isOnboarding } ) {
 	// Trigger a re-render when the back/forward buttons are clicked.
 	const handlePopState = useCallback( () => {
 		currentUrl.current = new URL( document.location.href );
-		const newScreen = currentUrl.current.searchParams.get( 'screen' );
-
-		if ( newScreen ) {
-			setScreen( newScreen );
-		}
-	}, [] );
+		setScreen( getScreenFromUrl( currentUrl.current, isOnboarding ) );
+	}, [ isOnboarding ] );
 
 	// Listen for back/forward button clicks.
 	useEffect( () => {
