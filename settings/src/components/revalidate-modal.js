@@ -23,9 +23,6 @@ export default function RevalidateModal() {
 			title="Two-Factor Authentication"
 			onRequestClose={ goBack }
 			className="wporg-2fa__revalidate-modal"
-			// Temporary workaround until https://github.com/WordPress/gutenberg/issues/40912 is fixed.
-			// Without this the modal immediately closes in Firefox, see https://github.com/WordPress/wporg-two-factor/issues/180
-			shouldCloseOnClickOutside={ false }
 		>
 			<p>To update your two-factor options, you must first revalidate your session.</p>
 
