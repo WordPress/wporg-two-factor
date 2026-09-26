@@ -4,6 +4,7 @@ namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
+use WordPressdotorg\Two_Factor\Recovery;
 use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, get_svn_password_creation_date };
 
 defined( 'WPINC' ) || die();
@@ -415,6 +416,138 @@ function register_user_fields(): void {
 				'type'    => [ 'boolean', 'string' ],
 				'context' => [ 'edit' ],
 			]
+		]
+	);
+
+	// Recovery fields.
+	register_rest_field(
+		'user',
+		'2fa_recovery_available',
+		[
+			'get_callback' => function( $user ) {
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\is_recovery_available( $user_obj ) : false;
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_contacts',
+		[
+			'get_callback' => function( $user ) {
+				$contacts = Recovery\get_designated_contacts( $user['id'] );
+				return array_map( function( $contact ) {
+					return [
+						'id'           => $contact->ID,
+						'login'        => $contact->user_login,
+						'display_name' => $contact->display_name,
+					];
+				}, $contacts );
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_contacts_pending',
+		[
+			'get_callback' => function( $user ) {
+				$pending_list = Recovery\get_pending_contact_designations( $user['id'] );
+				$result = [];
+				foreach ( $pending_list as $pending ) {
+					if ( Recovery\is_designation_expired( $pending ) ) {
+						continue;
+					}
+					$contact = get_userdata( $pending['contact_id'] );
+					if ( $contact ) {
+						$result[] = [
+							'contact_id'    => $contact->ID,
+							'contact_login' => $contact->user_login,
+							'requested_at'  => $pending['requested_at'],
+						];
+					}
+				}
+				return $result;
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_pending_request',
+		[
+			'get_callback' => function( $user ) {
+				$request = Recovery\get_pending_recovery( $user['id'] );
+				if ( ! $request || 'cancelled' === $request['status'] || Recovery\is_recovery_expired( $request ) ) {
+					return null;
+				}
+				return [
+					'requested_at' => $request['requested_at'],
+					'expires_at'   => (int) $request['requested_at'] + Recovery\RECOVERY_REQUEST_TTL,
+					'status'       => $request['status'],
+				];
+			},
+			'schema' => [
+				'type'    => [ 'object', 'null' ],
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_designated_for',
+		[
+			'get_callback' => function( $user ) {
+				$ids = get_user_meta( $user['id'], Recovery\DESIGNATED_FOR_META, true );
+				if ( ! is_array( $ids ) ) {
+					return [];
+				}
+				$result = [];
+				foreach ( $ids as $for_user_id ) {
+					$for_user = get_userdata( $for_user_id );
+					if ( $for_user ) {
+						$result[] = [
+							'id'           => $for_user->ID,
+							'login'        => $for_user->user_login,
+							'display_name' => $for_user->display_name,
+						];
+					}
+				}
+				return $result;
+			},
+			'schema' => [
+				'type'    => 'array',
+				'context' => [ 'edit' ],
+			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'2fa_recovery_prompt_needed',
+		[
+			'get_callback' => function( $user ) {
+				$user_obj = get_userdata( $user['id'] );
+				return $user_obj ? Recovery\check_recovery_prompt_needed( $user_obj ) : false;
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			],
 		]
 	);
 

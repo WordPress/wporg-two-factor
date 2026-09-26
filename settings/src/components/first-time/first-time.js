@@ -10,6 +10,7 @@ import ScreenNavigation from '../screen-navigation';
 import TOTP from '../totp';
 import WebAuthn from '../webauthn/webauthn';
 import BackupCodes from '../backup-codes';
+import RecoverySetup from './recovery-setup';
 import SetupProgressBar from './setup-progress-bar';
 import Home from './home';
 import Congratulations from './congratulations';
@@ -62,13 +63,24 @@ export default function FirstTime() {
 			component: (
 				<BackupCodes
 					onSuccess={ () => {
+						navigateToScreen( 'recovery-setup' );
+					} }
+				/>
+			),
+		},
+		'recovery-setup': {
+			stepIndex: 3,
+			title: 'Set up recovery options',
+			component: (
+				<RecoverySetup
+					onSuccess={ () => {
 						navigateToScreen( 'congratulations' );
 					} }
 				/>
 			),
 		},
 		congratulations: {
-			stepIndex: 3,
+			stepIndex: 4,
 			component: <Congratulations />,
 		},
 	};
@@ -87,7 +99,7 @@ export default function FirstTime() {
 			<>
 				<SetupProgressBar
 					currentStepIndex={ currentStepIndex }
-					steps={ [ 'Select', 'Configure', 'Generate codes' ] }
+					steps={ [ 'Select', 'Configure', 'Generate codes', 'Recovery' ] }
 				/>
 				<ScreenNavigation
 					screen={ screen }

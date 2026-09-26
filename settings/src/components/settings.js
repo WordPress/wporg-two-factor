@@ -15,6 +15,8 @@ import WebAuthn from './webauthn/webauthn';
 import BackupCodes from './backup-codes';
 import SVNPassword from './svn-password';
 import ApplicationPasswords from './application-passwords';
+import RecoverySettings from './recovery/recovery-settings';
+import ContactApproval from './recovery/contact-approval';
 
 import { GlobalContext } from '../script';
 
@@ -75,6 +77,14 @@ export default function Settings() {
 		'application-passwords': {
 			title: 'Application passwords',
 			component: <ApplicationPasswords />,
+		},
+		recovery: {
+			title: 'Account recovery',
+			component: <RecoverySettings />,
+		},
+		'contact-approval': {
+			title: 'Recovery contact approval',
+			component: <ContactApproval />,
 		},
 	};
 

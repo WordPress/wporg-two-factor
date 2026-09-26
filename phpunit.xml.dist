@@ -32,6 +32,8 @@
 			<file>wporg-two-factor.php</file>
 			<file>settings/settings.php</file>
 			<file>settings/rest-api.php</file>
+			<file>recovery/recovery.php</file>
+			<file>recovery/rest-api.php</file>
 		</include>
 
 		<report>
