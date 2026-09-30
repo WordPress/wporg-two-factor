@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/WordPress/wporg-two-factor#readme",
   "dependencies": {
-    "@wordpress/base-styles": "^4.17.0",
-    "@wordpress/env": "^10.1.0"
+    "@wordpress/base-styles": "^6.16.0",
+    "@wordpress/env": "^11.0.0"
   },
   "workspaces": {
     "packages": [

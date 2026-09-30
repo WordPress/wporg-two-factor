@@ -15,6 +15,9 @@ import apiFetch from '@wordpress/api-fetch';
  * Local dependencies
  */
 import ApplicationPasswords from '../../components/application-passwords';
+import { GlobalContext } from '../../script';
+
+const realUseContext = jest.requireActual( '@wordpress/element' ).useContext;
 
 jest.mock( '@wordpress/element', () => ( {
 	...jest.requireActual( '@wordpress/element' ),
@@ -57,7 +60,12 @@ describe( 'ApplicationPasswords', () => {
 
 	beforeEach( () => {
 		mockContext = createMockContext();
-		useContext.mockReturnValue( mockContext );
+		useContext.mockImplementation( ( context ) => {
+			if ( context === GlobalContext ) {
+				return mockContext;
+			}
+			return realUseContext( context );
+		} );
 		apiFetch.mockResolvedValue( {} );
 	} );
 
@@ -68,7 +76,12 @@ describe( 'ApplicationPasswords', () => {
 	describe( 'Empty state', () => {
 		it( 'should show empty message when no application passwords exist', () => {
 			mockContext = createMockContext( [] );
-			useContext.mockReturnValue( mockContext );
+			useContext.mockImplementation( ( context ) => {
+				if ( context === GlobalContext ) {
+					return mockContext;
+				}
+				return realUseContext( context );
+			} );
 
 			const { getByText } = render( <ApplicationPasswords /> );
 
@@ -77,7 +90,12 @@ describe( 'ApplicationPasswords', () => {
 
 		it( 'should not render a table when no application passwords exist', () => {
 			mockContext = createMockContext( [] );
-			useContext.mockReturnValue( mockContext );
+			useContext.mockImplementation( ( context ) => {
+				if ( context === GlobalContext ) {
+					return mockContext;
+				}
+				return realUseContext( context );
+			} );
 
 			const { queryByRole } = render( <ApplicationPasswords /> );
 

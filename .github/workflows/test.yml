@@ -8,9 +8,13 @@ on:
 
 jobs:
 
-  lint:
-    name: Test
+  test-php:
+    name: PHP ${{ matrix.php-version }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.4', '8.5']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,17 +27,36 @@ jobs:
       - name: Setup PHP and Composer
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: ${{ matrix.php-version }}
           tools: composer:v2
 
       - name: Install NPM dependencies
         run: npm install
+
+      - name: Set PHP version for wp-env
+        run: |
+          echo '{ "phpVersion": "${{ matrix.php-version }}" }' > .wp-env.override.json
 
       - name: Start the Docker testing environment
         run: npx wp-env start --xdebug=coverage
 
       - name: Test PHP
         run: npm test
+
+  test-js:
+    name: JS Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: npm install
 
       - name: Test JS
         run: npm run test:js
