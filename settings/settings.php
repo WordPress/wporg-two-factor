@@ -201,7 +201,9 @@ function login_footer_revalidate_customizations() {
 		}
 	</style>
 
-	<script>
+	<?php
+	wp_print_inline_script_tag(
+		<<<'JS'
 		(function() {
 			const loginFormExists  = !! document.querySelector( '#loginform' );
 			const loginFormMessage = document.querySelector( '#login .message' )?.textContent || '';
@@ -211,9 +213,8 @@ function login_footer_revalidate_customizations() {
 				window.parent.postMessage( { type: 'reValidationComplete', message: loginFormMessage }, '*' );
 			}
 		})();
-	</script>
-
-	<?php
+		JS
+	);
 }
 
 /**
