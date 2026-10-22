@@ -50,10 +50,8 @@ function replace_core_ui_with_custom() : void {
  * Display a warning about where to manage ones profile details.
  */
 function remove_admin_profile_php() {
-	// IS_PROFILE_PAGE isn't defined yet when network/profile.php fires this hook.
 	$user = 'load-profile.php' === current_action() ? wp_get_current_user() : get_userdata( absint( $_REQUEST['user_id'] ?? 0 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Core verifies the nonce on save.
 
-	// Core dies with "Invalid user ID." after this hook.
 	if ( ! $user ) {
 		return;
 	}
