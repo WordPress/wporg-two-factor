@@ -50,7 +50,11 @@ function replace_core_ui_with_custom() : void {
  * Display a warning about where to manage ones profile details.
  */
 function remove_admin_profile_php() {
-	$user = defined( 'IS_PROFILE_PAGE' ) ? wp_get_current_user() : get_user_by( 'id', $_REQUEST['user_id'] );
+	$user = 'load-profile.php' === current_action() ? wp_get_current_user() : get_userdata( absint( $_REQUEST['user_id'] ?? 0 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Core verifies the nonce on save.
+
+	if ( ! $user ) {
+		return;
+	}
 
 	add_action( 'admin_notices', function() use ( $user ) {
 		echo '<div class="notice notice-info"><p>';
