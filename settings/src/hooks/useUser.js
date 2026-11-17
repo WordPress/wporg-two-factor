@@ -21,6 +21,14 @@ export function useUser( userId ) {
 	const applicationPasswords = userRecord.record?.application_passwords ?? [];
 	const hasPrimaryProvider = totpEnabled || webAuthnEnabled;
 
+	// Recovery fields.
+	const recoveryAvailable = userRecord.record?.[ '2fa_recovery_available' ] ?? true;
+	const recoveryContacts = userRecord.record?.[ '2fa_recovery_contacts' ] ?? [];
+	const recoveryContactsPending = userRecord.record?.[ '2fa_recovery_contacts_pending' ] ?? [];
+	const recoveryPendingRequest = userRecord.record?.[ '2fa_recovery_pending_request' ] ?? null;
+	const recoveryPromptNeeded = userRecord.record?.[ '2fa_recovery_prompt_needed' ] ?? false;
+	const designatedFor = userRecord.record?.[ '2fa_designated_for' ] ?? [];
+
 	return {
 		userRecord,
 		isSaving,
@@ -31,5 +39,11 @@ export function useUser( userId ) {
 		webAuthnEnabled,
 		backupCodesRemaining,
 		applicationPasswords,
+		recoveryAvailable,
+		recoveryContacts,
+		recoveryContactsPending,
+		recoveryPendingRequest,
+		recoveryPromptNeeded,
+		designatedFor,
 	};
 }
