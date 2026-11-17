@@ -58,10 +58,7 @@ function preload_api_requests( array $preload_paths ) : void {
 
 	// The script may have already been printed. In that case, add the pre-loading inline now.
 	if ( wp_script_is( 'wp-api-fetch', 'done' ) ) {
-		printf(
-			'<script>%s</script>',
-			$preload_js
-		);
+		wp_print_inline_script_tag( $preload_js );
 	} else {
 		wp_enqueue_script( 'wp-api-fetch' );
 		wp_add_inline_script(
