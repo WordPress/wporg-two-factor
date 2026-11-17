@@ -175,6 +175,26 @@ class Test_WPorg_Two_Factor_Settings_REST_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The provider must be a string naming a known provider.
+	 *
+	 * @covers WordPressdotorg\Two_Factor\register_rest_routes
+	 */
+	public function test_provider_status_rejects_non_string_provider() : void {
+		wp_set_current_user( self::$privileged_user->ID, self::$privileged_user->user_login );
+
+		$request = new WP_REST_Request( 'POST', '/wporg-two-factor/1.0/provider-status' );
+		$request->set_query_params( array(
+			'user_id'  => self::$privileged_user->ID,
+			'provider' => array( 'Two_Factor_Totp' ),
+			'status'   => 'enable',
+		) );
+		$response = rest_do_request( $request );
+
+		$this->assertTrue( $response->is_error() );
+		$this->assertSame( 'rest_invalid_param', $response->as_error()->get_error_code() );
+	}
+
+	/**
 	 * An Application Password bypasses the two-factor login prompt, so it must not be able to
 	 * change two-factor settings even for a user who has not enabled two-factor yet (where the
 	 * revalidation check would otherwise allow it).

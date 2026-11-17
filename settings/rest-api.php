@@ -118,7 +118,7 @@ function register_rest_routes() : void {
 					'type'     => 'string',
 					'validate_callback' => function( $provider ) {
 						$valid_providers = Two_Factor_Core::get_providers();
-						return array_key_exists( $provider, $valid_providers );
+						return is_string( $provider ) && array_key_exists( $provider, $valid_providers );
 					},
 				),
 
