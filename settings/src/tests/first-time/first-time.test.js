@@ -1,35 +1,30 @@
-/* global jest, describe, afterEach, it, expect */
-
 /**
  * External dependencies
  */
 import { render } from '@testing-library/react';
 
 /**
- * WordPress dependencies
- */
-import { useContext } from '@wordpress/element';
-
-/**
  * Local dependencies
  */
 import FirstTime from '../../components/first-time/first-time';
+import { mockGlobalContext } from '../mock-global-context';
 
-jest.mock( '@wordpress/element', () => ( {
-	...jest.requireActual( '@wordpress/element' ),
-	useContext: jest.fn(),
-} ) );
+vi.mock( '@wordpress/element', async () => {
+	const actual = await vi.importActual( '@wordpress/element' );
 
-jest.mock( '../../script', () => ( { GlobalContext: {} } ) );
-jest.mock( '../../components/totp', () => () => null );
-jest.mock( '../../components/webauthn/webauthn', () => () => null );
-jest.mock( '../../components/backup-codes', () => () => null );
-jest.mock( '../../components/first-time/home', () => () => null );
-jest.mock( '../../components/first-time/congratulations', () => () => null );
+	return { ...actual, useContext: vi.fn( actual.useContext ) };
+} );
+
+vi.mock( '../../script', () => ( { GlobalContext: {} } ) );
+vi.mock( '../../components/totp', () => ( { default: () => null } ) );
+vi.mock( '../../components/webauthn/webauthn', () => ( { default: () => null } ) );
+vi.mock( '../../components/backup-codes', () => ( { default: () => null } ) );
+vi.mock( '../../components/first-time/home', () => ( { default: () => null } ) );
+vi.mock( '../../components/first-time/congratulations', () => ( { default: () => null } ) );
 
 const renderScreen = ( screen, hasPrimaryProvider, error = '' ) => {
-	useContext.mockReturnValue( {
-		navigateToScreen: jest.fn(),
+	mockGlobalContext( {
+		navigateToScreen: vi.fn(),
 		screen,
 		user: { hasPrimaryProvider },
 		error,
@@ -40,7 +35,7 @@ const renderScreen = ( screen, hasPrimaryProvider, error = '' ) => {
 
 describe( 'FirstTime', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should not offer Back on backup codes once a primary method is set up', () => {
