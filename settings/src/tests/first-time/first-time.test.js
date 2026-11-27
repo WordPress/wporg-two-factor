@@ -27,11 +27,12 @@ jest.mock( '../../components/backup-codes', () => () => null );
 jest.mock( '../../components/first-time/home', () => () => null );
 jest.mock( '../../components/first-time/congratulations', () => () => null );
 
-const renderScreen = ( screen, hasPrimaryProvider ) => {
+const renderScreen = ( screen, hasPrimaryProvider, error = '' ) => {
 	useContext.mockReturnValue( {
 		navigateToScreen: jest.fn(),
 		screen,
 		user: { hasPrimaryProvider },
+		error,
 	} );
 
 	return render( <FirstTime /> );
@@ -46,6 +47,12 @@ describe( 'FirstTime', () => {
 		const { queryByText } = renderScreen( 'backup-codes', true );
 
 		expect( queryByText( 'Back' ) ).toBeNull();
+	} );
+
+	it( 'should offer Back on backup codes if generating the codes failed', () => {
+		const { queryByText } = renderScreen( 'backup-codes', true, { message: 'Error' } );
+
+		expect( queryByText( 'Back' ) ).not.toBeNull();
 	} );
 
 	it( 'should offer Back on backup codes before a primary method is set up', () => {

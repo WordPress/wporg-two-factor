@@ -23,6 +23,7 @@ export default function FirstTime() {
 		navigateToScreen,
 		screen,
 		user: { hasPrimaryProvider },
+		error,
 	} = useContext( GlobalContext );
 
 	// The index is the URL slug and the value is the React component.
@@ -78,9 +79,9 @@ export default function FirstTime() {
 	};
 
 	const currentStepIndex = screens[ screen ].stepIndex;
-	// Going back from backup codes after adding a method would restart setup, so require the codes first.
+	// Back from backup codes after adding a method restarts setup, so only offer it if generating codes failed.
 	const canNavigate =
-		currentStepIndex !== 0 && ! ( 'backup-codes' === screen && hasPrimaryProvider );
+		currentStepIndex !== 0 && ! ( 'backup-codes' === screen && hasPrimaryProvider && ! error );
 	let currentScreenComponent = null;
 
 	if ( 'congratulations' === screen ) {
