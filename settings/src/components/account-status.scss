@@ -82,7 +82,10 @@
 			fill: $alert-yellow;
 		}
 
-		&.is-info,
+		&.is-info {
+			fill: $gray-700;
+		}
+
 		&.is-disabled,
 		&.is-error {
 			fill: $alert-red;
