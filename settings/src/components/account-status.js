@@ -3,7 +3,7 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, chevronRight, warning } from '@wordpress/icons';
+import { Icon, cancelCircleFilled, check, chevronRight, info, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -201,6 +201,9 @@ function StatusIcon( { status } ) {
 			break;
 
 		case 'info':
+			icon = info;
+			break;
+
 		case 'error':
 		case 'disabled':
 		default:
