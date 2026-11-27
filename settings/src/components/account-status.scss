@@ -68,6 +68,7 @@
 			.wporg-2fa__status-card-open {
 				grid-area: open;
 				align-self: center;
+				color: $black;
 			}
 		}
 	}
@@ -75,20 +76,20 @@
 	.wporg-2fa__status-icon {
 		&.is-enabled,
 		&.is-ok {
-			fill: $black;
+			color: $black;
 		}
 
 		&.is-pending {
-			fill: $alert-yellow;
+			color: $alert-yellow;
 		}
 
 		&.is-info {
-			fill: $gray-700;
+			color: $gray-700;
 		}
 
 		&.is-disabled,
 		&.is-error {
-			fill: $alert-red;
+			color: $alert-red;
 		}
 	}
 }

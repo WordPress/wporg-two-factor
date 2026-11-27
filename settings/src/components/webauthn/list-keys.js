@@ -3,7 +3,7 @@
  */
 import { Button, Modal, Notice } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled, key as keyIcon } from '@wordpress/icons';
+import { Icon, close, key as keyIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -119,7 +119,7 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ error }
 				</Notice>
 			) }

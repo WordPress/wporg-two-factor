@@ -1,5 +1,3 @@
-/* global jest, describe, beforeAll, afterEach, it, expect */
-
 /**
  * External dependencies
  */
@@ -8,24 +6,25 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Local dependencies
  */
+import { mockGlobalContext } from '../mock-global-context';
 import { GlobalContext } from '../../script';
 import Password from '../../components/password';
 import { mockPasswordEstimator } from './mocks';
 
 // Mock the context
-jest.mock( '@wordpress/element', () => ( {
-	...jest.requireActual( '@wordpress/element' ),
-	useContext: jest.fn(),
-} ) );
+vi.mock( '@wordpress/element', async () => {
+	const actual = await vi.importActual( '@wordpress/element' );
+
+	return { ...actual, useContext: vi.fn( actual.useContext ) };
+} );
 
 // Mock the return value of any api calls
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( '@wordpress/api-fetch' );
 
 // We set this after making a request.
 apiFetch.nonceMiddleware = { nonce: '' };
@@ -37,8 +36,8 @@ const mockContext = {
 			editedRecord: {
 				password: 'password',
 			},
-			edit: jest.fn(),
-			save: jest.fn(),
+			edit: vi.fn(),
+			save: vi.fn(),
 			hasEdits: false,
 			record: {
 				'2fa_required': true,
@@ -46,14 +45,14 @@ const mockContext = {
 		},
 		isSaving: false,
 	},
-	setGlobalNotice: jest.fn(),
+	setGlobalNotice: vi.fn(),
 };
 
 describe( 'Password', () => {
 	beforeAll( () => {
 		apiFetch.mockReturnValue(
 			Promise.resolve( {
-				text: jest.fn(),
+				text: vi.fn(),
 			} )
 		);
 	} );
@@ -69,7 +68,7 @@ describe( 'Password', () => {
 		const strongPasswordRegex = /Your password is strong enough to be saved./i;
 
 		it( 'should not display any notice on load', () => {
-			useContext.mockReturnValue( mockContext );
+			mockGlobalContext( mockContext );
 
 			const { queryAllByText } = render( <Password />, {
 				wrapper: ( { children } ) => (
@@ -89,7 +88,7 @@ describe( 'Password', () => {
 			mockContext.user.userRecord.editedRecord.password = 'weak';
 			mockContext.user.userRecord.hasEdits = true;
 
-			useContext.mockReturnValue( mockContext );
+			mockGlobalContext( mockContext );
 
 			// We'll mock the password estimator to return a score of 1.
 			mockPasswordEstimator( 1 );
@@ -117,7 +116,7 @@ describe( 'Password', () => {
 			mockContext.user.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
 			mockContext.user.userRecord.hasEdits = true;
 
-			useContext.mockReturnValue( mockContext );
+			mockGlobalContext( mockContext );
 
 			// We'll mock the password estimator to return a score of 4.
 			mockPasswordEstimator( 4 );
@@ -136,7 +135,7 @@ describe( 'Password', () => {
 	} );
 
 	it( 'should update the user record password', () => {
-		useContext.mockReturnValue( mockContext );
+		mockGlobalContext( mockContext );
 
 		const { getByLabelText } = render( <Password />, {
 			wrapper: ( { children } ) => (
@@ -158,7 +157,7 @@ describe( 'Password', () => {
 		mockContext.user.userRecord.editedRecord.password = '@#4asdf34asdfasdf';
 		mockContext.user.userRecord.hasEdits = true;
 
-		useContext.mockReturnValue( mockContext );
+		mockGlobalContext( mockContext );
 
 		// We'll mock the password estimator to return a score of 4.
 		mockPasswordEstimator( 4 );
@@ -177,7 +176,7 @@ describe( 'Password', () => {
 	} );
 
 	it( 'should submit form on enter', () => {
-		useContext.mockReturnValue( mockContext );
+		mockGlobalContext( mockContext );
 
 		const { getByLabelText } = render( <Password />, {
 			wrapper: ( { children } ) => (

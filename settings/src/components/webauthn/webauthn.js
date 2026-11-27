@@ -3,7 +3,7 @@
  */
 import { Button, Flex, Notice, Spinner, Modal } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, close } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -146,7 +146,7 @@ export default function WebAuthn( { onKeyAdd = () => {} } ) {
 
 			{ statusError && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ statusError }
 				</Notice>
 			) }

@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Flex, Modal, Notice, Spinner } from '@wordpress/components';
-import { Icon, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, close } from '@wordpress/icons';
 import { RawHTML, useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
@@ -285,7 +285,7 @@ function SetupForm( {
 		<div className="wporg-2fa__setup-form-container">
 			{ error && (
 				<Notice status="error" isDismissible={ false } className="is-shown">
-					<Icon icon={ cancelCircleFilled } /> { error }
+					<Icon icon={ close } /> { error }
 				</Notice>
 			) }
 
@@ -406,7 +406,7 @@ function Manage() {
 
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ error }
 				</Notice>
 			) }

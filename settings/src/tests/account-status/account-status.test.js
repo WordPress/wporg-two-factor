@@ -1,5 +1,3 @@
-/* global jest, describe, afterEach, it, expect */
-
 /**
  * External dependencies
  */
@@ -8,29 +6,25 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
-import { Icon, cancelCircleFilled, info } from '@wordpress/icons';
+import { Icon, close, info } from '@wordpress/icons';
 
 /**
  * Local dependencies
  */
+import { mockGlobalContext } from '../mock-global-context';
 import AccountStatus from '../../components/account-status';
 
-jest.mock( '@wordpress/element', () => ( {
-	...jest.requireActual( '@wordpress/element' ),
-	useContext: jest.fn(),
-} ) );
+vi.mock( '@wordpress/element', async () => {
+	const actual = await vi.importActual( '@wordpress/element' );
 
-jest.mock( '../../script', () => ( { GlobalContext: {} } ) );
-jest.mock(
-	'../../components/screen-link',
-	() =>
-		( { anchorText } ) =>
-			anchorText
-);
+	return { ...actual, useContext: vi.fn( actual.useContext ) };
+} );
+
+vi.mock( '../../script', () => ( { GlobalContext: {} } ) );
+vi.mock( '../../components/screen-link', () => ( { default: ( { anchorText } ) => anchorText } ) );
 
 const renderStatus = ( user ) => {
-	useContext.mockReturnValue( {
+	mockGlobalContext( {
 		user: {
 			userRecord: { record: { email: 'user@example.org' } },
 			hasPrimaryProvider: false,
@@ -56,7 +50,7 @@ const statusIcon = ( container, screen ) =>
 
 describe( 'AccountStatus', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should show an info icon, not an error icon, for an optional method that is not set up', () => {
@@ -77,8 +71,6 @@ describe( 'AccountStatus', () => {
 		const icon = statusIcon( container, 'webauthn' );
 
 		expect( icon.classList.contains( 'is-disabled' ) ).toBe( true );
-		expect( icon.querySelector( 'path' ).getAttribute( 'd' ) ).toBe(
-			iconPath( cancelCircleFilled )
-		);
+		expect( icon.querySelector( 'path' ).getAttribute( 'd' ) ).toBe( iconPath( close ) );
 	} );
 } );

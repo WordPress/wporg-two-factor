@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { useContext, useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button, ButtonGroup, CheckboxControl, Flex, Notice, Spinner } from '@wordpress/components';
-import { Icon, warning, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, caution, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,7 +32,7 @@ export default function BackupCodes( { onSuccess = () => {} } ) {
 	if ( ! hasPrimaryProvider ) {
 		return (
 			<Notice status="error" isDismissible={ false }>
-				<Icon icon={ cancelCircleFilled } />
+				<Icon icon={ close } />
 				Please
 				<ScreenLink screen="home" anchorText="enable a Two-Factor security key or app" />
 				before enabling backup codes.
@@ -118,7 +118,7 @@ function Setup( { setGenerating, onSuccess } ) {
 				<p>Please print the codes and keep them in a safe place.</p>
 
 				<Notice status="warning" isDismissible={ false }>
-					<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+					<Icon icon={ caution } className="wporg-2fa__print-codes-warning" />
 					Without access to the one-time password app or a backup code, you will lose
 					access to your account. Once you navigate away from this page, you will not be
 					be able to view these codes again.
@@ -127,7 +127,7 @@ function Setup( { setGenerating, onSuccess } ) {
 
 			{ error ? (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ error.message }
 				</Notice>
 			) : (
@@ -238,7 +238,7 @@ function Manage( { setGenerating } ) {
 
 				{ backupCodesEnabled && backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } />
+						<Icon icon={ caution } />
 						<div>
 							You only have <strong>{ backupCodesRemaining }</strong> backup codes
 							remaining. Please regenerate and save new ones before you run out. If

@@ -1,5 +1,3 @@
-/* global jest, describe, beforeEach, afterEach, it, expect */
-
 /**
  * External dependencies
  */
@@ -8,20 +6,21 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Local dependencies
  */
+import { mockGlobalContext } from '../mock-global-context';
 import ApplicationPasswords from '../../components/application-passwords';
 
-jest.mock( '@wordpress/element', () => ( {
-	...jest.requireActual( '@wordpress/element' ),
-	useContext: jest.fn(),
-} ) );
+vi.mock( '@wordpress/element', async () => {
+	const actual = await vi.importActual( '@wordpress/element' );
 
-jest.mock( '@wordpress/api-fetch' );
+	return { ...actual, useContext: vi.fn( actual.useContext ) };
+} );
+
+vi.mock( '@wordpress/api-fetch' );
 
 const mockAppPasswords = [
 	{
@@ -44,12 +43,12 @@ const createMockContext = ( appPasswords = mockAppPasswords ) => ( {
 	user: {
 		userRecord: {
 			record: { id: 1 },
-			edit: jest.fn(),
-			save: jest.fn().mockResolvedValue( true ),
+			edit: vi.fn(),
+			save: vi.fn().mockResolvedValue( true ),
 		},
 		applicationPasswords: appPasswords,
 	},
-	setGlobalNotice: jest.fn(),
+	setGlobalNotice: vi.fn(),
 } );
 
 describe( 'ApplicationPasswords', () => {
@@ -57,18 +56,18 @@ describe( 'ApplicationPasswords', () => {
 
 	beforeEach( () => {
 		mockContext = createMockContext();
-		useContext.mockReturnValue( mockContext );
+		mockGlobalContext( mockContext );
 		apiFetch.mockResolvedValue( {} );
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'Empty state', () => {
 		it( 'should show empty message when no application passwords exist', () => {
 			mockContext = createMockContext( [] );
-			useContext.mockReturnValue( mockContext );
+			mockGlobalContext( mockContext );
 
 			const { getByText } = render( <ApplicationPasswords /> );
 
@@ -77,7 +76,7 @@ describe( 'ApplicationPasswords', () => {
 
 		it( 'should not render a table when no application passwords exist', () => {
 			mockContext = createMockContext( [] );
-			useContext.mockReturnValue( mockContext );
+			mockGlobalContext( mockContext );
 
 			const { queryByRole } = render( <ApplicationPasswords /> );
 
