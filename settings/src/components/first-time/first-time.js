@@ -19,7 +19,11 @@ import { GlobalContext } from '../../script';
  * Render the correct component based on the URL.
  */
 export default function FirstTime() {
-	const { navigateToScreen, screen } = useContext( GlobalContext );
+	const {
+		navigateToScreen,
+		screen,
+		user: { hasPrimaryProvider },
+	} = useContext( GlobalContext );
 
 	// The index is the URL slug and the value is the React component.
 	const screens = {
@@ -74,6 +78,9 @@ export default function FirstTime() {
 	};
 
 	const currentStepIndex = screens[ screen ].stepIndex;
+	// Going back from backup codes after adding a method would restart setup, so require the codes first.
+	const canNavigate =
+		currentStepIndex !== 0 && ! ( 'backup-codes' === screen && hasPrimaryProvider );
 	let currentScreenComponent = null;
 
 	if ( 'congratulations' === screen ) {
@@ -92,7 +99,7 @@ export default function FirstTime() {
 				<ScreenNavigation
 					screen={ screen }
 					title={ screens[ screen ].title }
-					canNavigate={ currentStepIndex !== 0 }
+					canNavigate={ canNavigate }
 				>
 					{ screens[ screen ].component }
 				</ScreenNavigation>
