@@ -4,8 +4,6 @@
  * @param {number} returnValue The score that is returned by the mocked zxcvbn library.
  */
 export const mockPasswordEstimator = ( returnValue = 0 ) => {
-	// Mock the zxcvbn library
-	global.window = Object.create( window );
 	Object.defineProperty( window, 'zxcvbn', {
 		value: () => {
 			return {

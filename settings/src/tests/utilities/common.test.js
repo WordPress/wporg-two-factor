@@ -1,5 +1,3 @@
-/* global jest, it, describe, beforeEach, expect, afterEach */
-
 /**
  * Local dependencies
  */
@@ -10,8 +8,8 @@ describe( 'refreshRecord', () => {
 
 	beforeEach( () => {
 		mockRecord = {
-			edit: jest.fn(),
-			save: jest.fn(),
+			edit: vi.fn(),
+			save: vi.fn(),
 		};
 	} );
 

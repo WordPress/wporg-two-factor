@@ -3,7 +3,7 @@
  */
 import { Button, TextControl, Notice } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -109,7 +109,7 @@ export default function EmailAddress() {
 
 			{ emailError && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ emailError }
 				</Notice>
 			) }

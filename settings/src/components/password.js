@@ -13,7 +13,7 @@ import { generatePassword } from '@automattic/generate-password';
  */
 import { Button, Flex, Notice, TextControl } from '@wordpress/components';
 import { useCallback, useContext, useEffect, useState } from '@wordpress/element';
-import { Icon, cancelCircleFilled, check, seen, unseen } from '@wordpress/icons';
+import { Icon, close, check, seen, unseen } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -153,7 +153,7 @@ export default function Password() {
 
 			{ hasEdits && editedRecord.password && hasAttemptedSave && ! passwordStrong && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					That password is too easy to compromise. Please make it longer and/or add random
 					numbers/symbols.
 				</Notice>
@@ -161,7 +161,7 @@ export default function Password() {
 
 			{ saveError && (
 				<Notice status="error" isDismissible={ false }>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 					{ saveError }
 				</Notice>
 			) }

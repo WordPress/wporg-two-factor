@@ -1,5 +1,3 @@
-/* global jest, it, describe, beforeEach, expect */
-
 /**
  * WordPress dependencies
  */
@@ -12,8 +10,8 @@ import { renderHook } from '@testing-library/react';
  */
 import { useUser } from '../../hooks/useUser';
 
-jest.mock( '@wordpress/data' );
-jest.mock( '@wordpress/core-data' );
+vi.mock( '@wordpress/data', () => ( { useSelect: vi.fn() } ) );
+vi.mock( '@wordpress/core-data', () => ( { store: {}, useEntityRecord: vi.fn() } ) );
 
 describe( 'useUser', () => {
 	beforeEach( () => {

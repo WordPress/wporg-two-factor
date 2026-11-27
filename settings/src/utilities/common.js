@@ -35,7 +35,7 @@ export function getWordPressOrgUrl( url ) {
 
 	try {
 		parsed = new URL( url );
-	} catch ( exception ) {
+	} catch {
 		return null;
 	}
 
