@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { GlobalContext } from '../script';
-import { Modal } from '@wordpress/components';
+import { Modal, Notice } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities/common';
 
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
+	const [ error, setError ] = useState( '' );
 
 	const goBack = useCallback(
 		( event ) => {
@@ -29,13 +30,20 @@ export default function RevalidateModal() {
 		>
 			<p>To update your two-factor options, you must first revalidate your session.</p>
 
-			<RevalidateIframe />
+			{ error && (
+				<Notice status="error" isDismissible={ false }>
+					{ error }
+				</Notice>
+			) }
+
+			<RevalidateIframe setError={ setError } />
 		</Modal>
 	);
 }
 
-function RevalidateIframe() {
+function RevalidateIframe( { setError } ) {
 	const {
+		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
 	const { record } = userRecord;
@@ -59,7 +67,12 @@ function RevalidateIframe() {
 			try {
 				await refreshRecord( userRecordRef.current );
 			} catch ( error ) {
-				// TODO: handle error more properly here, likely by showing a error notice
+				const message =
+					'Your session was revalidated, but your account details could not be refreshed. Please reload the page and try again.';
+
+				// The modal unmounts on the edit when only the client-side expiry triggered it, so show both.
+				setError( message );
+				setGlobalNotice( { message, isError: true } );
 				// eslint-disable-next-line no-console
 				console.error( 'Failed to refresh user record:', error );
 			}
@@ -70,7 +83,7 @@ function RevalidateIframe() {
 		return () => {
 			window.removeEventListener( 'message', maybeRefreshUser );
 		};
-	}, [] );
+	}, [ setError, setGlobalNotice ] );
 
 	return (
 		<iframe

@@ -26,4 +26,8 @@
 
 		fill: $alert-green;
 	}
+
+	&.is-error .components-snackbar__icon {
+		fill: $alert-red;
+	}
 }
