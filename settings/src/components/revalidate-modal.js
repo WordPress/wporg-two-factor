@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { GlobalContext } from '../script';
-import { Modal } from '@wordpress/components';
+import { Modal, Notice } from '@wordpress/components';
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { refreshRecord } from '../utilities/common';
 
 export default function RevalidateModal() {
 	const { navigateToScreen } = useContext( GlobalContext );
+	const [ error, setError ] = useState( '' );
 
 	const goBack = useCallback(
 		( event ) => {
@@ -29,12 +30,18 @@ export default function RevalidateModal() {
 		>
 			<p>To update your two-factor options, you must first revalidate your session.</p>
 
-			<RevalidateIframe />
+			{ error && (
+				<Notice status="error" isDismissible={ false }>
+					{ error }
+				</Notice>
+			) }
+
+			<RevalidateIframe setError={ setError } />
 		</Modal>
 	);
 }
 
-function RevalidateIframe() {
+function RevalidateIframe( { setError } ) {
 	const {
 		user: { userRecord },
 	} = useContext( GlobalContext );
@@ -56,12 +63,13 @@ function RevalidateIframe() {
 			recordRef.current[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
+			setError( '' );
 			try {
 				await refreshRecord( userRecordRef.current );
-			} catch ( error ) {
-				// TODO: handle error more properly here, likely by showing a error notice
-				// eslint-disable-next-line no-console
-				console.error( 'Failed to refresh user record:', error );
+			} catch {
+				setError(
+					'Your session was revalidated, but your account details could not be refreshed. Please reload the page and try again.'
+				);
 			}
 		}
 
@@ -70,7 +78,7 @@ function RevalidateIframe() {
 		return () => {
 			window.removeEventListener( 'message', maybeRefreshUser );
 		};
-	}, [] );
+	}, [ setError ] );
 
 	return (
 		<iframe
