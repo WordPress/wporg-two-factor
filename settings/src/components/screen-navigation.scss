@@ -23,4 +23,20 @@
 		margin: unset;
 	}
 
+	// Stack the Back link above the title where there's no room for both on one line.
+	@media (max-width: 600px) {
+		flex-direction: column !important;
+		gap: 8px;
+
+		a {
+			position: static;
+			align-self: flex-start;
+			margin-left: 24px;
+		}
+
+		h3 {
+			text-align: center;
+		}
+	}
+
 }
