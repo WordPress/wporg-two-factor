@@ -43,6 +43,7 @@ export default function RevalidateModal() {
 
 function RevalidateIframe( { setError } ) {
 	const {
+		setGlobalNotice,
 		user: { userRecord },
 	} = useContext( GlobalContext );
 	const { record } = userRecord;
@@ -63,13 +64,17 @@ function RevalidateIframe( { setError } ) {
 			recordRef.current[ '2fa_revalidation' ].expires_at = new Date().getTime() / 1000 + 3600;
 
 			// Refresh the user record, to fetch the correct 2fa_revalidation data.
-			setError( '' );
 			try {
 				await refreshRecord( userRecordRef.current );
-			} catch {
-				setError(
-					'Your session was revalidated, but your account details could not be refreshed. Please reload the page and try again.'
-				);
+			} catch ( error ) {
+				const message =
+					'Your session was revalidated, but your account details could not be refreshed. Please reload the page and try again.';
+
+				// The modal unmounts on the edit when only the client-side expiry triggered it, so show both.
+				setError( message );
+				setGlobalNotice( { message, isError: true } );
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to refresh user record:', error );
 			}
 		}
 
@@ -78,7 +83,7 @@ function RevalidateIframe( { setError } ) {
 		return () => {
 			window.removeEventListener( 'message', maybeRefreshUser );
 		};
-	}, [ setError ] );
+	}, [ setError, setGlobalNotice ] );
 
 	return (
 		<iframe

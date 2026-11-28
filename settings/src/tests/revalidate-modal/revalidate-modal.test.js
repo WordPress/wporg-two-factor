@@ -26,6 +26,7 @@ jest.mock( '../../script', () => ( {
 
 const createMockContext = ( save ) => ( {
 	navigateToScreen: jest.fn(),
+	setGlobalNotice: jest.fn(),
 	user: {
 		userRecord: {
 			record: {
@@ -49,33 +50,54 @@ const sendRevalidationComplete = async () => {
 	} );
 };
 
-// The modal renders in a portal, and the notice's screen reader announcement outlives each test.
-const getErrorNotice = () => document.querySelector( '.components-notice.is-error' );
-
 describe( 'RevalidateModal', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 
 	describe( 'when refreshing the user record fails', () => {
+		let context;
+
 		beforeEach( () => {
-			useContext.mockReturnValue(
-				createMockContext( jest.fn().mockRejectedValue( new Error( 'Network error' ) ) )
+			jest.spyOn( console, 'error' ).mockImplementation( () => {} );
+			context = createMockContext(
+				jest.fn().mockRejectedValue( new Error( 'Network error' ) )
 			);
+			useContext.mockReturnValue( context );
 		} );
 
-		it( 'should show an error notice', async () => {
+		it( 'should show the error in the global notice after the modal closes', async () => {
+			const { unmount } = render( <RevalidateModal /> );
+
+			// In the app, the edit marks the session as valid, which unmounts the modal before the save fails.
+			context.user.userRecord.edit.mockImplementation( unmount );
+
+			await sendRevalidationComplete();
+
+			expect( context.setGlobalNotice ).toHaveBeenCalledWith( {
+				message: expect.stringMatching( /could not be refreshed/ ),
+				isError: true,
+			} );
+		} );
+
+		it( 'should show the error in the modal when it stays open', async () => {
 			render( <RevalidateModal /> );
 
 			await sendRevalidationComplete();
 
-			expect( getErrorNotice()?.textContent ).toMatch( /could not be refreshed/ );
+			// The modal renders in a portal, so query the whole document.
+			expect( document.querySelector( '.components-notice.is-error' )?.textContent ).toMatch(
+				/could not be refreshed/
+			);
 		} );
 	} );
 
 	describe( 'when refreshing the user record succeeds', () => {
+		let context;
+
 		beforeEach( () => {
-			useContext.mockReturnValue( createMockContext( jest.fn().mockResolvedValue( true ) ) );
+			context = createMockContext( jest.fn().mockResolvedValue( true ) );
+			useContext.mockReturnValue( context );
 		} );
 
 		it( 'should not show an error notice', async () => {
@@ -83,7 +105,7 @@ describe( 'RevalidateModal', () => {
 
 			await sendRevalidationComplete();
 
-			expect( getErrorNotice() ).toBeNull();
+			expect( context.setGlobalNotice ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
