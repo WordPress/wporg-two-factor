@@ -13,7 +13,9 @@ import { renderHook } from '@testing-library/react';
 import { useUser } from '../../hooks/useUser';
 
 jest.mock( '@wordpress/data' );
-jest.mock( '@wordpress/core-data' );
+jest.mock( '@wordpress/core-data', () => ( {
+	useEntityRecord: jest.fn(),
+} ) );
 
 describe( 'useUser', () => {
 	beforeEach( () => {
